@@ -120,7 +120,7 @@ check_sys() {
   fi
 
   if [[ -z "${get_arch}" ]]; then
-    echo_content red "仅支持amd64处理器架构"
+    echo_content red "仅支持x86_64/amd64处理器架构"
     exit 1
   fi
 }
@@ -282,15 +282,19 @@ k8s_run() {
 
 # 安装k8s网络
 k8s_network_install() {
-  echo_content green "---> 安装k8s网络"
-  if [[ ${network} == "flannel" ]]; then
-    wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${kube_flannel_url}
-    kubectl create -f /k8sdata/network/flannelkube-flannel.yml
-  elif [[ ${network} == "calico" ]]; then
-    wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${calico_url}
-    kubectl create -f /k8sdata/network/flannelkube-flannel.yml
+  if [[ -n ${network} ]]; then
+    echo_content green "---> 安装k8s网络"
+    if [[ ${network} == "flannel" ]]; then
+      wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${kube_flannel_url}
+      kubectl create -f /k8sdata/network/flannelkube-flannel.yml
+    elif [[ ${network} == "calico" ]]; then
+      wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${calico_url}
+      kubectl create -f /k8sdata/network/flannelkube-flannel.yml
+    fi
+    echo_content skyBlue "---> k8s网络安装完成"
+  else
+    echo_content red "---> 未设置k8s网络"
   fi
-  echo_content skyBlue "---> k8s网络安装完成"
 }
 
 # k8s命令行补全
@@ -298,7 +302,7 @@ k8s_bash_completion() {
   if [[ $(command -v kubectl) ]]; then
     ! grep -q kubectl "$HOME/.bashrc" && echo "source <(kubectl completion bash)" >>"$HOME/.bashrc"
   fi
-  if [[ $(command -v kubectl) ]]; then
+  if [[ $(command -v kubeadm) ]]; then
     ! grep -q kubeadm "$HOME/.bashrc" && echo "source <(kubeadm completion bash)" >>"$HOME/.bashrc"
   fi
   source "$HOME/.bashrc"
