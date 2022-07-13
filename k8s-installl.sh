@@ -72,13 +72,8 @@ can_connect() {
 }
 
 set_hostname() {
-  local hostname=$1
-  if [[ ${hostname} =~ '_' ]]; then
-    echo_content red "hostname can't contain '_' character, auto change to '-'.."
-    hostname=$(echo "${hostname}" | sed 's/_/-/g')
-  fi
-  echo "127.0.0.1 ${hostname}" >>/etc/hosts
-  hostnamectl --static set-hostname "${hostname}"
+  echo "127.0.0.1 $1" >>/etc/hosts
+  hostnamectl --static set-hostname "$1"
 }
 
 check_sys() {
@@ -86,7 +81,7 @@ check_sys() {
     echo_content red "必须是 root 才能运行此脚本"
     exit 1
   fi
-  if [[ $(cat /proc/cpuinfo | grep "processor" | wc -l) == 1 && ${is_master} == 1 ]]; then
+  if [[ $(grep -c "processor" /proc/cpuinfo) == 1 && ${is_master} == 1 ]]; then
     echo_content red "主节点 需要 2 CPU 核或更多"
     exit 1
   fi
@@ -292,10 +287,10 @@ k8s_network_install() {
 
 k8s_bash_completion() {
   if [[ $(command -v kubectl) ]]; then
-    [[ -z $(grep kubectl ~/.bashrc) ]] && echo "source <(kubectl completion bash)" >>~/.bashrc
+    ! grep -q kubectl "$HOME/.bashrc" && echo "source <(kubectl completion bash)" >>~/.bashrc
   fi
   if [[ $(command -v kubectl) ]]; then
-    [[ -z $(grep kubeadm ~/.bashrc) ]] && echo "source <(kubeadm completion bash)" >>~/.bashrc
+    ! grep -q kubeadm "$HOME/.bashrc" && echo "source <(kubeadm completion bash)" >>~/.bashrc
   fi
   source "$HOME/.bashrc"
 }
