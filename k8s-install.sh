@@ -65,9 +65,9 @@ echo_content() {
 
 can_connect() {
   if ping -c2 -i0.3 -W1 "$1" &>/dev/null; then
-    return 1
-  else
     return 0
+  else
+    return 1
   fi
 }
 
