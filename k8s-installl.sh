@@ -287,10 +287,10 @@ k8s_network_install() {
 
 k8s_bash_completion() {
   if [[ $(command -v kubectl) ]]; then
-    ! grep -q kubectl "$HOME/.bashrc" && echo "source <(kubectl completion bash)" >>~/.bashrc
+    ! grep -q kubectl "$HOME/.bashrc" && echo "source <(kubectl completion bash)" >>"$HOME/.bashrc"
   fi
   if [[ $(command -v kubectl) ]]; then
-    ! grep -q kubeadm "$HOME/.bashrc" && echo "source <(kubeadm completion bash)" >>~/.bashrc
+    ! grep -q kubeadm "$HOME/.bashrc" && echo "source <(kubeadm completion bash)" >>"$HOME/.bashrc"
   fi
   source "$HOME/.bashrc"
 }
