@@ -229,7 +229,7 @@ repo_gpgcheck=1
 gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
   elif [[ ${release} == 'debian' || ${release} == 'ubuntu' ]]; then
-    apt-get update && apt-get install -y apt-transport-https
+    ${package_manager} install -y apt-transport-https
     curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -
     cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
 deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
