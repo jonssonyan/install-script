@@ -218,6 +218,7 @@ EOF
 
 k8s_install() {
   echo_content green "---> 安装k8s"
+  # https://developer.aliyun.com/mirror/kubernetes
   if [[ ${release} == 'centos' ]]; then
     cat <<EOF >/etc/yum.repos.d/kubernetes.repo
 [kubernetes]
@@ -245,7 +246,7 @@ EOF
       install_version=$(apt-cache madison kubectl | grep "${k8s_version}" | cut -d \| -f 2 | sed 's/ //g')
       ${package_manager} install -y kubelet="${install_version}" kubeadm="${install_version}" kubectl="${install_version}"
     else
-      ${package_manager} install -y kubelet-"${k8s_version}" kubeadm-"${k8s_version}" kubectl-"${k8s_version}"
+      ${package_manager} install -y --nogpgcheck kubelet-"${k8s_version}" kubeadm-"${k8s_version}" kubectl-"${k8s_version}"
     fi
   fi
   systemctl enable kubelet && systemctl start kubelet
