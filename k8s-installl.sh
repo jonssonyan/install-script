@@ -24,8 +24,8 @@ init_var() {
   K8S_LOG="/k8sdata/log"
   K8S_NETWORK="/k8sdata/network"
   K8S_MIRROR="registry.aliyuncs.com/google_containers"
-  kube_flannel_url=""
-  calico_url=""
+  kube_flannel_url="https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
+  calico_url="https://docs.projectcalico.org/manifests/calico.yaml"
 
   # Docker
   DOCKER_MIRROR='"https://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://registry.docker-cn.com"'
@@ -245,12 +245,6 @@ EOF
   echo_content skyBlue "---> k8s安装完成"
 }
 
-k8s_pull_images() {
-  echo_content green "---> 拉取k8s镜像"
-
-  echo_content skyBlue "---> k8s镜像拉取完成"
-}
-
 k8s_run() {
   echo_content green "---> 运行k8s"
   if [[ ${is_master} == 1 ]]; then
@@ -261,34 +255,35 @@ k8s_run() {
       --pod-network-cidr=10.244.0.0/16 \
       --service-cidr=10.233.0.0/16 \
       --token-ttl 0 | tee /k8sdata/log/kubeadm-init.log
-    if [[ ${network} == "flannel" ]]; then
-      mkdir -p "$HOME"/.kube
-      cp -i /etc/kubernetes/admin.conf "$HOM"E/.kube/config
-      chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
-      wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${kube_flannel_url}
-      kubectl create -f /k8sdata/network/flannelkube-flannel.yml
-    elif [[ ${network} == "calico" ]]; then
-      mkdir -p "$HOME"/.kube
-      cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
-      chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
-      wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${calico_url}
-      kubectl create -f /k8sdata/network/flannelkube-flannel.yml
-    fi
+    mkdir -p "$HOME"/.kube
+    cp -i /etc/kubernetes/admin.conf "$HOM"E/.kube/config
+    chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
   else
     echo "this node is slave, please manual run 'kubeadm join' command. if forget join command, please run $(
       echo_content green
       "kubeadm token create --print-join-command"
     ) in master node"
   fi
+  echo_content skyBlue "---> k8s运行完成"
+}
+
+k8s_network_install() {
+  echo_content green "---> 安装k8s网络"
+  if [[ ${network} == "flannel" ]]; then
+    wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${kube_flannel_url}
+    kubectl create -f /k8sdata/network/flannelkube-flannel.yml
+  elif [[ ${network} == "calico" ]]; then
+    wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${calico_url}
+    kubectl create -f /k8sdata/network/flannelkube-flannel.yml
+  fi
+  echo_content skyBlue "---> k8s网络安装完成"
+}
+
+k8s_bash_completion() {
   if [[ $(command -v kubectl) ]]; then
     source <(kubectl completion bash)
     [[ -z $(grep kubectl ~/.bashrc) ]] && echo "source <(kubectl completion bash)" >>~/.bashrc
   fi
-  if [[ $(command -v crictl) ]]; then
-    crictl config --set runtime-endpoint=unix:///run/containerd/containerd.sock
-    [[ -z $(grep crictl ~/.bashrc) ]] && echo "source <(crictl completion bash)" >>~/.bashrc
-  fi
-  echo_content skyBlue "---> k8s运行完成"
 }
 
 main() {
@@ -300,8 +295,9 @@ main() {
   install_prepare
   install_docker
   k8s_install
-  k8s_pull_images
   k8s_run
+  k8s_network_install
+  k8s_bash_completion
 }
 
 main
