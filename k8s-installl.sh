@@ -199,11 +199,11 @@ EOF
 EOF
     fi
 
+    systemctl daemon-reload && systemctl enable docker && systemctl restart docker
+
     containerd config default >/etc/containerd/config.toml
     sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
     systemctl enable containerd && systemctl restart containerd
-
-    systemctl daemon-reload && systemctl enable docker && systemctl restart docker
 
     if [[ $(docker -v 2>/dev/null) ]]; then
       echo_content skyBlue "---> Docker安装完成"
