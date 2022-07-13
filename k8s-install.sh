@@ -32,8 +32,8 @@ init_var() {
 }
 
 mkdir_tools() {
-  mkdir - p ${K8S_DATA}
-  mkdir - p ${K8S_LOG}
+  mkdir -p ${K8S_DATA}
+  mkdir -p ${K8S_LOG}
   mkdir -p ${K8S_NETWORK}
 }
 
