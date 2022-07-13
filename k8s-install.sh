@@ -127,7 +127,7 @@ check_sys() {
 
 # 安装依赖
 install_depend() {
-  if [[ "${package_manager}" != 'yum' && "${package_manager}" != 'dnf' ]]; then
+  if [[ "${package_manager}" == 'apt' && "${package_manager}" == 'apt-get' ]]; then
     ${package_manager} update -y
   fi
   ${package_manager} install -y \
