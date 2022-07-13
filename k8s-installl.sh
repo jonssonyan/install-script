@@ -64,11 +64,10 @@ echo_content() {
 }
 
 can_connect() {
-  ping -c2 -i0.3 -W1 "$1" &>/dev/null
-  if [[ "$?" == "0" ]]; then
-    return 0
-  else
+  if ping -c2 -i0.3 -W1 "$1" &>/dev/null; then
     return 1
+  else
+    return 0
   fi
 }
 
@@ -76,13 +75,22 @@ set_hostname() {
   local hostname=$1
   if [[ ${hostname} =~ '_' ]]; then
     echo_content red "hostname can't contain '_' character, auto change to '-'.."
-    hostname=$(echo ${hostname} | sed 's/_/-/g')
+    hostname=$(echo "${hostname}" | sed 's/_/-/g')
   fi
-  echo_content skyBlue "127.0.0.1 ${hostname}" >>/etc/hosts
-  hostnamectl --static set-hostname ${hostname}
+  echo "127.0.0.1 ${hostname}" >>/etc/hosts
+  hostnamectl --static set-hostname "${hostname}"
 }
 
 check_sys() {
+  if [[ $(id -u) != "0" ]]; then
+    echo_content red "必须是 root 才能运行此脚本"
+    exit 1
+  fi
+  if [[ $(cat /proc/cpuinfo | grep "processor" | wc -l) == 1 && ${is_master} == 1 ]]; then
+    echo_content red "主节点 需要 2 CPU 核或更多"
+    exit 1
+  fi
+
   if [[ $(command -v yum) ]]; then
     package_manager='yum'
   elif [[ $(command -v dnf) ]]; then
@@ -95,7 +103,7 @@ check_sys() {
 
   if [[ -z "${package_manager}" ]]; then
     echo_content red "暂不支持该系统"
-    exit 0
+    exit 1
   fi
 
   if [[ -n $(find /etc -name "redhat-release") ]] || grep </proc/version -q -i "centos"; then
@@ -108,7 +116,7 @@ check_sys() {
 
   if [[ -z "${release}" ]]; then
     echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
-    exit 0
+    exit 1
   fi
 
   if [[ $(arch) =~ ("x86_64"|"amd64") ]]; then
@@ -117,7 +125,7 @@ check_sys() {
 
   if [[ -z "${get_arch}" ]]; then
     echo_content red "仅支持amd64处理器架构"
-    exit 0
+    exit 1
   fi
 }
 
@@ -160,8 +168,7 @@ install_docker() {
   if [[ ! $(docker -v 2>/dev/null) ]]; then
     echo_content green "---> 安装Docker"
 
-    can_connect www.google.com
-    [[ "$?" == "0" ]] && can_google=1
+    can_connect www.google.com && can_google=1
 
     mkdir -p /etc/docker
     if [[ ${can_google} == 0 ]]; then
@@ -207,7 +214,7 @@ EOF
       echo_content skyBlue "---> Docker安装完成"
     else
       echo_content red "---> Docker安装失败"
-      exit 0
+      exit 1
     fi
   else
     echo_content skyBlue "---> 你已经安装了Docker"
@@ -234,16 +241,16 @@ deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
 EOF
   else
     echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
-    exit 0
+    exit 1
   fi
   if [[ -z ${k8s_version} ]]; then
     ${package_manager} install -y kubelet kubeadm kubectl
   else
     if [[ ${package_manager} == "apt-get" ]]; then
-      install_version=$(apt-cache madison kubectl | grep ${k8s_version} | cut -d \| -f 2 | sed 's/ //g')
-      ${package_manager} install -y kubelet=${install_version} kubeadm=${install_version} kubectl=${install_version}
+      install_version=$(apt-cache madison kubectl | grep "${k8s_version}" | cut -d \| -f 2 | sed 's/ //g')
+      ${package_manager} install -y kubelet="${install_version}" kubeadm="${install_version}" kubectl="${install_version}"
     else
-      ${package_manager} install -y kubelet-${k8s_version} kubeadm-${k8s_version} kubectl-${k8s_version}
+      ${package_manager} install -y kubelet-"${k8s_version}" kubeadm-"${k8s_version}" kubectl-"${k8s_version}"
     fi
   fi
   systemctl enable kubelet && systemctl start kubelet
@@ -255,7 +262,7 @@ k8s_run() {
   if [[ ${is_master} == 1 ]]; then
     kubeadm init \
       --image-repository ${K8S_MIRROR} \
-      --kubernetes-version ${k8s_version} \
+      --kubernetes-version "${k8s_version}" \
       --apiserver-advertise-address 192.168.0.101 \
       --pod-network-cidr=10.244.0.0/16 \
       --service-cidr=10.233.0.0/16 \
@@ -290,7 +297,7 @@ k8s_bash_completion() {
   if [[ $(command -v kubectl) ]]; then
     [[ -z $(grep kubeadm ~/.bashrc) ]] && echo "source <(kubeadm completion bash)" >>~/.bashrc
   fi
-  source ~/.bashrc
+  source "$HOME/.bashrc"
 }
 
 main() {
