@@ -76,6 +76,7 @@ set_hostname() {
   hostnamectl --static set-hostname "$1"
 }
 
+# 检查系统
 check_sys() {
   if [[ $(id -u) != "0" ]]; then
     echo_content red "必须是 root 才能运行此脚本"
@@ -124,6 +125,7 @@ check_sys() {
   fi
 }
 
+# 安装依赖
 install_depend() {
   if [[ "${package_manager}" != 'yum' && "${package_manager}" != 'dnf' ]]; then
     ${package_manager} update -y
@@ -136,6 +138,7 @@ install_depend() {
     lrzsz
 }
 
+# 准备安装
 install_prepare() {
   echo_content green "---> 准备安装"
   if [[ ${release} == 'centos' ]]; then
@@ -216,6 +219,7 @@ EOF
   fi
 }
 
+# 安装k8s
 k8s_install() {
   echo_content green "---> 安装k8s"
   # https://developer.aliyun.com/mirror/kubernetes
@@ -253,9 +257,11 @@ EOF
   echo_content skyBlue "---> k8s安装完成"
 }
 
+# 运行k8s
 k8s_run() {
   echo_content green "---> 运行k8s"
   if [[ ${is_master} == 1 ]]; then
+    # https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
     kubeadm init \
       --image-repository ${K8S_MIRROR} \
       --kubernetes-version "${k8s_version}" \
@@ -274,6 +280,7 @@ k8s_run() {
   echo_content skyBlue "---> k8s运行完成"
 }
 
+# 安装k8s网络
 k8s_network_install() {
   echo_content green "---> 安装k8s网络"
   if [[ ${network} == "flannel" ]]; then
@@ -286,6 +293,7 @@ k8s_network_install() {
   echo_content skyBlue "---> k8s网络安装完成"
 }
 
+# k8s命令行补全
 k8s_bash_completion() {
   if [[ $(command -v kubectl) ]]; then
     ! grep -q kubectl "$HOME/.bashrc" && echo "source <(kubectl completion bash)" >>"$HOME/.bashrc"
