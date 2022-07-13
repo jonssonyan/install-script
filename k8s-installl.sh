@@ -255,7 +255,7 @@ k8s_run() {
   echo_content green "---> 运行k8s"
   if [[ ${is_master} == 1 ]]; then
     kubeadm init \
-      --image-repository registry.aliyuncs.com/google_containers \
+      --image-repository ${K8S_MIRROR} \
       --kubernetes-version ${k8s_version} \
       --apiserver-advertise-address 192.168.0.101 \
       --pod-network-cidr=10.244.0.0/16 \
