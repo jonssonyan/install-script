@@ -121,7 +121,7 @@ check_sys() {
   fi
 }
 
-depend_install() {
+install_depend() {
   if [[ "${package_manager}" != 'yum' && "${package_manager}" != 'dnf' ]]; then
     ${package_manager} update -y
   fi
@@ -296,7 +296,7 @@ main() {
   init_var
   mkdir_tools
   check_sys
-  depend_install
+  install_depend
   install_prepare
   install_docker
   k8s_install
