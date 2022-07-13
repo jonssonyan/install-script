@@ -223,9 +223,12 @@ EOF
 # 安装k8s
 k8s_install() {
   echo_content green "---> 安装k8s"
-  # https://developer.aliyun.com/mirror/kubernetes
-  if [[ ${release} == 'centos' ]]; then
-    cat <<EOF >/etc/yum.repos.d/kubernetes.repo
+
+  if [[ ${can_google} == 0 ]]; then
+    # https://developer.aliyun.com/mirror/kubernetes
+    if [[ ${release} == 'centos' ]]; then
+      if [[ ${can_google} == 0 ]]; then
+        cat <<EOF >/etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
 baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
@@ -234,15 +237,35 @@ gpgcheck=1
 repo_gpgcheck=1
 gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
-  elif [[ ${release} == 'debian' || ${release} == 'ubuntu' ]]; then
-    ${package_manager} install -y apt-transport-https
-    curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -
-    cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
+      else
+        cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOF
+      fi
+    elif [[ ${release} == 'debian' || ${release} == 'ubuntu' ]]; then
+      ${package_manager} install -y apt-transport-https ca-certificates
+      if [[ ${can_google} == 0 ]]; then
+        curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -
+        cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
 deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
 EOF
-  else
-    echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
-    exit 1
+      else
+        curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
+deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+      fi
+      ${package_manager} update
+    else
+      echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
+      exit 1
+    fi
   fi
   if [[ -z ${k8s_version} ]]; then
     ${package_manager} install -y kubelet kubeadm kubectl
