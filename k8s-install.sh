@@ -246,7 +246,7 @@ EOF
   if [[ -z ${k8s_version} ]]; then
     ${package_manager} install -y kubelet kubeadm kubectl
   else
-    if [[ ${package_manager} == "apt-get" ]]; then
+    if [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
       install_version=$(apt-cache madison kubectl | grep "${k8s_version}" | cut -d \| -f 2 | sed 's/ //g')
       ${package_manager} install -y kubelet="${install_version}" kubeadm="${install_version}" kubectl="${install_version}"
     else
@@ -280,10 +280,10 @@ k8s_run() {
   echo_content skyBlue "---> k8s运行完成"
 }
 
-# 安装k8s网络
+# 安装网络系统
 k8s_network_install() {
   if [[ -n ${network} ]]; then
-    echo_content green "---> 安装k8s网络"
+    echo_content green "---> 安装网络系统"
     if [[ ${network} == "flannel" ]]; then
       wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${kube_flannel_url}
       kubectl create -f /k8sdata/network/flannelkube-flannel.yml
@@ -291,9 +291,9 @@ k8s_network_install() {
       wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${calico_url}
       kubectl create -f /k8sdata/network/flannelkube-flannel.yml
     fi
-    echo_content skyBlue "---> k8s网络安装完成"
+    echo_content skyBlue "---> 网络系统安装完成"
   else
-    echo_content red "---> 未设置k8s网络"
+    echo_content red "---> 未设置网络系统"
   fi
 }
 
