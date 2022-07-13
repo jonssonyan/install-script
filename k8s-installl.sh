@@ -259,10 +259,9 @@ k8s_run() {
     cp -i /etc/kubernetes/admin.conf "$HOM"E/.kube/config
     chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
   else
-    echo "this node is slave, please manual run 'kubeadm join' command. if forget join command, please run $(
-      echo_content green
-      "kubeadm token create --print-join-command"
-    ) in master node"
+    echo "该节点为从节点, 请手动运行 kubeadm join 命令. 如果你忘记了命令, 可以在主节点上运行 $(
+      echo_content green "kubeadm token create --print-join-command"
+    )"
   fi
   echo_content skyBlue "---> k8s运行完成"
 }
