@@ -20,9 +20,21 @@ init_var() {
   k8s_version=""
   network=""
   is_master=0
+  K8S_DATA="/k8sdata"
+  K8S_LOG="/k8sdata/log"
+  K8S_NETWORK="/k8sdata/network"
+  K8S_MIRROR="registry.aliyuncs.com/google_containers"
+  kube_flannel_url=""
+  calico_url=""
 
   # Docker
   DOCKER_MIRROR='"https://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://registry.docker-cn.com"'
+}
+
+mkdir_tools() {
+  mkir - p ${K8S_DATA}
+  mkir - p ${K8S_LOG}
+  mkdir -p ${K8S_NETWORK}
 }
 
 echo_content() {
@@ -51,10 +63,6 @@ echo_content() {
   esac
 }
 
-mkdir_tools() {
-  echo ...
-}
-
 can_connect() {
   ping -c2 -i0.3 -W1 "$1" &>/dev/null
   if [[ "$?" == "0" ]]; then
@@ -70,50 +78,9 @@ set_hostname() {
     echo_content red "hostname can't contain '_' character, auto change to '-'.."
     hostname=$(echo ${hostname} | sed 's/_/-/g')
   fi
-  echo_content skyBlue "set hostname: ${hostname}"
   echo_content skyBlue "127.0.0.1 ${hostname}" >>/etc/hosts
-  run_command "hostnamectl --static set-hostname ${hostname}"
+  hostnamectl --static set-hostname ${hostname}
 }
-
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-  --hostname)
-    set_hostname $2
-    shift
-    ;;
-  -v | --version)
-    k8s_version=$(echo "$2" | sed 's/v//g')
-    echo "prepare install k8s version: $(echo_content green ${k8s_version})"
-    shift
-    ;;
-  --flannel)
-    echo "use flannel network, and set this node as master"
-    network="flannel"
-    is_master=1
-    ;;
-  --calico)
-    echo "use calico network, and set this node as master"
-    network="calico"
-    is_master=1
-    ;;
-  -h | --help)
-    echo "Usage: $0 [options]"
-    echo "Options:"
-    echo "   --flannel                    use flannel network, and set this node as master"
-    echo "   --calico                     use calico network, and set this node as master"
-    echo "   --hostname [hostname]        set hostname"
-    echo "   -v, --version [version]:     install special version k8s"
-    echo "   -h, --help:                  find help"
-    echo ""
-    exit 0
-    shift
-    ;;
-  *)
-    echo_content red "没有这个选项"
-    ;;
-  esac
-  shift
-done
 
 check_sys() {
   if [[ $(command -v yum) ]]; then
@@ -144,12 +111,12 @@ check_sys() {
     exit 0
   fi
 
-  if [[ $(arch) =~ ("x86_64"|"amd64"|"arm64"|"aarch64") ]]; then
+  if [[ $(arch) =~ ("x86_64"|"amd64") ]]; then
     get_arch=$(arch)
   fi
 
   if [[ -z "${get_arch}" ]]; then
-    echo_content red "仅支持amd64/arm64处理器架构"
+    echo_content red "仅支持amd64处理器架构"
     exit 0
   fi
 }
@@ -161,29 +128,30 @@ depend_install() {
   ${package_manager} install -y \
     curl \
     wget \
-    systemd
+    systemd \
+    bash-completion \
+    lrzsz
 }
 
 install_prepare() {
   echo_content green "---> 准备安装"
   if [[ ${release} == 'centos' ]]; then
     systemctl disable firewalld.service && systemctl stop firewalld.service
-    cat >/etc/modules-load.d/k8s.conf <<EOF
-br_netfilter
-EOF
-
-    cat >/etc/sysctl.d/k8s.conf <<EOF
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-EOF
-    sysctl --system
   fi
   if [ -s /etc/selinux/config ] && grep 'SELINUX=enforcing' /etc/selinux/config; then
-    setenforce 0
-    sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+    setenforce 0 && sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
   fi
-  sed -ri 's/.*swap.*/#&/' /etc/fstab
-  swapoff -a
+  swapoff -a && sed -ri 's/.*swap.*/#&/' /etc/fstab
+  cat >/etc/modules-load.d/k8s.conf <<EOF
+  br_netfilter
+EOF
+  cat >/etc/sysctl.d/k8s.conf <<EOF
+  net.bridge.bridge-nf-call-ip6tables = 1
+  net.bridge.bridge-nf-call-iptables = 1
+EOF
+  sysctl --system
+  timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
+  systemctl restart rsyslog && systemctl restart crond
   echo_content green "---> 准备安装完成"
 }
 
@@ -219,11 +187,11 @@ EOF
         "exec-opts": ["native.cgroupdriver=systemd"],
         "log-driver": "json-file",
         "log-opts": {
-          "max-size": "100m"
+            "max-size": "100m"
         },
         "storage-driver": "overlay2",
         "storage-opts": [
-          "overlay2.override_kernel_check=true"
+            "overlay2.override_kernel_check=true"
         ]
     }
 EOF
@@ -231,7 +199,7 @@ EOF
 
     containerd config default >/etc/containerd/config.toml
     sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
-    systemctl enable containerd &&  systemctl restart containerd
+    systemctl enable containerd && systemctl restart containerd
 
     systemctl daemon-reload && systemctl enable docker && systemctl restart docker
 
@@ -279,37 +247,42 @@ EOF
 
 k8s_pull_images() {
   echo_content green "---> 拉取k8s镜像"
-  pause_version=$(cat /etc/containerd/config.toml | grep k8s.gcr.io/pause | grep -Po '\d\.\d')
-  k8s_images=("$(kubeadm config images list 2>/dev/null | grep 'k8s.gcr.io' | xargs -r)" "k8s.gcr.io/pause:$pause_version")
-  for imageName in ${k8s_images[@]}; do
-    docker pull k8simage/"${imageName}"
-    docker tag k8simage/"${imageName}" k8s.gcr.io/"${imageName}"
-    docker rmi k8simage/"${imageName}"
-  done
+
   echo_content skyBlue "---> k8s镜像拉取完成"
 }
 
 k8s_run() {
   echo_content green "---> 运行k8s"
   if [[ ${is_master} == 1 ]]; then
+    kubeadm init \
+      --image-repository registry.aliyuncs.com/google_containers \
+      --kubernetes-version ${k8s_version} \
+      --apiserver-advertise-address 192.168.0.101 \
+      --pod-network-cidr=10.244.0.0/16 \
+      --service-cidr=10.233.0.0/16 \
+      --token-ttl 0 | tee /k8sdata/log/kubeadm-init.log
     if [[ ${network} == "flannel" ]]; then
-      kubeadm init --pod-network-cidr=10.244.0.0/16 --kubernetes-version=$(echo $k8s_version | sed "s/v//g")
       mkdir -p "$HOME"/.kube
       cp -i /etc/kubernetes/admin.conf "$HOM"E/.kube/config
       chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
-      kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+      wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${kube_flannel_url}
+      kubectl create -f /k8sdata/network/flannelkube-flannel.yml
     elif [[ ${network} == "calico" ]]; then
-      kubeadm init --pod-network-cidr=192.168.0.0/16 --kubernetes-version=$(echo $k8s_version | sed "s/v//g")
       mkdir -p "$HOME"/.kube
       cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
       chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
-      kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+      wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${calico_url}
+      kubectl create -f /k8sdata/network/flannelkube-flannel.yml
     fi
   else
     echo "this node is slave, please manual run 'kubeadm join' command. if forget join command, please run $(
       echo_content green
       "kubeadm token create --print-join-command"
     ) in master node"
+  fi
+  if [[ $(command -v kubectl) ]]; then
+    source <(kubectl completion bash)
+    [[ -z $(grep kubectl ~/.bashrc) ]] && echo "source <(kubectl completion bash)" >>~/.bashrc
   fi
   if [[ $(command -v crictl) ]]; then
     crictl config --set runtime-endpoint=unix:///run/containerd/containerd.sock
