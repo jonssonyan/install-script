@@ -140,7 +140,7 @@ install_depend() {
 
 # 准备安装
 install_prepare() {
-  echo_content green "---> 准备安装"
+  echo_content green "---> 环境准备"
   if [[ ${release} == 'centos' ]]; then
     systemctl disable firewalld.service && systemctl stop firewalld.service
   fi
@@ -159,7 +159,7 @@ EOF
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
   systemctl restart rsyslog
   systemctl restart crond
-  echo_content green "---> 准备安装完成"
+  echo_content green "---> 环境准备完成"
 }
 
 # 安装Docker
@@ -222,13 +222,14 @@ EOF
 
 # 安装k8s
 k8s_install() {
-  echo_content green "---> 安装k8s"
+  if [[ ! $(docker -v 2>/dev/null) ]]; then
+    echo_content green "---> 安装k8s"
 
-  if [[ ${can_google} == 0 ]]; then
-    # https://developer.aliyun.com/mirror/kubernetes
-    if [[ ${release} == 'centos' ]]; then
-      if [[ ${can_google} == 0 ]]; then
-        cat <<EOF >/etc/yum.repos.d/kubernetes.repo
+    if [[ ${can_google} == 0 ]]; then
+      # https://developer.aliyun.com/mirror/kubernetes
+      if [[ ${release} == 'centos' ]]; then
+        if [[ ${can_google} == 0 ]]; then
+          cat <<EOF >/etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
 baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
@@ -237,8 +238,8 @@ gpgcheck=1
 repo_gpgcheck=1
 gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
-      else
-        cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+        else
+          cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
 baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
@@ -247,38 +248,47 @@ gpgcheck=1
 repo_gpgcheck=1
 gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOF
-      fi
-    elif [[ ${release} == 'debian' || ${release} == 'ubuntu' ]]; then
-      ${package_manager} install -y apt-transport-https ca-certificates
-      if [[ ${can_google} == 0 ]]; then
-        curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -
-        cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
+        fi
+      elif [[ ${release} == 'debian' || ${release} == 'ubuntu' ]]; then
+        ${package_manager} install -y apt-transport-https ca-certificates
+        if [[ ${can_google} == 0 ]]; then
+          curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -
+          cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
 deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
 EOF
-      else
-        curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
+        else
+          curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+          cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
 deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
+        fi
+        ${package_manager} update
+      else
+        echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
+        exit 1
       fi
-      ${package_manager} update
+    fi
+    if [[ -z ${k8s_version} ]]; then
+      ${package_manager} install -y kubelet kubeadm kubectl
     else
-      echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
+      if [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
+        install_version=$(apt-cache madison kubectl | grep "${k8s_version}" | cut -d \| -f 2 | sed 's/ //g')
+        ${package_manager} install -y kubelet="${install_version}" kubeadm="${install_version}" kubectl="${install_version}"
+      else
+        ${package_manager} install -y --nogpgcheck kubelet-"${k8s_version}" kubeadm-"${k8s_version}" kubectl-"${k8s_version}"
+      fi
+    fi
+    systemctl enable kubelet && systemctl start kubelet
+
+    if [[ $(kubelet --version 2>/dev/null) ]]; then
+      echo_content skyBlue "---> k8s安装完成"
+    else
+      echo_content red "---> k8s安装失败"
       exit 1
     fi
-  fi
-  if [[ -z ${k8s_version} ]]; then
-    ${package_manager} install -y kubelet kubeadm kubectl
   else
-    if [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
-      install_version=$(apt-cache madison kubectl | grep "${k8s_version}" | cut -d \| -f 2 | sed 's/ //g')
-      ${package_manager} install -y kubelet="${install_version}" kubeadm="${install_version}" kubectl="${install_version}"
-    else
-      ${package_manager} install -y --nogpgcheck kubelet-"${k8s_version}" kubeadm-"${k8s_version}" kubectl-"${k8s_version}"
-    fi
+    echo_content skyBlue "---> 你已经安装了k8s"
   fi
-  systemctl enable kubelet && systemctl start kubelet
-  echo_content skyBlue "---> k8s安装完成"
 }
 
 # 运行k8s
