@@ -157,7 +157,8 @@ EOF
 EOF
   sysctl --system
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
-  systemctl restart rsyslog && systemctl restart crond
+  systemctl restart rsyslog
+  systemctl restart crond
   echo_content green "---> 准备安装完成"
 }
 
