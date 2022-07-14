@@ -18,7 +18,7 @@ init_var() {
 
   # k8s
   k8s_version=""
-  is_master=0
+  is_master=1
   network="flannel"
   K8S_DATA="/k8sdata"
   K8S_LOG="/k8sdata/log"
