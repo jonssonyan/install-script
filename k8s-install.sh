@@ -359,7 +359,14 @@ k8s_network_install() {
       wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${calico_url}
       kubectl create -f /k8sdata/network/flannelkube-flannel.yml
     fi
-    echo_content skyBlue "---> 网络系统安装完成"
+    if [[ "$?" == "0" ]]; then
+      mkdir -p "$HOME"/.kube
+      cp -i /etc/kubernetes/admin.conf "$HOM"E/.kube/config
+      chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
+      echo_content skyBlue "---> 网络系统安装完成"
+    else
+      echo_content red "---> 网络系统安装失败"
+    fi
   else
     echo_content red "---> 未设置网络系统"
   fi
