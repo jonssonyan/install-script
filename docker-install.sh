@@ -460,7 +460,7 @@ install_ssr() {
     while true; do
       for ((i = 1; i <= ${#methods[@]}; i++)); do
         hint="${methods[$i - 1]}"
-        echo_content yellow "${i}) ${hint}"
+        echo "${i}) $(echo_content yellow "${hint}")"
       done
       read -r -p "请选择ShadowsocksR的加密类型(默认:${methods[0]}): " r_methods
       [[ -z "${r_methods}" ]] && r_methods=1
@@ -480,7 +480,7 @@ install_ssr() {
     while true; do
       for ((i = 1; i <= ${#protocols[@]}; i++)); do
         hint="${protocols[$i - 1]}"
-        echo_content yellow "${i}) ${hint}"
+        echo "${i}) $(echo_content yellow "${hint}")"
       done
       read -r -p "请选择ShadowsocksR的协议(默认:${protocols[0]}): " r_protocols
       [[ -z "${r_protocols}" ]] && r_protocols=1
@@ -500,7 +500,7 @@ install_ssr() {
     while true; do
       for ((i = 1; i <= ${#obfs[@]}; i++)); do
         hint="${obfs[$i - 1]}"
-        echo_content yellow "${i}) ${hint}"
+        echo "${i}) $(echo_content yellow "${hint}")"
       done
       read -r -p "请选择ShadowsocksR的混淆方式(默认:${obfs[0]}): " r_obfs
       [[ -z "${r_obfs}" ]] && r_obfs=1
