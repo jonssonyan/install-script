@@ -471,6 +471,7 @@ install_ssr() {
         continue
       fi
       ssr_method=${methods[r_methods - 1]}
+      break
     done
 
     while true; do
@@ -490,6 +491,7 @@ install_ssr() {
         continue
       fi
       ssr_protocols=${protocols[r_protocols - 1]}
+      break
     done
 
     while true; do
@@ -509,6 +511,7 @@ install_ssr() {
         continue
       fi
       ssr_obfs=${obfs[r_obfs - 1]}
+      break
     done
 
     cat >${ssr_config} <<EOF
