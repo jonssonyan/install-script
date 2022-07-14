@@ -3,6 +3,7 @@
 ## 0x0. K8s
 
 - OS version: CentOS 7+/Ubuntu 18+/Debian 10+
+- CPU Architecture: x86_64/amd64 arm64/aarch64
 - K8s version: latest
 - Docker version: latest
 
@@ -13,6 +14,7 @@ source <(curl -L https://github.com/jonssonyan/install-script/raw/main/k8s-insta
 ## 0x1. K8s for Centos7
 
 - OS version: CentOS 7+
+- CPU Architecture: x86_64/amd64 arm64/aarch64
 - K8s version: v1.20.15
 - Docker version: 19.03.15
 
@@ -23,6 +25,7 @@ source <(curl -L https://github.com/jonssonyan/install-script/raw/main/k8s-insta
 ## 0x2. Docker
 
 - OS version: CentOS 7+/Ubuntu 18+/Debian 10+
+- CPU Architecture: x86_64/amd64 arm64/aarch64
 - Docker version: 19.03.15
 
 ```bash
