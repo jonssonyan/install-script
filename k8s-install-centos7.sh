@@ -2,7 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-# System Required: CentOS 7+/Ubuntu 18+/Debian 10+
+# System Required: CentOS 7+
 # Version: v1.0.0
 # Description: One click install k8s
 # Author: jonssonyan <https://jonssonyan.com>
@@ -135,11 +135,11 @@ install_prepare() {
   fi
   swapoff -a && sed -ri 's/.*swap.*/#&/' /etc/fstab
   cat >/etc/modules-load.d/k8s.conf <<EOF
-  br_netfilter
+br_netfilter
 EOF
   cat >/etc/sysctl.d/k8s.conf <<EOF
-  net.bridge.bridge-nf-call-ip6tables = 1
-  net.bridge.bridge-nf-call-iptables = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
 EOF
   sysctl --system
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
@@ -170,33 +170,33 @@ install_docker() {
     if [[ ${can_google} == 0 ]]; then
       yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
       cat >/etc/docker/daemon.json <<EOF
-    {
-      "exec-opts": ["native.cgroupdriver=systemd"],
-        "log-driver": "json-file",
-        "log-opts": {
-          "max-size": "100m"
-        },
-        "storage-driver": "overlay2",
-        "storage-opts": [
-          "overlay2.override_kernel_check=true"
-        ],
-        "registry-mirrors":[${DOCKER_MIRROR}]
-    }
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+    "log-driver": "json-file",
+    "log-opts": {
+      "max-size": "100m"
+    },
+    "storage-driver": "overlay2",
+    "storage-opts": [
+      "overlay2.override_kernel_check=true"
+    ],
+    "registry-mirrors":[${DOCKER_MIRROR}]
+}
 EOF
     else
       yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
       cat >/etc/docker/daemon.json <<EOF
-    {
-        "exec-opts": ["native.cgroupdriver=systemd"],
-        "log-driver": "json-file",
-        "log-opts": {
-            "max-size": "100m"
-        },
-        "storage-driver": "overlay2",
-        "storage-opts": [
-            "overlay2.override_kernel_check=true"
-        ]
-    }
+{
+    "exec-opts": ["native.cgroupdriver=systemd"],
+    "log-driver": "json-file",
+    "log-opts": {
+        "max-size": "100m"
+    },
+    "storage-driver": "overlay2",
+    "storage-opts": [
+        "overlay2.override_kernel_check=true"
+    ]
+}
 EOF
     fi
 

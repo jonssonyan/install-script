@@ -173,33 +173,33 @@ install_docker() {
     if [[ ${can_google} == 0 ]]; then
       sh <(curl -sL https://get.docker.com) --mirror Aliyun
       cat >/etc/docker/daemon.json <<EOF
-    {
-      "exec-opts": ["native.cgroupdriver=systemd"],
-        "log-driver": "json-file",
-        "log-opts": {
-          "max-size": "100m"
-        },
-        "storage-driver": "overlay2",
-        "storage-opts": [
-          "overlay2.override_kernel_check=true"
-        ],
-        "registry-mirrors":[${DOCKER_MIRROR}]
-    }
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+    "log-driver": "json-file",
+    "log-opts": {
+      "max-size": "100m"
+    },
+    "storage-driver": "overlay2",
+    "storage-opts": [
+      "overlay2.override_kernel_check=true"
+    ],
+    "registry-mirrors":[${DOCKER_MIRROR}]
+}
 EOF
     else
       sh <(curl -sL https://get.docker.com)
       cat >/etc/docker/daemon.json <<EOF
-    {
-        "exec-opts": ["native.cgroupdriver=systemd"],
-        "log-driver": "json-file",
-        "log-opts": {
-            "max-size": "100m"
-        },
-        "storage-driver": "overlay2",
-        "storage-opts": [
-            "overlay2.override_kernel_check=true"
-        ]
-    }
+{
+    "exec-opts": ["native.cgroupdriver=systemd"],
+    "log-driver": "json-file",
+    "log-opts": {
+        "max-size": "100m"
+    },
+    "storage-driver": "overlay2",
+    "storage-opts": [
+        "overlay2.override_kernel_check=true"
+    ]
+}
 EOF
     fi
 
