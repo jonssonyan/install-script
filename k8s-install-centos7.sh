@@ -280,7 +280,7 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 EOF
     fi
 
-    yum install -y --nogpgcheck kubelet-"${k8s_version}" kubeadm-"${k8s_version}" kubectl-"${k8s_version}"
+    yum install -y --nogpgcheck kubelet-"${k8s_version//v/}" kubeadm-"${k8s_version//v/}" kubectl-"${k8s_version//v/}"
     systemctl enable kubelet && systemctl start kubelet
 
     if [[ $(kubelet --verison 2>/dev/null) ]]; then
