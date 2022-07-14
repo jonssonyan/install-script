@@ -335,7 +335,7 @@ k8s_run() {
       --token-ttl 0 | tee /k8sdata/log/kubeadm-init.log
     if [[ "$?" == "0" ]]; then
       mkdir -p "$HOME"/.kube
-      cp -i /etc/kubernetes/admin.conf "$HOM"E/.kube/config
+      cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
       chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
       echo_content skyBlue "---> k8s运行完成"
     else
