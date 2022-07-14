@@ -24,16 +24,31 @@ init_var() {
 
   # MySQL
   MySQL_DATA="/jsdata/mysql/"
-  mariadb_ip="js-mariadb"
+  mysql_ip="js-mariadb"
   mysql_port=9507
   mysql_user="root"
   mysql_pas=""
 
-  #Redis
+  # Redis
   REDIS_DATA="/jsdata/redis/"
-  redis_host="js-redis"
+  redis_ip="js-redis"
   redis_port=6378
   redis_pass=""
+
+  #Minio
+  MINIO_DATA="/jsdata/minio/"
+  MINIO_DATA_DATA="/jsdata/minio/data/"
+  MINIO_CONFIG="/jsdata/minio/config/"
+  minio_ip="js-minio"
+  minio_server_port=9000
+  minio_console_port=8000
+  minio_root_user="admin"
+  minio_root_password="12345678"
+
+  # Nacos
+  NACOS_DATA="/jsdata/nacos/"
+  nacos_ip="js-nacos"
+  nacos_port=8848
 }
 
 echo_content() {
@@ -71,6 +86,12 @@ mkdir_tools() {
 
   # Redis
   mkdir -p ${REDIS_DATA}
+
+  # Minio
+  mkdir -p ${MINIO_DATA}
+
+  # Nacos
+  mkdir -p ${NACOS_DATA}
 }
 
 can_connect() {
@@ -239,7 +260,7 @@ install_mysql() {
 
     if [[ "${mysql_user}" == "root" ]]; then
       docker pull mysql:5.7.38 &&
-        docker run -d --name js-mysql --restart always \
+        docker run -d --name ${mysql_ip} --restart always \
           --network=js-network \
           -p ${mysql_port}:3306 \
           -v ${MySQL_DATA}:/var/lib/mysql \
@@ -248,7 +269,7 @@ install_mysql() {
           mysql:5.7.38
     else
       docker pull mysql:5.7.38 &&
-        docker run -d --name trojan-panel-mariadb --restart always \
+        docker run -d --name ${mysql_ip} --restart always \
           --network=js-network \
           -p ${mysql_port}:3306 \
           -v ${MySQL_DATA}:/var/lib/mysql \
@@ -290,7 +311,7 @@ install_redis() {
     done
 
     docker pull redis:6.2.7 &&
-      docker run -d --name js-redis --restart always \
+      docker run -d --name ${redis_ip} --restart always \
         --network=js-network \
         -p ${redis_port}:6379 \
         -v ${REDIS_DATA}:/data redis:6.2.7 \
@@ -308,6 +329,70 @@ install_redis() {
   fi
 }
 
+install_minio() {
+  if [[ -z $(docker ps -q -f "name=^js-minio$") ]]; then
+    echo_content green "---> 安装Minio"
+
+    read -r -p "请输入Minio的服务端口(默认:9000): " minio_server_port
+    [[ -z "${minio_server_port}" ]] && minio_server_port=9000
+    read -r -p "请输入Minio的控制台端口(默认:8000): " minio_console_port
+    [[ -z "${minio_console_port}" ]] && minio_console_port=8000
+    read -r -p "请输入Minio的控制台用户名(默认:admin): " minio_root_user
+    [[ -z "${minio_root_user}" ]] && minio_root_user="admin"
+    while read -r -p "请输入Minio的控制台密码(默认:12345678): " minio_root_password; do
+      if [[ -z "${minio_root_password}" ]]; then
+        echo_content red "密码不能为空"
+      else
+        break
+      fi
+    done
+
+    docker pull minio/minio &&
+      docker run -d --name ${minio_ip} --restart=always \
+        --network=js-network \
+        -p ${minio_server_port}:9000 -p ${minio_console_port}:8000 \
+        -e "MINIO_ROOT_USER=${minio_root_user}" \
+        -e "MINIO_ROOT_PASSWORD=${minio_root_password}" \
+        -v ${MINIO_DATA_DATA}:/data \
+        -v ${MINIO_CONFIG}:/root/.minio \
+        minio/minio \
+        server --address ':9000' \
+        --console-address ':8000' /data
+    if [[ -n $(docker ps -q -f "name=^js-minio$") ]]; then
+      echo_content skyBlue "---> Minio安装完成"
+      echo_content yellow "---> Minio的用户号名(请妥善保存): ${minio_root_user}"
+      echo_content yellow "---> Minio的密码(请妥善保存): ${minio_root_password}"
+    else
+      echo_content red "---> Minio安装失败"
+      exit 1
+    fi
+  else
+    echo_content skyBlue "---> 你已经安装了Minio"
+  fi
+}
+
+install_nacos() {
+  if [[ -z $(docker ps -q -f "name=^js-nacos$") ]]; then
+    echo_content green "---> 安装Nacos"
+
+    docker pull nacos/nacos-server &&
+      docker run -d --name ${nacos_ip} --restart=always \
+        --network=js-network \
+        -p ${nacos_port}:8848 \
+        -e MODE=standalone nacos/nacos-server
+    if [[ -n $(docker ps -q -f "name=^js-nacos$") ]]; then
+      echo_content skyBlue "---> Nacos安装完成"
+      echo_content yellow "---> Nacos的用户号名(请妥善保存): nacos"
+      echo_content yellow "---> Nacos的密码(请妥善保存): nacos"
+    else
+      echo_content red "---> Nacos安装失败"
+      exit 1
+    fi
+  else
+    echo_content skyBlue "---> 你已经安装了Nacos"
+  fi
+}
+
 main() {
   cd "$HOME" || exit 0
   init_var
@@ -322,8 +407,10 @@ main() {
   echo_content skyBlue "Github: https://github.com/jonssonyan"
   echo_content red "\n=============================================================="
   echo_content yellow "1. 安装Docker"
-  echo_content yellow "2. 安装MySQL 5.7.28"
-  echo_content yellow "3. 安装Redis 6.2.7"
+  echo_content yellow "2. 安装MySQL"
+  echo_content yellow "3. 安装Redis"
+  echo_content yellow "4. 安装Minio"
+  echo_content yellow "5. 安装Nacos"
   read -r -p "请选择:" selectInstall_type
   case ${selectInstall_type} in
   1)
@@ -336,6 +423,14 @@ main() {
   3)
     install_docker
     install_redis
+    ;;
+  4)
+    install_docker
+    install_minio
+    ;;
+  5)
+    install_docker
+    install_nacos
     ;;
   *)
     echo_content red "没有这个选项"
