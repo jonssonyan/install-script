@@ -238,12 +238,12 @@ install_k8s() {
   if [[ ! $(kubelet --version 2>/dev/null) ]]; then
     echo_content green "---> 安装k8s"
 
-    while read -r -p "请输入安装哪个网络系统?(1/flannel 2/calico 默认:1/flannel): " is_master; do
-      if [[ -z "${network}" || ${network} == 1 ]]; then
+    while read -r -p "请输入安装哪个网络系统?(1/flannel 2/calico 默认:1/flannel): " networkNum; do
+      if [[ -z "${networkNum}" || ${networkNum} == 1 ]]; then
         network="flannel"
         break
       else
-        if [[ ${network} != 2 ]]; then
+        if [[ ${networkNum} != 2 ]]; then
           echo_content red "不可以输入除1和2之外的其他字符"
         else
           network="calico"
