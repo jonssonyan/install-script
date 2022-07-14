@@ -454,6 +454,9 @@ install_ssr() {
   if [[ -z $(docker ps -q -f "name=^js-ssr$") ]]; then
     echo_content green "---> 安装ShadowsocksR"
 
+    read -r -p "请输入ShadowsocksR的密码(默认:123456): " ssr_password
+    [[ -z "${ssr_password}" ]] && ssr_password="123456"
+
     while true; do
       for ((i = 1; i <= ${#methods[@]}; i++)); do
         hint="${methods[$i - 1]}"
@@ -539,7 +542,7 @@ EOF
       docker run -d --name ${ssr_ip} --restart=always \
         --network=js-network \
         -p ${ssr_port}:${ssr_port} -p ${ssr_port}:${ssr_port}/udp \
-        -v ${ssr_config}:/etc/shadowsocks-r \
+        -v ${ssr_config}:/etc/shadowsocks-r/config.json \
         teddysun/shadowsocks-r
 
     if [[ -n $(docker ps -q -f "name=^js-ssr$") ]]; then
