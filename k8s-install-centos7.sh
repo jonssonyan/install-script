@@ -217,7 +217,7 @@ EOF
     fi
 
     yum makecache fast
-    yum install docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io
+    yum install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io
     systemctl daemon-reload && systemctl enable docker && systemctl restart docker
 
     containerd config default >/etc/containerd/config.toml
