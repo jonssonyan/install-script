@@ -108,6 +108,12 @@ install_depend() {
     lrzsz
 }
 
+install_prepare() {
+  timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
+  systemctl restart rsyslog
+  systemctl restart crond
+}
+
 setup_docker() {
   can_connect www.google.com && can_google=1
 
@@ -187,6 +193,12 @@ install_docker() {
 }
 
 main() {
+  cd "$HOME" || exit 0
+  init_var
+  mkdir_tools
+  check_sys
+  install_depend
+  install_prepare
   install_docker
 }
 
