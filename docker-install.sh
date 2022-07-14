@@ -98,7 +98,7 @@ check_sys() {
 
 # 安装依赖
 install_depend() {
-  if [[ "${package_manager}" == 'apt' && "${package_manager}" == 'apt-get' ]]; then
+  if [[ "${package_manager}" == 'apt-get' ]]; then
     ${package_manager} update -y
   fi
   ${package_manager} install -y \
@@ -162,7 +162,7 @@ install_docker() {
         curl -fsSL https://download.docker.com/linux/${release}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
         echo \
           "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/${release} \
-      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+              $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
       fi
       apt-get update
       apt-get install docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
