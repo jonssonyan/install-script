@@ -220,7 +220,7 @@ EOF
 }
 
 # 安装k8s
-k8s_install() {
+install_k8s() {
   if [[ ! $(docker -v 2>/dev/null) ]]; then
     echo_content green "---> 安装k8s"
 
@@ -252,6 +252,9 @@ EOF
 
     if [[ $(kubelet --version 2>/dev/null) ]]; then
       echo_content skyBlue "---> k8s安装完成"
+      k8s_run
+      k8s_network_install
+      k8s_bash_completion
     else
       echo_content red "---> k8s安装失败"
       exit 1
@@ -320,10 +323,7 @@ main() {
   install_depend
   install_prepare
   install_docker
-  k8s_install
-  k8s_run
-  k8s_network_install
-  k8s_bash_completion
+  install_k8s
 }
 
 main
