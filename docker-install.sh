@@ -283,7 +283,7 @@ install_docker() {
 
     setup_docker
 
-    systemctl daemon-reload && systemctl enable docker && systemctl restart docker && docker network create trojan-panel-network
+    systemctl daemon-reload && systemctl enable docker && systemctl restart docker && docker network create js-network
 
     if [[ $(command -v docker) ]]; then
       echo_content skyBlue "---> Docker安装完成"
@@ -293,7 +293,7 @@ install_docker() {
     fi
   else
     if [[ -z $(docker network ls | grep "js-network") ]]; then
-      docker network create trojan-panel-network
+      docker network create js-network
     fi
     echo_content skyBlue "---> 你已经安装了Docker"
   fi
