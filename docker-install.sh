@@ -518,24 +518,24 @@ install_ssr() {
     done
 
     cat >${ssr_config} <<EOF
-    {
-        "server":"0.0.0.0",
-        "server_ipv6":"::",
-        "server_port":${ssr_port},
-        "local_address":"127.0.0.1",
-        "local_port":1080,
-        "password":"${ssr_password}",
-        "timeout":120,
-        "method":"${ssr_method}",
-        "protocol":"${ssr_protocols}",
-        "protocol_param":"",
-        "obfs":"${ssr_obfs}",
-        "obfs_param":"",
-        "redirect":"",
-        "dns_ipv6":false,
-        "fast_open":true,
-        "workers":1
-    }
+{
+    "server":"0.0.0.0",
+    "server_ipv6":"::",
+    "server_port":${ssr_port},
+    "local_address":"127.0.0.1",
+    "local_port":1080,
+    "password":"${ssr_password}",
+    "timeout":120,
+    "method":"${ssr_method}",
+    "protocol":"${ssr_protocols}",
+    "protocol_param":"",
+    "obfs":"${ssr_obfs}",
+    "obfs_param":"",
+    "redirect":"",
+    "dns_ipv6":false,
+    "fast_open":true,
+    "workers":1
+}
 EOF
 
     docker pull teddysun/shadowsocks-r &&
