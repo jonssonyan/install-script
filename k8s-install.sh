@@ -18,8 +18,8 @@ init_var() {
 
   # k8s
   k8s_version=""
-  network=""
-  is_master=0
+  is_master=1
+  network="flannel"
   K8S_DATA="/k8sdata"
   K8S_LOG="/k8sdata/log"
   K8S_NETWORK="/k8sdata/network"
@@ -224,6 +224,33 @@ EOF
 install_k8s() {
   if [[ ! $(docker -v 2>/dev/null) ]]; then
     echo_content green "---> 安装k8s"
+
+    while read -r -p "请输入是否为主节点?(0/否 1/是 默认:1/是): " is_master; do
+      if [[ -z "${is_master}" || ${is_master} == 1 ]]; then
+        is_master=1
+        break
+      else
+        if [[ ${is_master} != 0 ]]; then
+          echo_content red "不可以输入除0和1之外的其他字符"
+        else
+          break
+        fi
+      fi
+    done
+
+    while read -r -p "请输入安装哪个网络系统?(1/flannel 2/calico 默认:1/flannel): " is_master; do
+      if [[ -z "${network}" || ${network} == 1 ]]; then
+        network="flannel"
+        break
+      else
+        if [[ ${network} != 2 ]]; then
+          echo_content red "不可以输入除1和2之外的其他字符"
+        else
+          network="calico"
+          break
+        fi
+      fi
+    done
 
     if [[ ${can_google} == 0 ]]; then
       # https://developer.aliyun.com/mirror/kubernetes
