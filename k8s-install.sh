@@ -361,7 +361,7 @@ k8s_network_install() {
     fi
     if [[ "$?" == "0" ]]; then
       mkdir -p "$HOME"/.kube
-      cp -i /etc/kubernetes/admin.conf "$HOM"E/.kube/config
+      cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
       chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
       echo_content skyBlue "---> 网络系统安装完成"
     else
