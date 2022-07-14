@@ -49,6 +49,60 @@ init_var() {
   NACOS_DATA="/jsdata/nacos/"
   nacos_ip="js-nacos"
   nacos_port=8848
+
+  # ShadowsocksR
+  SSR_DATA="/jsdata/ssr/"
+  ssr_ip="js-ssr"
+  ssr_port=80
+  ssr_password="123456"
+  ssr_config="/jsdata/ssr/config.json"
+  ssr_method=""
+  ssr_protocols=""
+  ssr_obfs=""
+  methods=(
+    none
+    aes-256-cfb
+    aes-192-cfb
+    aes-128-cfb
+    aes-256-cfb8
+    aes-192-cfb8
+    aes-128-cfb8
+    aes-256-ctr
+    aes-192-ctr
+    aes-128-ctr
+    chacha20-ietf
+    chacha20
+    salsa20
+    xchacha20
+    xsalsa20
+    rc4-md5
+  )
+  # https://github.com/shadowsocksr-rm/shadowsocks-rss/blob/master/ssr.md
+  protocols=(
+    origin
+    verify_deflate
+    auth_sha1_v4
+    auth_sha1_v4_compatible
+    auth_aes128_md5
+    auth_aes128_sha1
+    auth_chain_a
+    auth_chain_b
+    auth_chain_c
+    auth_chain_d
+    auth_chain_e
+    auth_chain_f
+  )
+  obfs=(
+    plain
+    http_simple
+    http_simple_compatible
+    http_post
+    http_post_compatible
+    tls1.2_ticket_auth
+    tls1.2_ticket_auth_compatible
+    tls1.2_ticket_fastauth
+    tls1.2_ticket_fastauth_compatible
+  )
 }
 
 echo_content() {
@@ -92,6 +146,9 @@ mkdir_tools() {
 
   # Nacos
   mkdir -p ${NACOS_DATA}
+
+  # ShadowsocksR
+  mkdir -p ${SSR_DATA}
 }
 
 can_connect() {
@@ -393,6 +450,111 @@ install_nacos() {
   fi
 }
 
+install_ssr() {
+  if [[ -z $(docker ps -q -f "name=^js-ssr$") ]]; then
+    echo_content green "---> 安装ShadowsocksR"
+
+    while true; do
+      for ((i = 1; i <= ${#methods[@]}; i++)); do
+        hint="${methods[$i - 1]}"
+        echo_content yellow "${i}) ${hint}"
+      done
+      read -r -p "请选择ShadowsocksR的加密类型(默认:${methods[0]}): " r_methods
+      [[ -z "${r_methods}" ]] && r_methods=1
+      expr ${r_methods} + 1 &>/dev/null
+      if [[ "$?" != "0" ]]; then
+        echo_content red "请输入数字"
+        continue
+      fi
+      if [[ "${r_methods}" -lt 1 || "${r_methods}" -gt ${#methods[@]} ]]; then
+        echo_content red "输入的数字范围在 1 到 ${#methods[@]}"
+        continue
+      fi
+      ssr_method=${methods[r_methods - 1]}
+    done
+
+    while true; do
+      for ((i = 1; i <= ${#protocols[@]}; i++)); do
+        hint="${protocols[$i - 1]}"
+        echo_content yellow "${i}) ${hint}"
+      done
+      read -r -p "请选择ShadowsocksR的协议(默认:${protocols[0]}): " r_protocols
+      [[ -z "${r_protocols}" ]] && r_protocols=1
+      expr ${r_protocols} + 1 &>/dev/null
+      if [[ "$?" != "0" ]]; then
+        echo_content red "请输入数字"
+        continue
+      fi
+      if [[ "${r_protocols}" -lt 1 || "${r_protocols}" -gt ${#protocols[@]} ]]; then
+        echo_content red "输入的数字范围在 1 到 ${#protocols[@]}"
+        continue
+      fi
+      ssr_method=${protocols[r_protocols - 1]}
+    done
+
+    while true; do
+      for ((i = 1; i <= ${#obfs[@]}; i++)); do
+        hint="${obfs[$i - 1]}"
+        echo_content yellow "${i}) ${hint}"
+      done
+      read -r -p "请选择ShadowsocksR的混淆方式(默认:${obfs[0]}): " r_obfs
+      [[ -z "${r_obfs}" ]] && r_obfs=1
+      expr ${r_obfs} + 1 &>/dev/null
+      if [[ "$?" != "0" ]]; then
+        echo_content red "请输入数字"
+        continue
+      fi
+      if [[ "${r_obfs}" -lt 1 || "${r_obfs}" -gt ${#obfs[@]} ]]; then
+        echo_content red "输入的数字范围在 1 到 ${#obfs[@]}"
+        continue
+      fi
+      ssr_method=${obfs[r_obfs - 1]}
+    done
+
+    cat >${ssr_config} <<EOF
+    {
+        "server":"0.0.0.0",
+        "server_ipv6":"::",
+        "server_port":${ssr_port},
+        "local_address":"127.0.0.1",
+        "local_port":1080,
+        "password":"${ssr_password}",
+        "timeout":120,
+        "method":"${ssr_method}",
+        "protocol":"${ssr_protocols}",
+        "protocol_param":"",
+        "obfs":"${ssr_obfs}",
+        "obfs_param":"",
+        "redirect":"",
+        "dns_ipv6":false,
+        "fast_open":true,
+        "workers":1
+    }
+EOF
+
+    docker pull teddysun/shadowsocks-r &&
+      docker run -d --name ${ssr_ip} --restart=always \
+        --network=js-network \
+        -p ${ssr_port}:${ssr_port} -p ${ssr_port}:${ssr_port}/udp \
+        -v ${ssr_config}:/etc/shadowsocks-r \
+        teddysun/shadowsocks-r
+
+    if [[ -n $(docker ps -q -f "name=^js-ssr$") ]]; then
+      echo_content skyBlue "---> ShadowsocksR安装完成"
+      echo_content yellow "ShadowsocksR的端口: ${ssr_port}"
+      echo_content yellow "ShadowsocksR的密码(请妥善保存): ${ssr_password}"
+      echo_content yellow "ShadowsocksR的加密类型: ${ssr_method}"
+      echo_content yellow "ShadowsocksR的协议: ${ssr_protocols}"
+      echo_content yellow "ShadowsocksR的混淆方式: ${ssr_obfs}"
+    else
+      echo_content red "---> ShadowsocksR安装失败"
+      exit 1
+    fi
+  else
+    echo_content skyBlue "---> 你已经安装了ShadowsocksR"
+  fi
+}
+
 main() {
   cd "$HOME" || exit 0
   init_var
@@ -411,6 +573,7 @@ main() {
   echo_content yellow "3. 安装Redis"
   echo_content yellow "4. 安装Minio"
   echo_content yellow "5. 安装Nacos"
+  echo_content yellow "6. 安装ShadowsocksR"
   read -r -p "请选择:" selectInstall_type
   case ${selectInstall_type} in
   1)
@@ -431,6 +594,10 @@ main() {
   5)
     install_docker
     install_nacos
+    ;;
+  6)
+    install_docker
+    install_ssr
     ;;
   *)
     echo_content red "没有这个选项"
