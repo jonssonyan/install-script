@@ -146,7 +146,7 @@ install_docker() {
         yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
       fi
       yum makecache fast
-      yum install docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
+      yum install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
     elif [[ ${release} == 'debian' || ${release} == 'ubuntu' ]]; then
       apt-get remove docker docker-engine docker.io containerd runc
       apt-get update
@@ -168,7 +168,7 @@ install_docker() {
               $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
       fi
       apt-get update
-      apt-get install docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
+      apt-get install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
     fi
 
     setup_docker
