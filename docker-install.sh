@@ -547,11 +547,11 @@ EOF
 
     if [[ -n $(docker ps -q -f "name=^js-ssr$") ]]; then
       echo_content skyBlue "---> ShadowsocksR安装完成"
-      echo_content yellow "ShadowsocksR的端口: ${ssr_port}"
-      echo_content yellow "ShadowsocksR的密码(请妥善保存): ${ssr_password}"
-      echo_content yellow "ShadowsocksR的加密类型: ${ssr_method}"
-      echo_content yellow "ShadowsocksR的协议: ${ssr_protocols}"
-      echo_content yellow "ShadowsocksR的混淆方式: ${ssr_obfs}"
+      echo_content yellow "---> ShadowsocksR的端口: ${ssr_port}"
+      echo_content yellow "---> ShadowsocksR的密码(请妥善保存): ${ssr_password}"
+      echo_content yellow "---> ShadowsocksR的加密类型: ${ssr_method}"
+      echo_content yellow "---> ShadowsocksR的协议: ${ssr_protocols}"
+      echo_content yellow "---> ShadowsocksR的混淆方式: ${ssr_obfs}"
     else
       echo_content red "---> ShadowsocksR安装失败"
       exit 1
