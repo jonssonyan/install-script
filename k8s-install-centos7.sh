@@ -271,7 +271,7 @@ k8s_run() {
       --kubernetes-version "${k8s_version}" \
       --apiserver-advertise-address 192.168.0.101 \
       --pod-network-cidr=10.244.0.0/16 \
-      --service-cidr=10.233.0.0/16 \
+      --service-cidr=10.96.0.0/12 \
       --token-ttl 0 | tee /k8sdata/log/kubeadm-init.log
     mkdir -p "$HOME"/.kube
     cp -i /etc/kubernetes/admin.conf "$HOM"E/.kube/config
