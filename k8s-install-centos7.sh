@@ -158,7 +158,7 @@ EOF
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
   systemctl restart rsyslog
   systemctl restart crond
-  echo_content green "---> 环境准备完成"
+  echo_content skyBlue "---> 环境准备完成"
 }
 
 # 安装Docker
@@ -237,7 +237,7 @@ EOF
 
 # 安装k8s
 install_k8s() {
-  if [[ ! $(docker -v 2>/dev/null) ]]; then
+  if [[ ! $(kubelet --verison 2>/dev/null) ]]; then
     echo_content green "---> 安装k8s"
 
     read -r -p "请输入K8s版本(默认:v1.20.15): " k8s_version
@@ -283,7 +283,7 @@ EOF
     yum install -y --nogpgcheck kubelet-"${k8s_version}" kubeadm-"${k8s_version}" kubectl-"${k8s_version}"
     systemctl enable kubelet && systemctl start kubelet
 
-    if [[ $(kubelet --version 2>/dev/null) ]]; then
+    if [[ $(kubelet --verison 2>/dev/null) ]]; then
       echo_content skyBlue "---> k8s安装完成"
       k8s_run
       k8s_network_install
@@ -299,8 +299,8 @@ EOF
 
 # 运行k8s
 k8s_run() {
-  echo_content green "---> 运行k8s"
   if [[ ${is_master} == 1 ]]; then
+    echo_content green "---> 运行k8s"
     # https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
     kubeadm init \
       --image-repository ${K8S_MIRROR} \
@@ -309,15 +309,19 @@ k8s_run() {
       --pod-network-cidr=10.244.0.0/16 \
       --service-cidr=10.96.0.0/12 \
       --token-ttl 0 | tee /k8sdata/log/kubeadm-init.log
-    mkdir -p "$HOME"/.kube
-    cp -i /etc/kubernetes/admin.conf "$HOM"E/.kube/config
-    chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
+    if [[ "$?" == "0" ]]; then
+      mkdir -p "$HOME"/.kube
+      cp -i /etc/kubernetes/admin.conf "$HOM"E/.kube/config
+      chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
+      echo_content skyBlue "---> k8s运行完成"
+    else
+      echo_content red "---> k8s运行失败"
+    fi
   else
     echo "该节点为从节点, 请手动运行 kubeadm join 命令. 如果你忘记了命令, 可以在主节点上运行 $(
-      echo_content green "kubeadm token create --print-join-command"
+      echo_content yellow "kubeadm token create --print-join-command"
     )"
   fi
-  echo_content skyBlue "---> k8s运行完成"
 }
 
 # 安装网络系统
