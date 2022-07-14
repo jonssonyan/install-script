@@ -18,7 +18,7 @@ init_var() {
 
   # k8s
   k8s_version="v1.20.15"
-  is_master=1
+  is_master=0
   network="flannel"
   K8S_DATA="/k8sdata"
   K8S_LOG="/k8sdata/log"
@@ -83,6 +83,19 @@ check_sys() {
     echo_content red "必须是 root 才能运行此脚本"
     exit 1
   fi
+
+  while read -r -p "请输入是否为主节点?(0/否 1/是 默认:1/是): " is_master; do
+    if [[ -z "${is_master}" || ${is_master} == 1 ]]; then
+      is_master=1
+      break
+    else
+      if [[ ${is_master} != 0 ]]; then
+        echo_content red "不可以输入除0和1之外的其他字符"
+      else
+        break
+      fi
+    fi
+  done
   if [[ $(grep -c "processor" /proc/cpuinfo) == 1 && ${is_master} == 1 ]]; then
     echo_content red "主节点 需要 2 CPU 核或更多"
     exit 1
@@ -229,19 +242,6 @@ install_k8s() {
 
     read -r -p "请输入K8s版本(默认:v1.20.15): " k8s_version
     [[ -z "${k8s_version}" ]] && k8s_version="v1.20.15"
-
-    while read -r -p "请输入是否为主节点?(0/否 1/是 默认:1/是): " is_master; do
-      if [[ -z "${is_master}" || ${is_master} == 1 ]]; then
-        is_master=1
-        break
-      else
-        if [[ ${is_master} != 0 ]]; then
-          echo_content red "不可以输入除0和1之外的其他字符"
-        else
-          break
-        fi
-      fi
-    done
 
     while read -r -p "请输入安装哪个网络系统?(1/flannel 2/calico 默认:1/flannel): " is_master; do
       if [[ -z "${network}" || ${network} == 1 ]]; then
