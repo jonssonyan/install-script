@@ -11,6 +11,9 @@ export PATH
 init_var() {
   ECHO_TYPE="echo -e"
 
+  package_manager=""
+  release=""
+  get_arch=""
   can_google=0
 
   # k8s
@@ -244,7 +247,7 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 EOF
     fi
 
-    ${package_manager} install -y --nogpgcheck kubelet-"${k8s_version}" kubeadm-"${k8s_version}" kubectl-"${k8s_version}"
+    yum install -y --nogpgcheck kubelet-"${k8s_version}" kubeadm-"${k8s_version}" kubectl-"${k8s_version}"
     systemctl enable kubelet && systemctl start kubelet
 
     if [[ $(kubelet --version 2>/dev/null) ]]; then
