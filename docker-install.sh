@@ -128,7 +128,7 @@ EOF
 }
 
 install_docker() {
-  if [[ ! $(docker -v 2>/dev/null) ]]; then
+  if [[ ! $(command -v docker) ]]; then
     echo_content green "---> 安装Docker"
 
     read -r -p "请输入Docker版本(默认:19.03.15): " docker_version
@@ -181,7 +181,7 @@ install_docker() {
 
     systemctl daemon-reload && systemctl enable docker && systemctl restart docker
 
-    if [[ $(docker -v 2>/dev/null) ]]; then
+    if [[ $(command -v docker) ]]; then
       echo_content skyBlue "---> Docker安装完成"
     else
       echo_content red "---> Docker安装失败"

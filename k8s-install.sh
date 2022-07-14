@@ -177,7 +177,7 @@ EOF
 
 # 安装Docker
 install_docker() {
-  if [[ ! $(docker -v 2>/dev/null) ]]; then
+  if [[ ! $(command -v docker) ]]; then
     echo_content green "---> 安装Docker"
 
     can_connect www.google.com && can_google=1
@@ -222,7 +222,7 @@ EOF
     sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
     systemctl enable containerd && systemctl restart containerd
 
-    if [[ $(docker -v 2>/dev/null) ]]; then
+    if [[ $(command -v docker) ]]; then
       echo_content skyBlue "---> Docker安装完成"
     else
       echo_content red "---> Docker安装失败"
@@ -235,7 +235,7 @@ EOF
 
 # 安装k8s
 install_k8s() {
-  if [[ ! $(kubelet --version 2>/dev/null) ]]; then
+  if [[ ! $(command -v kubeadm) ]]; then
     echo_content green "---> 安装k8s"
 
     while read -r -p "请输入安装哪个网络系统?(1/flannel 2/calico 默认:1/flannel): " networkNum; do
@@ -307,7 +307,7 @@ EOF
     fi
     systemctl enable kubelet && systemctl start kubelet
 
-    if [[ $(kubelet --version 2>/dev/null) ]]; then
+    if [[ $(command -v kubeadm) ]]; then
       echo_content skyBlue "---> k8s安装完成"
       k8s_run
       k8s_network_install

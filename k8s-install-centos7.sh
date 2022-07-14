@@ -163,7 +163,7 @@ EOF
 
 # 安装Docker
 install_docker() {
-  if [[ ! $(docker -v 2>/dev/null) ]]; then
+  if [[ ! $(command -v docker) ]]; then
     echo_content green "---> 安装Docker"
 
     read -r -p "请输入Docker版本(默认:19.03.15): " docker_version
@@ -224,7 +224,7 @@ EOF
     sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
     systemctl enable containerd && systemctl restart containerd
 
-    if [[ $(docker -v 2>/dev/null) ]]; then
+    if [[ $(command -v docker) ]]; then
       echo_content skyBlue "---> Docker安装完成"
     else
       echo_content red "---> Docker安装失败"
@@ -237,7 +237,7 @@ EOF
 
 # 安装k8s
 install_k8s() {
-  if [[ ! $(kubelet --verison 2>/dev/null) ]]; then
+  if [[ ! $(command -v kubeadm) ]]; then
     echo_content green "---> 安装k8s"
 
     read -r -p "请输入K8s版本(默认:v1.20.15): " k8s_version
@@ -283,7 +283,7 @@ EOF
     yum install -y --nogpgcheck kubelet-"${k8s_version//v/}" kubeadm-"${k8s_version//v/}" kubectl-"${k8s_version//v/}"
     systemctl enable kubelet && systemctl start kubelet
 
-    if [[ $(kubelet --verison 2>/dev/null) ]]; then
+    if [[ $(command -v kubeadm) ]]; then
       echo_content skyBlue "---> k8s安装完成"
       k8s_run
       k8s_network_install
