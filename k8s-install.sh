@@ -149,11 +149,11 @@ install_prepare() {
   fi
   swapoff -a && sed -ri 's/.*swap.*/#&/' /etc/fstab
   cat >/etc/modules-load.d/k8s.conf <<EOF
-  br_netfilter
+br_netfilter
 EOF
   cat >/etc/sysctl.d/k8s.conf <<EOF
-  net.bridge.bridge-nf-call-ip6tables = 1
-  net.bridge.bridge-nf-call-iptables = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
 EOF
   sysctl --system
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
