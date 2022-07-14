@@ -4,7 +4,7 @@ export PATH
 
 # System Required: CentOS 7+/Ubuntu 18+/Debian 10+
 # Version: v1.0.0
-# Description: One click install docker
+# Description: One click install Docker based Services
 # Author: jonssonyan <https://jonssonyan.com>
 # Github: https://github.com/jonssonyan
 

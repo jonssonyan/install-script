@@ -11,7 +11,7 @@
 source <(curl -L https://github.com/jonssonyan/install-script/raw/main/k8s-install.sh)
 ```
 
-## 0x1. K8s for Centos7
+## 0x1. K8s for CentOS 7
 
 - OS version: CentOS 7+
 - CPU Architecture: x86_64/amd64 arm64/aarch64
@@ -22,7 +22,7 @@ source <(curl -L https://github.com/jonssonyan/install-script/raw/main/k8s-insta
 source <(curl -L https://github.com/jonssonyan/install-script/raw/main/k8s-install-centos7.sh)
 ```
 
-## 0x2. Docker
+## 0x2. Docker based Services
 
 - OS version: CentOS 7+/Ubuntu 18+/Debian 10+
 - CPU Architecture: x86_64/amd64 arm64/aarch64

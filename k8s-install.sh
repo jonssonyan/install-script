@@ -4,7 +4,7 @@ export PATH
 
 # System Required: CentOS 7+/Ubuntu 18+/Debian 10+
 # Version: v1.0.0
-# Description: One click install k8s
+# Description: One click install K8s
 # Author: jonssonyan <https://jonssonyan.com>
 # Github: https://github.com/jonssonyan
 
