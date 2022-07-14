@@ -489,7 +489,7 @@ install_ssr() {
         echo_content red "输入的数字范围在 1 到 ${#protocols[@]}"
         continue
       fi
-      ssr_method=${protocols[r_protocols - 1]}
+      ssr_protocols=${protocols[r_protocols - 1]}
     done
 
     while true; do
@@ -508,7 +508,7 @@ install_ssr() {
         echo_content red "输入的数字范围在 1 到 ${#obfs[@]}"
         continue
       fi
-      ssr_method=${obfs[r_obfs - 1]}
+      ssr_obfs=${obfs[r_obfs - 1]}
     done
 
     cat >${ssr_config} <<EOF
