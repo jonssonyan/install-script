@@ -125,6 +125,9 @@ install_docker() {
   if [[ ! $(docker -v 2>/dev/null) ]]; then
     echo_content green "---> 安装Docker"
 
+    read -r -p "请输入Docker版本(默认:19.03.15): " docker_version
+    [[ -z "${docker_version}" ]] && docker_version="19.03.15"
+
     can_connect www.google.com && can_google=1
 
     if [[ ${release} == 'centos' ]]; then
