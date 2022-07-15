@@ -201,7 +201,7 @@ install_docker() {
 }
 EOF
     else
-      yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+      yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
       cat >/etc/docker/daemon.json <<EOF
 {
     "exec-opts": ["native.cgroupdriver=systemd"],
