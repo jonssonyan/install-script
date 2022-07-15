@@ -258,9 +258,9 @@ install_k8s() {
       fi
     done
 
-    # https://developer.aliyun.com/mirror/kubernetes
     if [[ ${can_google} == 0 ]]; then
-      cat <<EOF >/etc/yum.repos.d/kubernetes.repo
+      # https://developer.aliyun.com/mirror/kubernetes
+      cat >/etc/yum.repos.d/kubernetes.repo <<EOF
 [kubernetes]
 name=Kubernetes
 baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
@@ -270,7 +270,7 @@ repo_gpgcheck=1
 gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
     else
-      cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+      cat >/etc/yum.repos.d/kubernetes.repo <<EOF
 [kubernetes]
 name=Kubernetes
 baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
