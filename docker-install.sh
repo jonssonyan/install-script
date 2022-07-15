@@ -229,6 +229,7 @@ setup_docker() {
 }
 EOF
   fi
+  systemctl daemon-reload
 }
 
 install_docker() {
@@ -240,7 +241,7 @@ install_docker() {
 
     can_connect www.google.com && can_google=1
 
-    if [[ ${release} == 'centos' ]]; then
+    if [[ "${release}" == "centos" ]]; then
       yum remove docker \
         docker-client \
         docker-client-latest \
@@ -257,7 +258,7 @@ install_docker() {
       fi
       yum makecache fast
       yum install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
-    elif [[ ${release} == 'debian' || ${release} == 'ubuntu' ]]; then
+    elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
       apt-get remove docker docker-engine docker.io containerd runc
       apt-get update -y
       apt-get install -y \
@@ -279,11 +280,14 @@ install_docker() {
       fi
       apt-get update -y
       apt-get install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
+    else
+      echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
+      exit 1
     fi
 
     setup_docker
 
-    systemctl daemon-reload && systemctl enable docker && systemctl restart docker && docker network create js-network
+    systemctl enable docker && systemctl restart docker && docker network create js-network
 
     if [[ $(command -v docker) ]]; then
       echo_content skyBlue "---> Docker安装完成"

@@ -155,7 +155,7 @@ install_depend() {
 # 准备安装
 install_prepare() {
   echo_content green "---> 环境准备"
-  if [[ ${release} == 'centos' ]]; then
+  if [[ "${release}" == "centos" ]]; then
     systemctl disable firewalld.service && systemctl stop firewalld.service
   fi
   if [ -s /etc/selinux/config ] && grep 'SELINUX=enforcing' /etc/selinux/config; then
@@ -229,7 +229,7 @@ install_docker() {
 
     can_connect www.google.com && can_google=1
 
-    if [[ ${release} == 'centos' ]]; then
+    if [[ "${release}" == "centos" ]]; then
       ${package_manager} remove docker \
         docker-client \
         docker-client-latest \
@@ -245,8 +245,7 @@ install_docker() {
         wget -O /etc/yum.repos.d/docker-ce.repo https://download.docker.com/linux/centos/docker-ce.repo
       fi
       ${package_manager} makecache fast
-
-    elif [[ ${release} == 'debian' || ${release} == 'ubuntu' ]]; then
+    elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
       ${package_manager} remove docker docker-engine docker.io containerd runc
       ${package_manager} update -y
       ${package_manager} install -y \
@@ -271,10 +270,18 @@ install_docker() {
       echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
       exit 1
     fi
+
     if [[ -z "${docker_version}" ]]; then
       ${package_manager} install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
     else
-      ${package_manager} install -y docker-ce-"${docker_version}" docker-ce-cli-"${docker_version}" containerd.io docker-compose-plugin
+      if [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
+        ${package_manager} install -y docker-ce="${docker_version}" docker-ce-cli="${docker_version}" containerd.io docker-compose-plugin
+      elif [[ ${package_manager} == "yum" || ${package_manager} == "dnf" ]]; then
+        ${package_manager} install -y docker-ce-"${docker_version}" docker-ce-cli-"${docker_version}" containerd.io docker-compose-plugin
+      else
+        echo_content red "暂不支持该系统"
+        exit 1
+      fi
     fi
 
     setup_docker
@@ -315,7 +322,7 @@ install_k8s() {
     done
 
     # https://developer.aliyun.com/mirror/kubernetes
-    if [[ ${release} == 'centos' ]]; then
+    if [[ "${release}" == "centos" ]]; then
       if [[ ${can_google} == 0 ]]; then
         cat >/etc/yum.repos.d/kubernetes.repo <<EOF
 [kubernetes]
@@ -337,7 +344,7 @@ repo_gpgcheck=1
 gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOF
       fi
-    elif [[ ${release} == 'debian' || ${release} == 'ubuntu' ]]; then
+    elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
       ${package_manager} install -y apt-transport-https ca-certificates
       if [[ ${can_google} == 0 ]]; then
         curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg
@@ -362,8 +369,11 @@ EOF
       if [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
         install_version=$(apt-cache madison kubectl | grep "${k8s_version}" | cut -d \| -f 2 | sed 's/ //g')
         ${package_manager} install -y kubelet="${install_version}" kubeadm="${install_version}" kubectl="${install_version}"
-      else
+      elif [[ ${package_manager} == "yum" || ${package_manager} == "dnf" ]]; then
         ${package_manager} install -y --nogpgcheck kubelet-"${k8s_version//v/}" kubeadm-"${k8s_version//v/}" kubectl-"${k8s_version//v/}"
+      else
+        echo_content red "暂不支持该系统"
+        exit 1
       fi
     fi
     systemctl enable kubelet && systemctl start kubelet
@@ -411,7 +421,7 @@ k8s_run() {
 
 # 安装网络系统
 k8s_network_install() {
-  if [[ -n ${network} ]]; then
+  if [[ -z "${network}" ]]; then
     echo_content green "---> 安装网络系统"
     if [[ ${network} == "flannel" ]]; then
       wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${kube_flannel_url}

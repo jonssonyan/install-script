@@ -327,7 +327,7 @@ k8s_run() {
 
 # 安装网络系统
 k8s_network_install() {
-  if [[ -n ${network} ]]; then
+  if [[ -z "${network}" ]]; then
     echo_content green "---> 安装网络系统"
     if [[ ${network} == "flannel" ]]; then
       wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${kube_flannel_url}
