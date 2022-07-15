@@ -150,6 +150,7 @@ install_prepare() {
   cat >/etc/modules-load.d/k8s.conf <<EOF
 br_netfilter
 EOF
+
   cat >/etc/sysctl.d/k8s.conf <<EOF
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
