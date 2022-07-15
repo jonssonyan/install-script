@@ -6,7 +6,7 @@ export PATH
 # Version: v1.0.0
 # Description: One click install K8s
 # Author: jonssonyan <https://jonssonyan.com>
-# Github: https://github.com/jonssonyan
+# Github: https://github.com/jonssonyan/install-scipt
 
 init_var() {
   ECHO_TYPE="echo -e"
@@ -28,6 +28,7 @@ init_var() {
   calico_url="https://docs.projectcalico.org/manifests/calico.yaml"
 
   # Docker
+  docker_version=""
   DOCKER_MIRROR='"https://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://registry.docker-cn.com"'
 }
 
@@ -128,12 +129,12 @@ check_sys() {
     exit 1
   fi
 
-  if [[ $(arch) =~ ("x86_64"|"amd64") ]]; then
+  if [[ $(arch) =~ ("x86_64"|"amd64"|"arm64"|"aarch64") ]]; then
     get_arch=$(arch)
   fi
 
   if [[ -z "${get_arch}" ]]; then
-    echo_content red "仅支持x86_64/amd64处理器架构"
+    echo_content red "仅支持x86_64/amd64和arm64/aarch64处理器架构"
     exit 1
   fi
 }
@@ -176,17 +177,12 @@ EOF
   echo_content skyBlue "---> 环境准备完成"
 }
 
-# 安装Docker
-install_docker() {
-  if [[ ! $(command -v docker) ]]; then
-    echo_content green "---> 安装Docker"
+setup_docker() {
+  can_connect www.google.com && can_google=1
 
-    can_connect www.google.com && can_google=1
-
-    mkdir -p /etc/docker
-    if [[ ${can_google} == 0 ]]; then
-      sh <(curl -sL https://get.docker.com) --mirror Aliyun
-      cat >/etc/docker/daemon.json <<EOF
+  mkdir -p /etc/docker
+  if [[ ${can_google} == 0 ]]; then
+    cat >/etc/docker/daemon.json <<EOF
 {
   "exec-opts": ["native.cgroupdriver=systemd"],
     "log-driver": "json-file",
@@ -200,9 +196,8 @@ install_docker() {
     "registry-mirrors":[${DOCKER_MIRROR}]
 }
 EOF
-    else
-      sh <(curl -sL https://get.docker.com)
-      cat >/etc/docker/daemon.json <<EOF
+  else
+    cat >/etc/docker/daemon.json <<EOF
 {
     "exec-opts": ["native.cgroupdriver=systemd"],
     "log-driver": "json-file",
@@ -215,13 +210,77 @@ EOF
     ]
 }
 EOF
+  fi
+  systemctl daemon-reload
+}
+
+setup_containerd() {
+  containerd config default >/etc/containerd/config.toml
+  sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
+  systemctl enable containerd && systemctl restart containerd
+}
+
+# 安装Docker
+install_docker() {
+  if [[ ! $(command -v docker) ]]; then
+    echo_content green "---> 安装Docker"
+
+    read -r -p "请输入Docker版本(默认:latest): " docker_version
+
+    can_connect www.google.com && can_google=1
+
+    if [[ ${release} == 'centos' ]]; then
+      ${package_manager} remove docker \
+        docker-client \
+        docker-client-latest \
+        docker-common \
+        docker-latest \
+        docker-latest-logrotate \
+        docker-logrotate \
+        docker-engine
+      ${package_manager} install -y yum-utils
+      if [[ ${can_google} == 0 ]]; then
+        wget -O /etc/yum.repos.d/docker-ce.repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+      else
+        wget -O /etc/yum.repos.d/docker-ce.repo https://download.docker.com/linux/centos/docker-ce.repo
+      fi
+      ${package_manager} makecache fast
+
+    elif [[ ${release} == 'debian' || ${release} == 'ubuntu' ]]; then
+      ${package_manager} remove docker docker-engine docker.io containerd runc
+      ${package_manager} update -y
+      ${package_manager} install -y \
+        ca-certificates \
+        curl \
+        gnupg \
+        lsb-release
+      mkdir -p /etc/apt/keyrings
+      if [[ ${can_google} == 0 ]]; then
+        curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/${release}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] http://mirrors.aliyun.com/docker-ce/linux/${release} \
+              $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+      else
+        curl -fsSL https://download.docker.com/linux/${release}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/${release} \
+              $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+      fi
+      ${package_manager} update -y
+    else
+      echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
+      exit 1
+    fi
+    if [[ -z "${docker_version}" ]]; then
+      ${package_manager} install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    else
+      ${package_manager} install -y docker-ce-"${docker_version}" docker-ce-cli-"${docker_version}" containerd.io docker-compose-plugin
     fi
 
-    systemctl daemon-reload && systemctl enable docker && systemctl restart docker
+    setup_docker
+    setup_containerd
 
-    containerd config default >/etc/containerd/config.toml
-    sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
-    systemctl enable containerd && systemctl restart containerd
+    systemctl enable docker && systemctl restart docker
 
     if [[ $(command -v docker) ]]; then
       echo_content skyBlue "---> Docker安装完成"
@@ -239,6 +298,8 @@ install_k8s() {
   if [[ ! $(command -v kubeadm) ]]; then
     echo_content green "---> 安装k8s"
 
+    read -r -p "请输入K8s版本(默认:latest): " k8s_version
+
     while read -r -p "请输入安装哪个网络系统?(1/flannel 2/calico 默认:1/flannel): " networkNum; do
       if [[ -z "${networkNum}" || ${networkNum} == 1 ]]; then
         network="flannel"
@@ -253,11 +314,10 @@ install_k8s() {
       fi
     done
 
-    if [[ ${can_google} == 0 ]]; then
-      # https://developer.aliyun.com/mirror/kubernetes
-      if [[ ${release} == 'centos' ]]; then
-        if [[ ${can_google} == 0 ]]; then
-          cat >/etc/yum.repos.d/kubernetes.repo <<EOF
+    # https://developer.aliyun.com/mirror/kubernetes
+    if [[ ${release} == 'centos' ]]; then
+      if [[ ${can_google} == 0 ]]; then
+        cat >/etc/yum.repos.d/kubernetes.repo <<EOF
 [kubernetes]
 name=Kubernetes
 baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
@@ -266,8 +326,8 @@ gpgcheck=1
 repo_gpgcheck=1
 gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
-        else
-          cat >/etc/yum.repos.d/kubernetes.repo <<EOF
+      else
+        cat >/etc/yum.repos.d/kubernetes.repo <<EOF
 [kubernetes]
 name=Kubernetes
 baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
@@ -276,27 +336,27 @@ gpgcheck=1
 repo_gpgcheck=1
 gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOF
-        fi
-      elif [[ ${release} == 'debian' || ${release} == 'ubuntu' ]]; then
-        ${package_manager} install -y apt-transport-https ca-certificates
-        if [[ ${can_google} == 0 ]]; then
-          curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -
-          cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
+      fi
+    elif [[ ${release} == 'debian' || ${release} == 'ubuntu' ]]; then
+      ${package_manager} install -y apt-transport-https ca-certificates
+      if [[ ${can_google} == 0 ]]; then
+        curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg
+        cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
 deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
 EOF
-        else
-          curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-          cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
+      else
+        curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
 deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
-        fi
-        ${package_manager} update -y
-      else
-        echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
-        exit 1
       fi
+      ${package_manager} update -y
+    else
+      echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
+      exit 1
     fi
-    if [[ -z ${k8s_version} ]]; then
+
+    if [[ -z "${k8s_version}" ]]; then
       ${package_manager} install -y --nogpgcheck kubelet kubeadm kubectl
     else
       if [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then

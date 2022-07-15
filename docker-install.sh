@@ -6,7 +6,7 @@ export PATH
 # Version: v1.0.0
 # Description: One click install Docker based Services
 # Author: jonssonyan <https://jonssonyan.com>
-# Github: https://github.com/jonssonyan
+# Github: https://github.com/jonssonyan/install-scipt
 
 init_var() {
   ECHO_TYPE="echo -e"
@@ -572,7 +572,7 @@ main() {
   echo_content red "\n=============================================================="
   echo_content skyBlue "System Required: CentOS 7+/Ubuntu 18+/Debian 10+"
   echo_content skyBlue "Author: jonssonyan <https://jonssonyan.com>"
-  echo_content skyBlue "Github: https://github.com/jonssonyan"
+  echo_content skyBlue "Github: https://github.com/jonssonyan/install-scipt"
   echo_content red "\n=============================================================="
   echo_content yellow "1. 安装Docker"
   echo_content yellow "2. 安装MySQL"

@@ -6,7 +6,7 @@ export PATH
 # Version: v1.0.0
 # Description: One click install K8s for CentOS 7
 # Author: jonssonyan <https://jonssonyan.com>
-# Github: https://github.com/jonssonyan
+# Github: https://github.com/jonssonyan/install-scipt
 
 init_var() {
   ECHO_TYPE="echo -e"
