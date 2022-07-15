@@ -259,8 +259,8 @@ install_docker() {
       yum install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
     elif [[ ${release} == 'debian' || ${release} == 'ubuntu' ]]; then
       apt-get remove docker docker-engine docker.io containerd runc
-      apt-get update
-      apt-get install \
+      apt-get update -y
+      apt-get install -y \
         ca-certificates \
         curl \
         gnupg \
@@ -277,7 +277,7 @@ install_docker() {
           "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/${release} \
               $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
       fi
-      apt-get update
+      apt-get update -y
       apt-get install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
     fi
 
