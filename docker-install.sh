@@ -24,7 +24,7 @@ init_var() {
 
   # MySQL
   MySQL_DATA="/jsdata/mysql/"
-  mysql_ip="js-mariadb"
+  mysql_ip="js-mysql"
   mysql_port=9507
   mysql_user="root"
   mysql_pas=""
@@ -341,7 +341,7 @@ install_mysql() {
           mysql:5.7.38
     fi
 
-    if [[ -n $(docker ps -q -f "name=^js-mariadb$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^js-mysql$") ]]; then
       echo_content skyBlue "---> MySQL安装完成"
       echo_content yellow "---> MySQL root的数据库密码(请妥善保存): ${mysql_pas}"
       if [[ "${mysql_user}" != "root" ]]; then
