@@ -303,6 +303,17 @@ install_docker() {
   fi
 }
 
+# 卸载Docker
+uninstall_docker() {
+  if [[ $(command -v docker) ]]; then
+    yum remove docker-ce docker-ce-cli containerd.io
+    rm -rf /var/lib/docker
+    rm -rf ${JS_DATA}*
+  else
+    echo_content skyBlue "---> 请先安装Docker"
+  fi
+}
+
 install_mysql() {
   if [[ -z $(docker ps -q -f "name=^js-mysql$") ]]; then
     echo_content green "---> 安装MySQL"
@@ -579,33 +590,37 @@ main() {
   echo_content skyBlue "Github: https://github.com/jonssonyan/install-scipt"
   echo_content red "\n=============================================================="
   echo_content yellow "1. 安装Docker"
-  echo_content yellow "2. 安装MySQL"
-  echo_content yellow "3. 安装Redis"
-  echo_content yellow "4. 安装Minio"
-  echo_content yellow "5. 安装Nacos"
-  echo_content yellow "6. 安装ShadowsocksR"
+  echo_content yellow "2. 卸载Docker"
+  echo_content yellow "3. 安装MySQL"
+  echo_content yellow "4. 安装Redis"
+  echo_content yellow "5. 安装Minio"
+  echo_content yellow "6. 安装Nacos"
+  echo_content yellow "7. 安装ShadowsocksR"
   read -r -p "请选择:" selectInstall_type
   case ${selectInstall_type} in
   1)
     install_docker
     ;;
   2)
-    install_docker
-    install_mysql
+    uninstall_docker
     ;;
   3)
     install_docker
-    install_redis
+    install_mysql
     ;;
   4)
     install_docker
-    install_minio
+    install_redis
     ;;
   5)
     install_docker
-    install_nacos
+    install_minio
     ;;
   6)
+    install_docker
+    install_nacos
+    ;;
+  7)
     install_docker
     install_ssr
     ;;
