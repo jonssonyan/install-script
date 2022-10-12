@@ -590,39 +590,40 @@ main() {
   echo_content skyBlue "Github: https://github.com/jonssonyan/install-scipt"
   echo_content red "\n=============================================================="
   echo_content yellow "1. 安装Docker"
-  echo_content yellow "2. 卸载Docker"
-  echo_content yellow "3. 安装MySQL"
-  echo_content yellow "4. 安装Redis"
-  echo_content yellow "5. 安装Minio"
-  echo_content yellow "6. 安装Nacos"
-  echo_content yellow "7. 安装ShadowsocksR"
+  echo_content yellow "2. 安装MySQL"
+  echo_content yellow "3. 安装Redis"
+  echo_content yellow "4. 安装Minio"
+  echo_content yellow "5. 安装Nacos"
+  echo_content yellow "6. 安装ShadowsocksR"
+  echo_content green "\n=============================================================="
+  echo_content yellow "7. 卸载Docker"
   read -r -p "请选择:" selectInstall_type
   case ${selectInstall_type} in
   1)
     install_docker
     ;;
   2)
-    uninstall_docker
-    ;;
-  3)
     install_docker
     install_mysql
     ;;
-  4)
+  3)
     install_docker
     install_redis
     ;;
-  5)
+  4)
     install_docker
     install_minio
     ;;
-  6)
+  5)
     install_docker
     install_nacos
     ;;
-  7)
+  6)
     install_docker
     install_ssr
+    ;;
+  7)
+    uninstall_docker
     ;;
   *)
     echo_content red "没有这个选项"
