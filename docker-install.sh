@@ -568,8 +568,9 @@ EOF
 # 卸载Docker
 uninstall_docker() {
   if [[ $(command -v docker) ]]; then
-    yum remove -y docker-ce docker-ce-cli containerd.io
+    yum remove docker-ce docker-ce-cli containerd.io docker-compose-plugin
     rm -rf /var/lib/docker
+    rm -rf /var/lib/containerd
     rm -rf ${JS_DATA}
   else
     echo_content skyBlue "---> 请先安装Docker"
