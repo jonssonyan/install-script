@@ -568,7 +568,7 @@ EOF
 # 卸载Docker
 uninstall_docker() {
   if [[ $(command -v docker) ]]; then
-    yum remove docker-ce docker-ce-cli containerd.io
+    yum remove -y docker-ce docker-ce-cli containerd.io
     rm -rf /var/lib/docker
     rm -rf ${JS_DATA}*
   else
