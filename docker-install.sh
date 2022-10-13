@@ -303,17 +303,6 @@ install_docker() {
   fi
 }
 
-# 卸载Docker
-uninstall_docker() {
-  if [[ $(command -v docker) ]]; then
-    yum remove docker-ce docker-ce-cli containerd.io
-    rm -rf /var/lib/docker
-    rm -rf ${JS_DATA}*
-  else
-    echo_content skyBlue "---> 请先安装Docker"
-  fi
-}
-
 install_mysql() {
   if [[ -z $(docker ps -q -f "name=^js-mysql$") ]]; then
     echo_content green "---> 安装MySQL"
@@ -573,6 +562,18 @@ EOF
     fi
   else
     echo_content skyBlue "---> 你已经安装了ShadowsocksR"
+  fi
+}
+
+# 卸载Docker
+uninstall_docker() {
+  if [[ $(command -v docker) ]]; then
+    yum remove docker-ce docker-ce-cli containerd.io
+    rm -rf /var/lib/docker
+    rm -rf ${JS_DATA}*
+    docker network rm js-network
+  else
+    echo_content skyBlue "---> 请先安装Docker"
   fi
 }
 
