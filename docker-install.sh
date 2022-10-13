@@ -571,7 +571,6 @@ uninstall_docker() {
     yum remove docker-ce docker-ce-cli containerd.io
     rm -rf /var/lib/docker
     rm -rf ${JS_DATA}*
-    docker network rm js-network
   else
     echo_content skyBlue "---> 请先安装Docker"
   fi
@@ -596,7 +595,7 @@ main() {
   echo_content yellow "4. 安装Minio"
   echo_content yellow "5. 安装Nacos"
   echo_content yellow "6. 安装ShadowsocksR"
-  echo_content green "\n=============================================================="
+  echo_content green "=============================================================="
   echo_content yellow "7. 卸载Docker"
   read -r -p "请选择:" selectInstall_type
   case ${selectInstall_type} in
