@@ -18,6 +18,7 @@ init_var() {
 
   # Docker
   docker_version="19.03.15"
+  docker_desc=""
   DOCKER_MIRROR='"https://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://registry.docker-cn.com"'
 
   JS_DATA="/jsdata/"
@@ -279,7 +280,12 @@ install_docker() {
               $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
       fi
       apt-get update -y
-      apt-get install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
+      if [[ "${release}" == "debian" ]]; then
+        docker_desc="buster"
+      else
+        docker_desc="bionic"
+      fi
+      apt-get install -y docker-ce=5:${docker_version}~3-0~${release}-${docker_desc} docker-ce-cli=5:${docker_version}~3-0~${release}-${docker_desc} containerd.io docker-compose-plugin
     else
       echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
       exit 1
