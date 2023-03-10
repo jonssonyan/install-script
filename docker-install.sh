@@ -17,7 +17,7 @@ init_var() {
   can_google=0
 
   # Docker
-  docker_version="19.03.15"
+  docker_version="20.10.23"
   docker_desc=""
   DOCKER_MIRROR='"https://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://registry.docker-cn.com"'
 
@@ -237,8 +237,8 @@ install_docker() {
   if [[ ! $(command -v docker) ]]; then
     echo_content green "---> 安装Docker"
 
-    read -r -p "请输入Docker版本(默认:19.03.15): " docker_version
-    [[ -z "${docker_version}" ]] && docker_version="19.03.15"
+    read -r -p "请输入Docker版本(默认:20.10.23): " docker_version
+    [[ -z "${docker_version}" ]] && docker_version="20.10.23"
 
     can_connect www.google.com && can_google=1
 
