@@ -229,8 +229,7 @@ setup_docker() {
   "registry-mirrors":[${DOCKER_MIRROR}],
   "log-driver":"json-file",
   "log-opts":{
-      "max-size":"50m",
-      "max-file":"3"
+      "max-size":"100m"
   }
 }
 EOF
