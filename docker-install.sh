@@ -294,9 +294,6 @@ install_docker() {
         docker_desc="bionic"
       fi
       ${package_manager} install -y docker-ce=5:${docker_version}~3-0~${release}-${docker_desc} docker-ce-cli=5:${docker_version}~3-0~${release}-${docker_desc} containerd.io docker-compose-plugin
-    else
-      echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
-      exit 1
     fi
 
     setup_docker
@@ -586,9 +583,6 @@ uninstall_docker() {
       ${package_manager} remove -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
     elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
       ${package_manager} purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
-    else
-      echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
-      exit 1
     fi
     rm -rf /var/lib/docker
     rm -rf /var/lib/containerd
