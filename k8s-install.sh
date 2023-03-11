@@ -72,6 +72,7 @@ can_connect() {
   fi
 }
 
+# 修改主机名
 set_hostname() {
   echo "127.0.0.1 $1" >>/etc/hosts
   hostnamectl --static set-hostname "$1"
@@ -158,10 +159,13 @@ install_prepare() {
   if [[ "${release}" == "centos" ]]; then
     systemctl disable firewalld.service && systemctl stop firewalld.service
   fi
+  # 关闭selinux
   if [ -s /etc/selinux/config ] && grep 'SELINUX=enforcing' /etc/selinux/config; then
     setenforce 0 && sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
   fi
+  # 关闭swap分区
   swapoff -a && sed -ri 's/.*swap.*/#&/' /etc/fstab
+  # 将桥接的IPV4流量传递到iptables 的链
   cat >/etc/modules-load.d/k8s.conf <<EOF
 br_netfilter
 EOF
@@ -171,6 +175,7 @@ net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 EOF
   sysctl --system
+  # 同步时间
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
   systemctl restart rsyslog
   systemctl restart crond
@@ -215,6 +220,7 @@ EOF
 }
 
 setup_containerd() {
+  # 安装容器运行时
   containerd config default >/etc/containerd/config.toml
   sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
   systemctl enable containerd && systemctl restart containerd
