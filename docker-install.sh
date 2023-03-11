@@ -107,6 +107,15 @@ init_var() {
   # nexus3
   NEXUS3_DATA="/jsdata/nexus3/"
   nexus3_port=8081
+
+  # gitlab
+  GITLAB_DATA="/jsdata/gitlab/"
+  GITLAB_CONFIG="/jsdata/gitlab/config/"
+  GITLAB_LOG="/jsdata/gitlab/logs/"
+  GITLAB_OPT="/jsdata/gitlab/opt/"
+  gitlab_http_port=8080
+  gitlab_https_port=8443
+  gitlab_ssh_port=8022
 }
 
 echo_content() {
@@ -156,6 +165,12 @@ mkdir_tools() {
 
   # Nexus3
   mkdir -p ${NEXUS3_DATA}
+
+  # GitLab
+  mkdir -p ${GITLAB_DATA}
+  mkdir -p ${GITLAB_CONFIG}
+  mkdir -p ${GITLAB_LOG}
+  mkdir -p ${GITLAB_OPT}
 }
 
 can_connect() {
@@ -594,7 +609,7 @@ install_nexus3() {
     read -r -p "请输入Nexus3的端口(默认:8081): " nexus3_port
     [[ -z "${nexus3_port}" ]] && nexus3_port=8081
     docker pull sonatype/nexus3:3.49.0 &&
-      docker run -d --name nexus --restart always \
+      docker run -d --name js-nexus3 --restart always \
         --network=js-network \
         -p ${nexus3_port}:8081 \
         -v ${NEXUS3_DATA}:/nexus-data \
@@ -608,6 +623,49 @@ install_nexus3() {
     fi
   else
     echo_content skyBlue "---> 你已经安装了Nexus3"
+  fi
+}
+
+# 安装GitLab
+install_gitlab() {
+  if [[ -z $(docker ps -q -f "name=^js-gitlab$") ]]; then
+    echo_content green "---> 安装GitLab"
+
+    read -r -p "请输入GitLab的HTTP端口(默认:8080): " gitlab_http_port
+    [[ -z "${gitlab_http_port}" ]] && gitlab_http_port=8080
+    read -r -p "请输入GitLab的HTTPS端口(默认:8443): " gitlab_https_port
+    [[ -z "${gitlab_https_port}" ]] && gitlab_https_port=8443
+    read -r -p "请输入GitLab的SSH端口(默认:8022): " gitlab_ssh_port
+    [[ -z "${gitlab_ssh_port}" ]] && gitlab_ssh_port=8022
+
+    docker pull gitlab/gitlab-ce:15.9.3-ce.0 &&
+      docker run -d --name js-gitlab --restart always \
+        --network=js-network \
+        -p ${gitlab_http_port}:80 \
+        -p ${gitlab_https_port}:443 \
+        -p ${gitlab_ssh_port}:22 \
+        -v ${GITLAB_CONFIG}:/etc/gitlab \
+        -v ${GITLAB_LOG}:/var/log/gitlab \
+        -v ${GITLAB_OPT}:/var/opt/gitlab \
+        -e TZ=Asia/Shanghai \
+        gitlab/gitlab-ce:15.9.3-ce.0
+# todo
+    cat >>/etc/gitlab/gitlab.rb <<EOF
+external_url 'http://localhost:${gitlab_http_port}'
+nginx['listen_port'] = ${gitlab_http_port}
+gitlab_rails['gitlab_shell_ssh_port'] = ${gitlab_ssh_port}
+EOF
+
+    gitlab-ctl reconfigure && gitlab-ctl restart
+
+    if [[ -n $(docker ps -q -f "name=^js-gitlab$") ]]; then
+      echo_content skyBlue "---> GitLab安装完成"
+    else
+      echo_content red "---> GitLab安装失败"
+      exit 1
+    fi
+  else
+    echo_content skyBlue "---> 你已经安装了GitLab"
   fi
 }
 
@@ -647,8 +705,9 @@ main() {
   echo_content yellow "5. 安装Nacos"
   echo_content yellow "6. 安装ShadowsocksR"
   echo_content yellow "7. 安装Nexus3"
+  echo_content yellow "8. 安装GitLab"
   echo_content green "=============================================================="
-  echo_content yellow "8. 卸载Docker"
+  echo_content yellow "9. 卸载Docker"
   read -r -p "请选择:" selectInstall_type
   case ${selectInstall_type} in
   1)
@@ -679,6 +738,10 @@ main() {
     install_nexus3
     ;;
   8)
+    install_docker
+    install_gitlab
+    ;;
+  9)
     uninstall_docker
     ;;
   *)
