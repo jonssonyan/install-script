@@ -26,7 +26,7 @@ source <(curl -L https://github.com/jonssonyan/install-script/raw/main/k8s-insta
 
 - OS version: CentOS 7+/Ubuntu 18+/Debian 10+
 - CPU Architecture: x86_64/amd64 arm64/aarch64
-- Docker version: 19.03.15
+- Docker version: 20.10.23
 
 ```bash
 source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker-install.sh)
