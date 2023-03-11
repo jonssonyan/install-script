@@ -169,8 +169,12 @@ check_sys() {
 
   if [[ $(command -v yum) ]]; then
     package_manager='yum'
+  elif [[ $(command -v dnf) ]]; then
+    package_manager='dnf'
   elif [[ $(command -v apt-get) ]]; then
     package_manager='apt-get'
+  elif [[ $(command -v apt) ]]; then
+    package_manager='apt'
   fi
 
   if [[ -z "${package_manager}" ]]; then
@@ -203,7 +207,7 @@ check_sys() {
 
 # 安装依赖
 install_depend() {
-  if [[ "${package_manager}" == 'apt-get' ]]; then
+  if [[ "${package_manager}" == 'apt-get' || "${package_manager}" == 'apt' ]]; then
     ${package_manager} update -y
   fi
   ${package_manager} install -y \
@@ -247,7 +251,7 @@ install_docker() {
     can_connect www.google.com && can_google=1
 
     if [[ "${release}" == "centos" ]]; then
-      yum remove docker \
+      ${package_manager} remove docker \
         docker-client \
         docker-client-latest \
         docker-common \
@@ -255,18 +259,18 @@ install_docker() {
         docker-latest-logrotate \
         docker-logrotate \
         docker-engine
-      yum install -y yum-utils
+      ${package_manager} install -y yum-utils
       if [[ ${can_google} == 0 ]]; then
-        yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+        ${package_manager}-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
       else
-        yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+        ${package_manager}-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
       fi
-      yum makecache || yum makecache fast
-      yum install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
+      ${package_manager} makecache || ${package_manager} makecache fast
+      ${package_manager} install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
     elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
-      apt-get remove docker docker-engine docker.io containerd runc
-      apt-get update -y
-      apt-get install -y \
+      ${package_manager} remove docker docker-engine docker.io containerd runc
+      ${package_manager} update -y
+      ${package_manager} install -y \
         ca-certificates \
         curl \
         gnupg \
@@ -283,13 +287,13 @@ install_docker() {
           "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/${release} \
               $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
       fi
-      apt-get update -y
+      ${package_manager} update -y
       if [[ "${release}" == "debian" ]]; then
         docker_desc="buster"
       else
         docker_desc="bionic"
       fi
-      apt-get install -y docker-ce=5:${docker_version}~3-0~${release}-${docker_desc} docker-ce-cli=5:${docker_version}~3-0~${release}-${docker_desc} containerd.io docker-compose-plugin
+      ${package_manager} install -y docker-ce=5:${docker_version}~3-0~${release}-${docker_desc} docker-ce-cli=5:${docker_version}~3-0~${release}-${docker_desc} containerd.io docker-compose-plugin
     else
       echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
       exit 1
@@ -578,7 +582,14 @@ EOF
 # 卸载Docker
 uninstall_docker() {
   if [[ $(command -v docker) ]]; then
-    yum remove -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    if [[ "${release}" == "centos" ]]; then
+      ${package_manager} remove -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
+      ${package_manager} purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
+    else
+      echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
+      exit 1
+    fi
     rm -rf /var/lib/docker
     rm -rf /var/lib/containerd
     rm -rf ${JS_DATA}
