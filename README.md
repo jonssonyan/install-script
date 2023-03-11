@@ -1,5 +1,9 @@
 # install-script
 
+# Recommended OS
+
+CentOS Stream 8/Ubuntu 20.04 LTS/Debian 11.1
+
 ## install K8s
 
 - OS version: CentOS 7+/Ubuntu 18+/Debian 10+
