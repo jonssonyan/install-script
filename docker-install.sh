@@ -229,7 +229,16 @@ setup_docker() {
   if [[ ${can_google} == 0 ]]; then
     cat >/etc/docker/daemon.json <<EOF
 {
-  "registry-mirrors":[${DOCKER_MIRROR}],
+  "log-driver":"json-file",
+  "log-opts":{
+      "max-size":"100m"
+  },
+  "registry-mirrors":[${DOCKER_MIRROR}]
+}
+EOF
+  else
+    cat >/etc/docker/daemon.json <<EOF
+{
   "log-driver":"json-file",
   "log-opts":{
       "max-size":"100m"

@@ -32,12 +32,6 @@ init_var() {
   DOCKER_MIRROR='"https://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://registry.docker-cn.com"'
 }
 
-mkdir_tools() {
-  mkdir -p ${K8S_DATA}
-  mkdir -p ${K8S_LOG}
-  mkdir -p ${K8S_NETWORK}
-}
-
 echo_content() {
   case $1 in
   "red")
@@ -62,6 +56,12 @@ echo_content() {
     ${ECHO_TYPE} "\033[37m$2\033[0m"
     ;;
   esac
+}
+
+mkdir_tools() {
+  mkdir -p ${K8S_DATA}
+  mkdir -p ${K8S_LOG}
+  mkdir -p ${K8S_NETWORK}
 }
 
 can_connect() {
@@ -105,10 +105,10 @@ check_sys() {
     package_manager='yum'
   elif [[ $(command -v dnf) ]]; then
     package_manager='dnf'
-  elif [[ $(command -v apt) ]]; then
-    package_manager='apt'
   elif [[ $(command -v apt-get) ]]; then
     package_manager='apt-get'
+  elif [[ $(command -v apt) ]]; then
+    package_manager='apt'
   fi
 
   if [[ -z "${package_manager}" ]]; then
@@ -141,7 +141,7 @@ check_sys() {
 
 # 安装依赖
 install_depend() {
-  if [[ "${package_manager}" == 'apt' && "${package_manager}" == 'apt-get' ]]; then
+  if [[ "${package_manager}" == 'apt-get' || "${package_manager}" == 'apt' ]]; then
     ${package_manager} update -y
   fi
   ${package_manager} install -y \
@@ -225,7 +225,8 @@ install_docker() {
   if [[ ! $(command -v docker) ]]; then
     echo_content green "---> 安装Docker"
 
-    read -r -p "请输入Docker版本(默认:latest): " docker_version
+    read -r -p "请输入Docker版本(默认:20.10.23): " docker_version
+    [[ -z "${docker_version}" ]] && docker_version="20.10.23"
 
     can_connect www.google.com && can_google=1
 
@@ -240,11 +241,12 @@ install_docker() {
         docker-engine
       ${package_manager} install -y yum-utils
       if [[ ${can_google} == 0 ]]; then
-        wget -O /etc/yum.repos.d/docker-ce.repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+        ${package_manager}-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
       else
-        wget -O /etc/yum.repos.d/docker-ce.repo https://download.docker.com/linux/centos/docker-ce.repo
+        ${package_manager}-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
       fi
-      ${package_manager} makecache fast
+      ${package_manager} makecache || ${package_manager} makecache fast
+      ${package_manager} install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
     elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
       ${package_manager} remove docker docker-engine docker.io containerd runc
       ${package_manager} update -y
@@ -266,22 +268,7 @@ install_docker() {
               $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
       fi
       ${package_manager} update -y
-    else
-      echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
-      exit 1
-    fi
-
-    if [[ -z "${docker_version}" ]]; then
-      ${package_manager} install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-    else
-      if [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
-        ${package_manager} install -y docker-ce="${docker_version}" docker-ce-cli="${docker_version}" containerd.io docker-compose-plugin
-      elif [[ ${package_manager} == "yum" || ${package_manager} == "dnf" ]]; then
-        ${package_manager} install -y docker-ce-"${docker_version}" docker-ce-cli-"${docker_version}" containerd.io docker-compose-plugin
-      else
-        echo_content red "暂不支持该系统"
-        exit 1
-      fi
+      ${package_manager} install -y docker-ce=5:${docker_version}~3-0~${release}-"$(lsb_release -c --short)" docker-ce-cli=5:${docker_version}~3-0~${release}-"$(lsb_release -c --short)" containerd.io docker-compose-plugin
     fi
 
     setup_docker
