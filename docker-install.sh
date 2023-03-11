@@ -103,6 +103,10 @@ init_var() {
     tls1.2_ticket_fastauth
     tls1.2_ticket_fastauth_compatible
   )
+
+  # nexus3
+  NEXUS3_DATA="/jsdata/nexus3/"
+  nexus3_port=8081
 }
 
 echo_content() {
@@ -149,6 +153,9 @@ mkdir_tools() {
 
   # ShadowsocksR
   mkdir -p ${SSR_DATA}
+
+  # Nexus3
+  mkdir -p ${NEXUS3_DATA}
 }
 
 can_connect() {
@@ -579,6 +586,31 @@ EOF
   fi
 }
 
+# 安装Nexus3
+install_nexus3() {
+  if [[ -z $(docker ps -q -f "name=^js-nexus3$") ]]; then
+    echo_content green "---> 安装Nexus3"
+
+    read -r -p "请输入Nexus3的端口(默认:8081): " nexus3_port
+    [[ -z "${nexus3_port}" ]] && nexus3_port=8081
+    docker pull sonatype/nexus3:3.49.0 &&
+      docker run -d --name nexus --restart always \
+        --network=js-network \
+        -p ${nexus3_port}:8081 \
+        -v ${NEXUS3_DATA}:/nexus-data \
+        sonatype/nexus3:3.49.0
+
+    if [[ -n $(docker ps -q -f "name=^js-nexus3$") ]]; then
+      echo_content skyBlue "---> Nexus3安装完成"
+    else
+      echo_content red "---> Nexus3安装失败"
+      exit 1
+    fi
+  else
+    echo_content skyBlue "---> 你已经安装了Nexus3"
+  fi
+}
+
 # 卸载Docker
 uninstall_docker() {
   if [[ $(command -v docker) ]]; then
@@ -614,8 +646,9 @@ main() {
   echo_content yellow "4. 安装Minio"
   echo_content yellow "5. 安装Nacos"
   echo_content yellow "6. 安装ShadowsocksR"
+  echo_content yellow "7. 安装Nexus3"
   echo_content green "=============================================================="
-  echo_content yellow "7. 卸载Docker"
+  echo_content yellow "8. 卸载Docker"
   read -r -p "请选择:" selectInstall_type
   case ${selectInstall_type} in
   1)
@@ -642,6 +675,10 @@ main() {
     install_ssr
     ;;
   7)
+    install_docker
+    install_nexus3
+    ;;
+  8)
     uninstall_docker
     ;;
   *)
