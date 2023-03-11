@@ -345,9 +345,6 @@ deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.k
 EOF
       fi
       ${package_manager} update -y
-    else
-      echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
-      exit 1
     fi
 
     if [[ -z "${k8s_version}" ]]; then
@@ -358,9 +355,6 @@ EOF
         ${package_manager} install -y kubelet="${install_version}" kubeadm="${install_version}" kubectl="${install_version}"
       elif [[ ${package_manager} == "yum" || ${package_manager} == "dnf" ]]; then
         ${package_manager} install -y --nogpgcheck kubelet-"${k8s_version//v/}" kubeadm-"${k8s_version//v/}" kubectl-"${k8s_version//v/}"
-      else
-        echo_content red "暂不支持该系统"
-        exit 1
       fi
     fi
     systemctl enable kubelet && systemctl start kubelet
