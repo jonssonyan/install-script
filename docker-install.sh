@@ -656,8 +656,6 @@ nginx['listen_port'] = ${gitlab_http_port}
 gitlab_rails['gitlab_shell_ssh_port'] = ${gitlab_ssh_port}
 EOF
 
-    gitlab-ctl reconfigure && gitlab-ctl restart
-
     if [[ -n $(docker ps -q -f "name=^js-gitlab$") ]]; then
       echo_content skyBlue "---> GitLab安装完成"
     else
