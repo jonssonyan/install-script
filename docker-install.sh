@@ -288,12 +288,7 @@ install_docker() {
               $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
       fi
       ${package_manager} update -y
-      if [[ "${release}" == "debian" ]]; then
-        docker_desc="buster"
-      else
-        docker_desc="bionic"
-      fi
-      ${package_manager} install -y docker-ce=5:${docker_version}~3-0~${release}-${docker_desc} docker-ce-cli=5:${docker_version}~3-0~${release}-${docker_desc} containerd.io docker-compose-plugin
+      ${package_manager} install -y docker-ce=5:${docker_version}~3-0~${release}-"$(lsb_release -c --short)" docker-ce-cli=5:${docker_version}~3-0~${release}-"$(lsb_release -c --short)" containerd.io docker-compose-plugin
     fi
 
     setup_docker
