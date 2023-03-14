@@ -17,13 +17,13 @@ init_var() {
   can_google=0
 
   # k8s
-  k8s_version=""
+  k8s_version="1.23.17"
   is_master=1
   network="flannel"
   K8S_DATA="/k8sdata"
   K8S_LOG="/k8sdata/log"
   K8S_NETWORK="/k8sdata/network"
-  K8S_MIRROR="registry.aliyuncs.com/google_containers"
+  K8S_MIRROR="registry.cn-hangzhou.aliyuncs.com/google_containers"
   kube_flannel_url="https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
   calico_url="https://docs.projectcalico.org/manifests/calico.yaml"
 
@@ -75,7 +75,7 @@ can_connect() {
 # 修改主机名
 set_hostname() {
   echo "127.0.0.1 $1" >>/etc/hosts
-  hostnamectl --static set-hostname "$1"
+  hostnamectl set-hostname "$1"
 }
 
 # 检查系统
@@ -138,6 +138,8 @@ check_sys() {
     echo_content red "仅支持x86_64/amd64和arm64/aarch64处理器架构"
     exit 1
   fi
+
+  can_connect www.google.com && can_google=1
 }
 
 # 安装依赖
@@ -156,35 +158,20 @@ install_depend() {
 # 准备安装
 install_prepare() {
   echo_content green "---> 环境准备"
-  if [[ "${release}" == "centos" ]]; then
-    systemctl disable firewalld.service && systemctl stop firewalld.service
-  fi
-  # 关闭selinux
-  if [ -s /etc/selinux/config ] && grep 'SELINUX=enforcing' /etc/selinux/config; then
-    setenforce 0 && sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
-  fi
-  # 关闭swap分区
-  swapoff -a && sed -ri 's/.*swap.*/#&/' /etc/fstab
-  # 将桥接的IPV4流量传递到iptables 的链
-  cat >/etc/modules-load.d/k8s.conf <<EOF
-br_netfilter
-EOF
 
-  cat >/etc/sysctl.d/k8s.conf <<EOF
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-EOF
-  sysctl --system
-  # 同步时间
+  # 同步服务器时间
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
   systemctl restart rsyslog
   systemctl restart crond
+
+  # 关闭防火墙
+  if [[ "${release}" == "centos" ]]; then
+    systemctl disable firewalld.service && systemctl stop firewalld.service
+  fi
   echo_content skyBlue "---> 环境准备完成"
 }
 
 setup_docker() {
-  can_connect www.google.com && can_google=1
-
   mkdir -p /etc/docker
   if [[ ${can_google} == 0 ]]; then
     cat >/etc/docker/daemon.json <<EOF
@@ -219,13 +206,6 @@ EOF
   systemctl daemon-reload
 }
 
-setup_containerd() {
-  # 安装容器运行时
-  containerd config default >/etc/containerd/config.toml
-  sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
-  systemctl enable containerd && systemctl restart containerd
-}
-
 # 安装Docker
 install_docker() {
   if [[ ! $(command -v docker) ]]; then
@@ -234,27 +214,10 @@ install_docker() {
     read -r -p "请输入Docker版本(默认:20.10.23): " docker_version
     [[ -z "${docker_version}" ]] && docker_version="20.10.23"
 
-    can_connect www.google.com && can_google=1
-
     if [[ "${release}" == "centos" ]]; then
-      ${package_manager} remove docker \
-        docker-client \
-        docker-client-latest \
-        docker-common \
-        docker-latest \
-        docker-latest-logrotate \
-        docker-logrotate \
-        docker-engine
-      ${package_manager} install -y yum-utils
-      if [[ ${can_google} == 0 ]]; then
-        ${package_manager}-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
-      else
-        ${package_manager}-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-      fi
       ${package_manager} makecache || ${package_manager} makecache fast
-      ${package_manager} install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
+      ${package_manager} install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io
     elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
-      ${package_manager} remove docker docker-engine docker.io containerd runc
       ${package_manager} update -y
       ${package_manager} install -y \
         ca-certificates \
@@ -278,7 +241,6 @@ install_docker() {
     fi
 
     setup_docker
-    setup_containerd
 
     systemctl enable docker && systemctl restart docker
 
@@ -291,6 +253,42 @@ install_docker() {
   else
     echo_content skyBlue "---> 你已经安装了Docker"
   fi
+}
+
+# 安装Containerd
+install_containerd() {
+  if [[ ! $(command -v containerd) ]]; then
+    echo_content green "---> 安装Containerd"
+
+    ${package_manager} makecache || ${package_manager} makecache fast
+    ${package_manager} install -y containerd.io
+    mkdir -p /etc/containerd
+    containerd config default >/etc/containerd/config.toml
+    sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
+    sed -i 's#registry.k8s.io#${K8S_MIRROR}#g' /etc/containerd/config.toml
+    systemctl daemon-reload
+    systemctl enable containerd && systemctl restart containerd
+
+    if [[ $(command -v containerd) ]]; then
+      echo_content skyBlue "---> Containerd安装完成"
+    else
+      echo_content red "---> Containerd安装失败"
+      exit 1
+    fi
+  else
+    echo_content skyBlue "---> 你已经安装了Containerd"
+  fi
+}
+
+# 安装运行时
+install_runtime() {
+  ${package_manager} install -y yum-utils
+  if [[ ${can_google} == 0 ]]; then
+    ${package_manager}-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+  else
+    ${package_manager}-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  fi
+
 }
 
 # 安装k8s
@@ -313,6 +311,32 @@ install_k8s() {
         fi
       fi
     done
+
+    # 安装运行时
+    setup_containerd
+
+    # 关闭selinux
+    if [ -s /etc/selinux/config ] && grep 'SELINUX=enforcing' /etc/selinux/config; then
+      setenforce 0 && sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+    fi
+
+    # 关闭swap分区
+    swapoff -a && sed -ri 's/.*swap.*/#&/' /etc/fstab
+
+    # 将桥接的IPV4流量传递到iptables 的链
+    cat >/etc/modules-load.d/k8s.conf <<EOF
+overlay
+br_netfilter
+EOF
+    modprobe overlay
+    modprobe br_netfilter
+
+    cat >/etc/sysctl.d/k8s.conf <<EOF
+net.bridge.bridge-nf-call-iptables=1
+net.bridge.bridge-nf-call-ip6tables=1
+net.ipv4.ip_forward=1
+EOF
+    sysctl --system
 
     # https://developer.aliyun.com/mirror/kubernetes
     if [[ "${release}" == "centos" ]]; then
@@ -383,6 +407,7 @@ EOF
 k8s_run() {
   if [[ ${is_master} == 1 ]]; then
     echo_content green "---> 运行k8s"
+
     # https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
     kubeadm init \
       --image-repository ${K8S_MIRROR} \
