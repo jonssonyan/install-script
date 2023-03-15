@@ -418,8 +418,8 @@ k8s_run() {
 
     # https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
     kubeadm init \
-      --apiserver-advertise-address 192.168.0.101 \
-      --image-repository ${k8s_mirror} \
+      --apiserver-advertise-address "${public_ip}" \
+      --image-repository "${k8s_mirror}" \
       --kubernetes-version "${k8s_version}" \
       --service-cidr=10.96.0.0/12 \
       --pod-network-cidr=10.244.0.0/16 | tee /k8sdata/log/kubeadm-init.log
