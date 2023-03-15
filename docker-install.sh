@@ -718,6 +718,8 @@ main() {
   clear
   echo_content red "\n=============================================================="
   echo_content skyBlue "System Required: CentOS 7+/Ubuntu 18+/Debian 10+"
+  echo_content skyBlue "Version: v1.0.0"
+  echo_content skyBlue "Description: One click install Docker based Services"
   echo_content skyBlue "Author: jonssonyan <https://jonssonyan.com>"
   echo_content skyBlue "Github: https://github.com/jonssonyan/install-scipt"
   echo_content red "\n=============================================================="

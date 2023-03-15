@@ -558,6 +558,16 @@ EOF
   fi
 }
 
+# 重设K8s
+reset_k8s() {
+  if [[ $(command -v kubeadm) ]]; then
+    kubeadm reset
+    rm -rf "$HOME"/.kube
+  else
+    echo_content skyBlue "---> 请先安装K8s"
+  fi
+}
+
 main() {
   cd "$HOME" || exit 0
   init_var
@@ -565,8 +575,29 @@ main() {
   check_sys
   install_depend
   install_prepare
-  install_docker
-  install_k8s
+  clear
+  echo_content red "\n=============================================================="
+  echo_content skyBlue "System Required: CentOS 7+/Ubuntu 18+/Debian 10+"
+  echo_content skyBlue "Version: v1.0.0"
+  echo_content skyBlue "Description: One click install K8s"
+  echo_content skyBlue "Author: jonssonyan <https://jonssonyan.com>"
+  echo_content skyBlue "Github: https://github.com/jonssonyan/install-scipt"
+  echo_content red "\n=============================================================="
+  echo_content yellow "1. 安装K8s"
+  echo_content green "=============================================================="
+  echo_content yellow "2. 重设K8s"
+  read -r -p "请选择:" selectInstall_type
+  case ${selectInstall_type} in
+  1)
+    install_k8s
+    ;;
+  2)
+    reset_k8s
+    ;;
+  *)
+    echo_content red "没有这个选项"
+    ;;
+  esac
 }
 
 main
