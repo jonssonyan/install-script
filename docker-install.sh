@@ -285,13 +285,13 @@ install_docker() {
 
     while read -r -p "请输入Docker版本(1/20.10.23 2/latest 默认:1/20.10.23): " dockerVersionNum; do
       if [[ -z "${dockerVersionNum}" || ${dockerVersionNum} == 1 ]]; then
-        docker_version=""
+        docker_version="20.10.23"
         break
       else
         if [[ ${dockerVersionNum} != 2 ]]; then
           echo_content red "不可以输入除1和2之外的其他字符"
         else
-          docker_version="20.10.23"
+          docker_version=""
           break
         fi
       fi
