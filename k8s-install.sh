@@ -596,8 +596,8 @@ EOF
     if [[ $(command -v kubeadm) ]]; then
       echo_content skyBlue "---> k8s安装完成"
       k8s_run
-      k8s_network_install
       k8s_bash_completion
+      k8s_network_install
     else
       echo_content red "---> k8s安装失败"
       exit 1
