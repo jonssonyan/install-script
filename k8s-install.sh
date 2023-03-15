@@ -372,6 +372,11 @@ install_containerd() {
 install_runtime() {
   echo_content green "---> 安装运行时"
 
+  install_docker
+  if [[ -z "${k8s_version}" ]]; then
+    setup_containerd
+  fi
+
   cho_content skyBlue "---> 运行时安装完成"
 }
 
@@ -458,8 +463,12 @@ setup_k8s() {
   cat >/etc/sysconfig/kubelet <<EOF
     KUBELET_EXTRA_ARGS="--cgroup-driver=systemd"
 EOF
-  crictl config runtime-endpoint unix:///run/containerd/containerd.sock
-  crictl config image-endpoint unix:///run/containerd/containerd.sock
+  crictl config runtime-endpoint unix:///var/run/containerd/containerd.sock
+  crictl config image-endpoint unix:///var/run/containerd/containerd.sock
+
+  if [[ -z "${k8s_version}" ]]; then
+    sed -i '/KUBELET_KUBEADM_ARGS/s/"$/ --container-runtime=remote --container-runtime-endpoint=unix:\/\/\/run\/containerd\/containerd.sock"/' /var/lib/kubelet/kubeadm-flags.env
+  fi
 }
 
 # 安装k8s
