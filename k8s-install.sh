@@ -482,12 +482,12 @@ k8s_install() {
         if [[ ${k8sVersionNum} != 2 ]]; then
           echo_content red "不可以输入除1和2之外的其他字符"
         else
-          k8s_version=""
+          k8s_version="stable-1"
           break
         fi
       fi
     done
-    echo "export K8S_VERSION=${k8s_version}" >>/etc/profile
+    echo "export K8S_VERSION=v${k8s_version}" >>/etc/profile
     source /etc/profile
 
     # 安装运行时
@@ -591,7 +591,7 @@ k8s_run() {
       kubeadm init \
         --apiserver-advertise-address "${PUBLIC_IP}" \
         --image-repository "${k8s_mirror}" \
-        --kubernetes-version "v${K8S_VERSION}" \
+        --kubernetes-version "${K8S_VERSION}" \
         --service-cidr=10.96.0.0/12 \
         --pod-network-cidr=10.244.0.0/16 | tee /k8sdata/log/kubeadm-init.log
       if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
