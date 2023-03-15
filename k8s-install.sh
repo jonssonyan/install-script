@@ -488,6 +488,7 @@ k8s_install() {
       fi
     done
     export K8S_VERSION=k8s_version
+    source /etc/profile
 
     # 安装运行时
     install_runtime
