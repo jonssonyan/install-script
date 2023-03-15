@@ -396,8 +396,8 @@ k8s_network_install() {
     wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${kube_flannel_url}
     kubectl create -f /k8sdata/network/flannelkube-flannel.yml
   elif [[ ${network} == "calico" ]]; then
-    wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${calico_url}
-    kubectl create -f /k8sdata/network/flannelkube-flannel.yml
+    wget --no-check-certificate -O /k8sdata/network/calico.yaml ${calico_url}
+    kubectl create -f /k8sdata/network/calico.yaml
   fi
 
   if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
@@ -433,6 +433,8 @@ k8s_run() {
       echo_content yellow "kubeadm token create --print-join-command"
     )"
   fi
+
+  k8s_network_install
 }
 
 setup_k8s() {
@@ -591,9 +593,7 @@ EOF
 
     if [[ $(command -v kubeadm) ]]; then
       echo_content skyBlue "---> k8s安装完成"
-      k8s_run
       k8s_bash_completion
-      k8s_network_install
     else
       echo_content red "---> k8s安装失败"
       exit 1
@@ -639,14 +639,18 @@ main() {
   echo_content skyBlue "Github: https://github.com/jonssonyan/install-scipt"
   echo_content red "\n=============================================================="
   echo_content yellow "1. 安装K8s"
+  echo_content yellow "2. 运行K8s"
   echo_content green "=============================================================="
-  echo_content yellow "2. 重设K8s"
+  echo_content yellow "3. 重设K8s"
   read -r -p "请选择:" selectInstall_type
   case ${selectInstall_type} in
   1)
     install_k8s
     ;;
   2)
+    k8s_run
+    ;;
+  3)
     reset_k8s
     ;;
   *)
