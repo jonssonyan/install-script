@@ -121,23 +121,6 @@ check_sys() {
   fi
 
   can_connect www.google.com && can_google=1
-
-  while read -r -p "请输入是否为主节点?(0/否 1/是 默认:1/是): " is_master; do
-    if [[ -z "${is_master}" || ${is_master} == 1 ]]; then
-      is_master=1
-      break
-    else
-      if [[ ${is_master} != 0 ]]; then
-        echo_content red "不可以输入除0和1之外的其他字符"
-      else
-        break
-      fi
-    fi
-  done
-  if [[ $(grep -c "processor" /proc/cpuinfo) == 1 && ${is_master} == 1 ]]; then
-    echo_content red "主节点 需要 2 CPU 核或更多"
-    exit 1
-  fi
 }
 
 # 修改主机名
@@ -174,19 +157,6 @@ install_prepare() {
   elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
     ufw disable
   fi
-
-  while read -r -p "请输入本机公网IP(必填): " public_ip; do
-    if [[ -z "${public_ip}" ]]; then
-      echo_content red "公网IP不能为空"
-    else
-      break
-    fi
-  done
-
-  # 设置主机名称
-  read -r -p "请输入主机名(默认:k8s-master): " host_name
-  [[ -z "${host_name}" ]] && host_name="k8s-master"
-  set_hostname host_name
 
   echo_content skyBlue "---> 环境准备完成"
 }
@@ -498,6 +468,36 @@ EOF
 install_k8s() {
   if [[ ! $(command -v kubeadm) ]]; then
     echo_content green "---> 安装k8s"
+
+    while read -r -p "请输入是否为主节点?(0/否 1/是 默认:1/是): " is_master; do
+      if [[ -z "${is_master}" || ${is_master} == 1 ]]; then
+        is_master=1
+        break
+      else
+        if [[ ${is_master} != 0 ]]; then
+          echo_content red "不可以输入除0和1之外的其他字符"
+        else
+          break
+        fi
+      fi
+    done
+    if [[ $(grep -c "processor" /proc/cpuinfo) == 1 && ${is_master} == 1 ]]; then
+      echo_content red "主节点需要CPU 2核心及以上"
+      exit 1
+    fi
+
+    while read -r -p "请输入本机公网IP(必填): " public_ip; do
+      if [[ -z "${public_ip}" ]]; then
+        echo_content red "公网IP不能为空"
+      else
+        break
+      fi
+    done
+
+    # 设置主机名称
+    read -r -p "请输入主机名(默认:k8s-master): " host_name
+    [[ -z "${host_name}" ]] && host_name="k8s-master"
+    set_hostname host_name
 
     while read -r -p "请输入K8s版本(1/1.23.17 2/latest 默认:1/1.23.17): " k8sVersionNum; do
       if [[ -z "${k8sVersionNum}" || ${k8sVersionNum} == 1 ]]; then
