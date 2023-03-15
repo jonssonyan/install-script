@@ -430,6 +430,7 @@ k8s_run() {
       echo_content skyBlue "---> k8s运行完成"
     else
       echo_content red "---> k8s运行失败"
+      exit 1
     fi
   else
     echo "该节点为从节点, 请手动运行 kubeadm join 命令. 如果你忘记了命令, 可以在主节点上运行 $(
