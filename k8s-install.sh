@@ -441,7 +441,7 @@ k8s_run() {
 
 setup_k8s() {
   cat >/etc/sysconfig/kubelet <<EOF
-    KUBELET_EXTRA_ARGS="--cgroup-driver=systemd"
+KUBELET_EXTRA_ARGS="--cgroup-driver=systemd"
 EOF
 
   crictl config runtime-endpoint unix:///var/run/containerd/containerd.sock
@@ -452,12 +452,12 @@ EOF
   fi
   if [[ ! -f /var/lib/kubelet/kubeadm-flags.env ]]; then
     cat >/var/lib/kubelet/kubeadm-flags.env <<EOF
-  KUBELET_KUBEADM_ARGS="--container-runtime=remote --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock"
+KUBELET_KUBEADM_ARGS="--container-runtime=remote --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock"
 EOF
   else
     if [[ -z "$(grep "KUBELET_KUBEADM_ARGS" /var/lib/kubelet/kubeadm-flags.env)" ]]; then
       cat >/var/lib/kubelet/kubeadm-flags.env <<EOF
-  KUBELET_KUBEADM_ARGS="--container-runtime=remote --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock"
+KUBELET_KUBEADM_ARGS="--container-runtime=remote --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock"
 EOF
     else
       sed -i '/KUBELET_KUBEADM_ARGS/s/"$/ --container-runtime=remote --container-runtime-endpoint=unix:\/\/\/run\/containerd\/containerd.sock"/' /var/lib/kubelet/kubeadm-flags.env
