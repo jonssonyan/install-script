@@ -464,6 +464,7 @@ k8s_install() {
         break
       fi
     done
+    export PUBLIC_IP=public_ip
 
     # 设置主机名称
     read -r -p "请输入主机名(默认:k8s-master): " host_name
@@ -483,6 +484,7 @@ k8s_install() {
         fi
       fi
     done
+    export K8S_VERSION=k8s_version
 
     # 安装运行时
     install_runtime
@@ -577,32 +579,39 @@ EOF
 
 # 运行k8s
 k8s_run() {
-  if [[ ${is_master} == 1 ]]; then
-    echo_content green "---> 运行k8s"
+  if [[ ! $(command -v kubeadm) ]]; then
+    if [[ ${is_master} == 1 ]]; then
+      echo_content green "---> 运行k8s"
 
-    # https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
-    kubeadm init \
-      --apiserver-advertise-address "${public_ip}" \
-      --image-repository "${k8s_mirror}" \
-      --kubernetes-version "${k8s_version}" \
-      --service-cidr=10.96.0.0/12 \
-      --pod-network-cidr=10.244.0.0/16 | tee /k8sdata/log/kubeadm-init.log
-    if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
-      mkdir -p "$HOME"/.kube
-      cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
-      chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
-      echo_content skyBlue "---> k8s运行完成"
+      public_ip="$(echo $PUBLIC_IP)"
+      k8s_version="$(echo $K8S_VERSION)"
+
+      # https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
+      kubeadm init \
+        --apiserver-advertise-address "${public_ip}" \
+        --image-repository "${k8s_mirror}" \
+        --kubernetes-version "${k8s_version}" \
+        --service-cidr=10.96.0.0/12 \
+        --pod-network-cidr=10.244.0.0/16 | tee /k8sdata/log/kubeadm-init.log
+      if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
+        mkdir -p "$HOME"/.kube
+        cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
+        chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
+        echo_content skyBlue "---> k8s运行完成"
+      else
+        echo_content red "---> k8s运行失败"
+        exit 1
+      fi
     else
-      echo_content red "---> k8s运行失败"
-      exit 1
+      echo "该节点为从节点, 请手动运行 kubeadm join 命令. 如果你忘记了命令, 可以在主节点上运行 $(
+        echo_content yellow "kubeadm token create --print-join-command"
+      )"
     fi
-  else
-    echo "该节点为从节点, 请手动运行 kubeadm join 命令. 如果你忘记了命令, 可以在主节点上运行 $(
-      echo_content yellow "kubeadm token create --print-join-command"
-    )"
-  fi
 
-  k8s_network_install
+    k8s_network_install
+  else
+    echo_content skyBlue "---> 请先安装K8s"
+  fi
 }
 
 # 重设K8s
