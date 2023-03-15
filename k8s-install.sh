@@ -561,8 +561,18 @@ EOF
 # 重设K8s
 reset_k8s() {
   if [[ $(command -v kubeadm) ]]; then
-    kubeadm reset
-    rm -rf "$HOME"/.kube
+    kubeadm reset -f
+    rm -rf /etc/cni /etc/kubernetes /var/lib/dockershim /var/lib/etcd /var/lib/kubelet /var/run/kubernetes "$HOME"/.kube
+    iptables -F && iptables -X
+    iptables -t nat -F && iptables -t nat -X
+    iptables -t raw -F && iptables -t raw -X
+    iptables -t mangle -F && iptables -t mangle -X
+    systemctl daemon-reload
+    if [[ ! $(command -v docker) ]]; then
+      systemctl restart docker
+    elif [[ ! $(command -v containerd) ]]; then
+      systemctl restart containerd
+    fi
   else
     echo_content skyBlue "---> 请先安装K8s"
   fi
