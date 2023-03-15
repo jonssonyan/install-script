@@ -452,6 +452,8 @@ k8s_install() {
         fi
       fi
     done
+    export IS_MASTER=is_master
+
     if [[ $(grep -c "processor" /proc/cpuinfo) == 1 && ${is_master} == 1 ]]; then
       echo_content red "主节点需要CPU 2核心及以上"
       exit 1
@@ -580,7 +582,7 @@ EOF
 # 运行k8s
 k8s_run() {
   if [[ ! $(command -v kubeadm) ]]; then
-    if [[ ${is_master} == 1 ]]; then
+    if [[ ${IS_MASTER} == 1 ]]; then
       echo_content green "---> 运行k8s"
 
       # https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
