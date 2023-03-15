@@ -581,7 +581,7 @@ EOF
 
 # 运行k8s
 k8s_run() {
-  if [[ ! $(command -v kubeadm) ]]; then
+  if [[ $(command -v kubeadm) ]]; then
     if [[ ${IS_MASTER} == 1 ]]; then
       echo_content green "---> 运行k8s"
 
