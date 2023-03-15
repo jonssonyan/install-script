@@ -18,7 +18,7 @@ init_var() {
 
   # Docker
   docker_version="20.10.23"
-  DOCKER_MIRROR='"https://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://registry.docker-cn.com"'
+  docker_mirror='"https://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://registry.docker-cn.com"'
 
   JS_DATA="/jsdata/"
 
@@ -106,6 +106,7 @@ init_var() {
 
   # nexus3
   NEXUS3_DATA="/jsdata/nexus3/"
+  nexus3_ip="js-nexus3"
   nexus3_port=8081
 
   # gitlab
@@ -113,6 +114,7 @@ init_var() {
   GITLAB_CONFIG="/jsdata/gitlab/config/"
   GITLAB_LOG="/jsdata/gitlab/logs/"
   GITLAB_OPT="/jsdata/gitlab/opt/"
+  gitlab_ip="js-gitlab"
   gitlab_http_port=8080
   gitlab_https_port=8443
   gitlab_ssh_port=8022
@@ -224,6 +226,8 @@ check_sys() {
     echo_content red "仅支持x86_64/amd64和arm64/aarch64处理器架构"
     exit 1
   fi
+
+  can_connect www.google.com && can_google=1
 }
 
 # 安装依赖
@@ -238,15 +242,19 @@ install_depend() {
     lrzsz
 }
 
+# 环境准备
 install_prepare() {
+  echo_content green "---> 环境准备"
+
+  # 同步时间
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
   systemctl restart rsyslog
   systemctl restart crond
+
+  echo_content skyBlue "---> 环境准备完成"
 }
 
 setup_docker() {
-  can_connect www.google.com && can_google=1
-
   mkdir -p /etc/docker
   if [[ ${can_google} == 0 ]]; then
     cat >/etc/docker/daemon.json <<EOF
@@ -255,7 +263,7 @@ setup_docker() {
   "log-opts":{
       "max-size":"100m"
   },
-  "registry-mirrors":[${DOCKER_MIRROR}]
+  "registry-mirrors":[${docker_mirror}]
 }
 EOF
   else
@@ -277,8 +285,6 @@ install_docker() {
 
     read -r -p "请输入Docker版本(默认:20.10.23): " docker_version
     [[ -z "${docker_version}" ]] && docker_version="20.10.23"
-
-    can_connect www.google.com && can_google=1
 
     if [[ "${release}" == "centos" ]]; then
       ${package_manager} remove docker \
@@ -609,7 +615,7 @@ install_nexus3() {
     read -r -p "请输入Nexus3的端口(默认:8081): " nexus3_port
     [[ -z "${nexus3_port}" ]] && nexus3_port=8081
     docker pull sonatype/nexus3:3.49.0 &&
-      docker run -d --name js-nexus3 --restart always \
+      docker run -d --name ${nexus3_ip} --restart always \
         --network=js-network \
         -p ${nexus3_port}:8081 \
         -v ${NEXUS3_DATA}:/nexus-data \
@@ -639,7 +645,7 @@ install_gitlab() {
     [[ -z "${gitlab_ssh_port}" ]] && gitlab_ssh_port=8022
 
     docker pull gitlab/gitlab-ce:15.9.3-ce.0 &&
-      docker run -d --name js-gitlab --restart always \
+      docker run -d --name ${gitlab_ip} --restart always \
         --network=js-network \
         -p ${gitlab_http_port}:80 \
         -p ${gitlab_https_port}:443 \
@@ -649,7 +655,7 @@ install_gitlab() {
         -v ${GITLAB_OPT}:/var/opt/gitlab \
         -e TZ=Asia/Shanghai \
         gitlab/gitlab-ce:15.9.3-ce.0
-# todo
+    # todo
     cat >>/etc/gitlab/gitlab.rb <<EOF
 external_url 'http://localhost:${gitlab_http_port}'
 nginx['listen_port'] = ${gitlab_http_port}
