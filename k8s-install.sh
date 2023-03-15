@@ -303,7 +303,6 @@ setup_containerd() {
     sed -i '/\[plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"\]/a\          endpoint = ["${k8s_mirror}"]' /etc/containerd/config.toml
     sed -i '/endpoint = \["${k8s_mirror}"\]/a\        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."k8s.gcr.io"]' /etc/containerd/config.toml
     sed -i '/\[plugins."io.containerd.grpc.v1.cri".registry.mirrors."k8s.gcr.io"\]/a\          endpoint = ["${k8s_mirror}"]' /etc/containerd/config.toml
-
   fi
   systemctl daemon-reload
 }
