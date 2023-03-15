@@ -16,6 +16,8 @@ init_var() {
   get_arch=""
   can_google=0
 
+  host_name="k8s-master"
+
   # k8s
   K8S_DATA="/k8sdata"
   K8S_LOG="/k8sdata/log"
@@ -171,6 +173,11 @@ install_prepare() {
   elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
     ufw disable
   fi
+
+  # 设置主机名称
+  read -r -p "请输入主机名(默认:k8s-master): " host_name
+  [[ -z "${host_name}" ]] && host_name="k8s-master"
+  set_hostname host_name
 
   echo_content skyBlue "---> 环境准备完成"
 }
