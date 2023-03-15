@@ -376,7 +376,8 @@ k8s_bash_completion() {
 
 # 安装网络系统
 k8s_network_install() {
-  if [[ -z $(kubectl get pods -n kube-system | grep -E 'calico|flannel') ]]; then
+  systemctl status kubelet
+  if [[ ${PIPESTATUS[0]} -eq 0 && -z $(kubectl get pods -n kube-system | grep -E 'calico|flannel') ]]; then
     echo_content green "---> 安装网络系统"
 
     while read -r -p "请输入安装哪个网络系统?(1/flannel 2/calico 默认:1/flannel): " networkNum; do
