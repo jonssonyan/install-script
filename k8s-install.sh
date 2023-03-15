@@ -17,6 +17,7 @@ init_var() {
   can_google=0
 
   host_name="k8s-master"
+  public_ip=""
 
   # k8s
   K8S_DATA="/k8sdata"
@@ -141,7 +142,7 @@ check_sys() {
 
 # 修改主机名
 set_hostname() {
-  echo "127.0.0.1 $1" >>/etc/hosts
+  echo "${public_ip} $1" >>/etc/hosts
   hostnamectl set-hostname "$1"
 }
 
@@ -173,6 +174,14 @@ install_prepare() {
   elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
     ufw disable
   fi
+
+  while read -r -p "请输入本机公网IP(必填): " public_ip; do
+    if [[ -z "${public_ip}" ]]; then
+      echo_content red "公网IP不能为空"
+    else
+      break
+    fi
+  done
 
   # 设置主机名称
   read -r -p "请输入主机名(默认:k8s-master): " host_name
