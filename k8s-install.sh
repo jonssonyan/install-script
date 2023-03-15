@@ -267,7 +267,7 @@ install_docker() {
     fi
 
     if [[ -z "${docker_version}" ]]; then
-      ${package_manager} install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+      ${package_manager} install -y docker-ce docker-ce-cli containerd.io
     else
       if [[ ${package_manager} == "yum" || ${package_manager} == "dnf" ]]; then
         ${package_manager} install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
