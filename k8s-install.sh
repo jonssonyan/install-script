@@ -400,7 +400,7 @@ k8s_network_install() {
     kubectl create -f /k8sdata/network/flannelkube-flannel.yml
   fi
 
-  if [[ "$?" == "0" ]]; then
+  if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
     echo_content skyBlue "---> 网络系统安装完成"
   else
     echo_content red "---> 网络系统安装失败"
@@ -419,7 +419,7 @@ k8s_run() {
       --kubernetes-version "${k8s_version}" \
       --service-cidr=10.96.0.0/12 \
       --pod-network-cidr=10.244.0.0/16 | tee /k8sdata/log/kubeadm-init.log
-    if [[ "$?" == "0" ]]; then
+    if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
       mkdir -p "$HOME"/.kube
       cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
       chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
