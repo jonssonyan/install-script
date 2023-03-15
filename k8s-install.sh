@@ -245,7 +245,6 @@ install_docker() {
         ${package_manager}-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
       fi
       ${package_manager} makecache || ${package_manager} makecache fast
-      ${package_manager} install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
     elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
       ${package_manager} remove docker docker-engine docker.io containerd runc
       ${package_manager} update -y
@@ -265,7 +264,16 @@ install_docker() {
               $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
       fi
       ${package_manager} update -y
-      ${package_manager} install -y docker-ce=5:${docker_version}~3-0~${release}-"$(lsb_release -c --short)" docker-ce-cli=5:${docker_version}~3-0~${release}-"$(lsb_release -c --short)" containerd.io docker-compose-plugin
+    fi
+
+    if [[ -z "${docker_version}" ]]; then
+      ${package_manager} install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    else
+      if [[ ${package_manager} == "yum" || ${package_manager} == "dnf" ]]; then
+        ${package_manager} install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
+      elif [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
+        ${package_manager} install -y docker-ce=5:${docker_version}~3-0~${release}-"$(lsb_release -c --short)" docker-ce-cli=5:${docker_version}~3-0~${release}-"$(lsb_release -c --short)" containerd.io docker-compose-plugin
+      fi
     fi
 
     setup_docker

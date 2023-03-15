@@ -283,8 +283,19 @@ install_docker() {
   if [[ ! $(command -v docker) ]]; then
     echo_content green "---> 安装Docker"
 
-    read -r -p "请输入Docker版本(默认:20.10.23): " docker_version
-    [[ -z "${docker_version}" ]] && docker_version="20.10.23"
+    while read -r -p "请输入Docker版本(1/20.10.23 2/latest 默认:1/20.10.23): " dockerVersionNum; do
+      if [[ -z "${dockerVersionNum}" || ${dockerVersionNum} == 1 ]]; then
+        docker_version=""
+        break
+      else
+        if [[ ${dockerVersionNum} != 2 ]]; then
+          echo_content red "不可以输入除1和2之外的其他字符"
+        else
+          docker_version="20.10.23"
+          break
+        fi
+      fi
+    done
 
     if [[ "${release}" == "centos" ]]; then
       ${package_manager} remove docker \
@@ -302,7 +313,6 @@ install_docker() {
         ${package_manager}-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
       fi
       ${package_manager} makecache || ${package_manager} makecache fast
-      ${package_manager} install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
     elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
       ${package_manager} remove docker docker-engine docker.io containerd runc
       ${package_manager} update -y
@@ -324,7 +334,16 @@ install_docker() {
               $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
       fi
       ${package_manager} update -y
-      ${package_manager} install -y docker-ce=5:${docker_version}~3-0~${release}-"$(lsb_release -c --short)" docker-ce-cli=5:${docker_version}~3-0~${release}-"$(lsb_release -c --short)" containerd.io docker-compose-plugin
+    fi
+
+    if [[ -z "${docker_version}" ]]; then
+      ${package_manager} install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    else
+      if [[ ${package_manager} == "yum" || ${package_manager} == "dnf" ]]; then
+        ${package_manager} install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
+      elif [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
+        ${package_manager} install -y docker-ce=5:${docker_version}~3-0~${release}-"$(lsb_release -c --short)" docker-ce-cli=5:${docker_version}~3-0~${release}-"$(lsb_release -c --short)" containerd.io docker-compose-plugin
+      fi
     fi
 
     setup_docker
