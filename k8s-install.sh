@@ -591,7 +591,7 @@ k8s_run() {
       kubeadm init \
         --apiserver-advertise-address "${PUBLIC_IP}" \
         --image-repository "${k8s_mirror}" \
-        --kubernetes-version "${K8S_VERSION}" \
+        --kubernetes-version "v${K8S_VERSION}" \
         --service-cidr=10.96.0.0/12 \
         --pod-network-cidr=10.244.0.0/16 | tee /k8sdata/log/kubeadm-init.log
       if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
