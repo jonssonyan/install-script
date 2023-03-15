@@ -443,7 +443,8 @@ setup_k8s() {
   cat >/etc/sysconfig/kubelet <<EOF
     KUBELET_EXTRA_ARGS="--cgroup-driver=systemd"
 EOF
-  crictl config runtime-endpoint unix:///run/containerd/containerd.sock
+  crictl config runtime-endpoint unix:///var/run/containerd/containerd.sock
+  crictl config image-endpoint unix:///var/run/containerd/containerd.sock
 }
 
 # 安装k8s
