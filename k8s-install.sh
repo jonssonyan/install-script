@@ -376,34 +376,36 @@ k8s_bash_completion() {
 
 # 安装网络系统
 k8s_network_install() {
-  echo_content green "---> 安装网络系统"
+  if [[ -z $(kubectl get pods -n kube-system | grep -E 'calico|flannel') ]]; then
+    echo_content green "---> 安装网络系统"
 
-  while read -r -p "请输入安装哪个网络系统?(1/flannel 2/calico 默认:1/flannel): " networkNum; do
-    if [[ -z "${networkNum}" || ${networkNum} == 1 ]]; then
-      network="flannel"
-      break
-    else
-      if [[ ${networkNum} != 2 ]]; then
-        echo_content red "不可以输入除1和2之外的其他字符"
-      else
-        network="calico"
+    while read -r -p "请输入安装哪个网络系统?(1/flannel 2/calico 默认:1/flannel): " networkNum; do
+      if [[ -z "${networkNum}" || ${networkNum} == 1 ]]; then
+        network="flannel"
         break
+      else
+        if [[ ${networkNum} != 2 ]]; then
+          echo_content red "不可以输入除1和2之外的其他字符"
+        else
+          network="calico"
+          break
+        fi
       fi
+    done
+
+    if [[ ${network} == "flannel" ]]; then
+      wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${kube_flannel_url}
+      kubectl create -f /k8sdata/network/flannelkube-flannel.yml
+    elif [[ ${network} == "calico" ]]; then
+      wget --no-check-certificate -O /k8sdata/network/calico.yaml ${calico_url}
+      kubectl create -f /k8sdata/network/calico.yaml
     fi
-  done
 
-  if [[ ${network} == "flannel" ]]; then
-    wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${kube_flannel_url}
-    kubectl create -f /k8sdata/network/flannelkube-flannel.yml
-  elif [[ ${network} == "calico" ]]; then
-    wget --no-check-certificate -O /k8sdata/network/calico.yaml ${calico_url}
-    kubectl create -f /k8sdata/network/calico.yaml
-  fi
-
-  if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
-    echo_content skyBlue "---> 网络系统安装完成"
-  else
-    echo_content red "---> 网络系统安装失败"
+    if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
+      echo_content skyBlue "---> 网络系统安装完成"
+    else
+      echo_content red "---> 网络系统安装失败"
+    fi
   fi
 }
 
