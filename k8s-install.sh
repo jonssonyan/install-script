@@ -867,7 +867,6 @@ main() {
   mkdir_tools
   check_sys
   install_depend
-  install_prepare
   clear
   echo_content red "\n=============================================================="
   echo_content skyBlue "System Required: CentOS 7+/Ubuntu 18+/Debian 10+"
@@ -883,6 +882,7 @@ main() {
   read -r -p "请选择:" selectInstall_type
   case ${selectInstall_type} in
   1)
+    install_prepare
     k8s_install
     ;;
   2)
