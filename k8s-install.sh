@@ -259,7 +259,6 @@ install_docker() {
     fi
 
     setup_docker
-    setup_containerd
 
     systemctl enable docker && systemctl restart docker
 
@@ -348,7 +347,11 @@ install_containerd() {
 install_runtime() {
   echo_content green "---> 安装运行时"
 
-  install_docker
+  if [[ -z "${k8s_version}" ]]; then
+    install_containerd
+  else
+    install_docker
+  fi
 
   cho_content skyBlue "---> 运行时安装完成"
 }
@@ -788,7 +791,7 @@ k8s_run() {
           --kubernetes-version "${K8S_VERSION}" \
           --service-cidr=10.96.0.0/12 \
           --pod-network-cidr=10.244.0.0/16 \
-          --cri-socket=unix:///var/run/containerd/containerd.sock | tee /k8sdata/log/kubeadm-init.log
+          --cri-socket=unix:///var/run/cri-dockerd.sock | tee /k8sdata/log/kubeadm-init.log
       fi
 
       if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
