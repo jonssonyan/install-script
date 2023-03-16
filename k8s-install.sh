@@ -639,7 +639,7 @@ k8s_install() {
         fi
       fi
     done
-    echo "export IS_MASTER=${is_master}" >>/etc/profile
+    echo "export IS_MASTER=${is_master}" >>"$HOME/.bashrc"
 
     if [[ $(grep -c "processor" /proc/cpuinfo) == 1 && ${is_master} == 1 ]]; then
       echo_content red "主节点需要CPU 2核心及以上"
@@ -653,7 +653,7 @@ k8s_install() {
         break
       fi
     done
-    echo "export PUBLIC_IP=${public_ip}" >>/etc/profile
+    echo "export PUBLIC_IP=${public_ip}" >>"$HOME/.bashrc"
 
     # 设置主机名称
     read -r -p "请输入主机名(默认:k8s-master): " host_name
@@ -673,8 +673,8 @@ k8s_install() {
         fi
       fi
     done
-    echo "export K8S_VERSION=${k8s_version}" >>/etc/profile
-    source /etc/profile
+    echo "export K8S_VERSION=${k8s_version}" >>"$HOME/.bashrc"
+    source "$HOME/.bashrc"
 
     # 安装运行时
     install_runtime
@@ -839,7 +839,7 @@ main() {
   check_sys
   install_depend
   install_prepare
-  source /etc/profile
+  source "$HOME/.bashrc"
   clear
   echo_content red "\n=============================================================="
   echo_content skyBlue "System Required: CentOS 7+/Ubuntu 18+/Debian 10+"
