@@ -679,7 +679,7 @@ k8s_install() {
     # 设置主机名称
     read -r -p "请输入主机名(默认:k8s-master): " host_name
     [[ -z "${host_name}" ]] && host_name="k8s-master"
-    set_hostname host_name
+    set_hostname ${host_name}
 
     while read -r -p "请输入K8s版本(1/1.23.17 2/latest 默认:1/1.23.17): " k8sVersionNum; do
       if [[ -z "${k8sVersionNum}" || ${k8sVersionNum} == 1 ]]; then
