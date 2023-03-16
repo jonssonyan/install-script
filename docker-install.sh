@@ -340,9 +340,9 @@ install_docker() {
       ${package_manager} install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
     else
       if [[ ${package_manager} == "yum" || ${package_manager} == "dnf" ]]; then
-        ${package_manager} install -y docker-ce-${docker_version} docker-ce-cli-${docker_version} containerd.io docker-compose-plugin
+        ${package_manager} install -y docker-ce-"${docker_version}" docker-ce-cli-"${docker_version}" containerd.io docker-compose-plugin
       elif [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
-        ${package_manager} install -y docker-ce=5:${docker_version}~3-0~${release}-"$(lsb_release -c --short)" docker-ce-cli=5:${docker_version}~3-0~${release}-"$(lsb_release -c --short)" containerd.io docker-compose-plugin
+        ${package_manager} install -y docker-ce=5:"${docker_version}"~3-0~${release}-"$(lsb_release -c --short)" docker-ce-cli=5:"${docker_version}"~3-0~${release}-"$(lsb_release -c --short)" containerd.io docker-compose-plugin
       fi
     fi
 
