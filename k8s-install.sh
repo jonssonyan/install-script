@@ -82,7 +82,7 @@ get_config_val() {
   while read -r line; do
     k=${line%=*}
     v=${line#*=}
-    if [[ "${k}" -eq "$1" ]]; then
+    if [[ "${k}" == "$1" ]]; then
       echo "${v}"
       break
     fi
