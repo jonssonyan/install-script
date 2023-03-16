@@ -144,8 +144,6 @@ install_depend() {
 
 # 环境准备
 install_prepare() {
-  echo_content green "---> 环境准备"
-
   # 同步时间
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
   systemctl restart rsyslog
@@ -157,8 +155,6 @@ install_prepare() {
   elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
     ufw disable
   fi
-
-  echo_content skyBlue "---> 环境准备完成"
 }
 
 setup_docker() {
