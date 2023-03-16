@@ -263,6 +263,7 @@ install_docker() {
     fi
 
     setup_docker
+    setup_containerd
 
     systemctl enable docker && systemctl restart docker
 
@@ -352,7 +353,7 @@ install_runtime() {
   echo_content green "---> 安装运行时"
 
   install_docker
-  setup_containerd
+
 
   cho_content skyBlue "---> 运行时安装完成"
 }
