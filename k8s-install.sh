@@ -796,7 +796,7 @@ EOF
 # 运行k8s
 k8s_run() {
   if [[ $(command -v kubeadm) ]]; then
-    if [[ ${IS_MASTER} == 1 ]]; then
+    if [[ "${IS_MASTER}" == "1" ]]; then
       echo_content green "---> 运行k8s"
 
       # https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
@@ -818,7 +818,7 @@ k8s_run() {
         echo_content red "---> k8s运行失败"
         exit 1
       fi
-    elif [[ ${IS_MASTER} == 0 ]]; then
+    elif [[ "${IS_MASTER}" == "0" ]]; then
       k8s_network_install
       echo "该节点为从节点, 请手动运行 kubeadm join 命令. 如果你忘记了命令, 可以在主节点上运行 $(
         echo_content yellow "kubeadm token create --print-join-command"
