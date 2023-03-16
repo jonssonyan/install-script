@@ -624,23 +624,6 @@ EOF
 
   crictl config runtime-endpoint unix:///var/run/containerd/containerd.sock
   crictl config image-endpoint unix:///var/run/containerd/containerd.sock
-
-  if [[ ! -d /var/lib/kubelet/ ]]; then
-    mkdir -p /var/lib/kubelet/
-  fi
-  if [[ ! -f /var/lib/kubelet/kubeadm-flags.env ]]; then
-    cat >/var/lib/kubelet/kubeadm-flags.env <<EOF
-KUBELET_KUBEADM_ARGS="--container-runtime=remote --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock"
-EOF
-  else
-    if [[ -z "$(grep "KUBELET_KUBEADM_ARGS" /var/lib/kubelet/kubeadm-flags.env)" ]]; then
-      cat >/var/lib/kubelet/kubeadm-flags.env <<EOF
-KUBELET_KUBEADM_ARGS="--container-runtime=remote --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock"
-EOF
-    else
-      sed -i '/KUBELET_KUBEADM_ARGS/s/"$/ --container-runtime=remote --container-runtime-endpoint=unix:\/\/\/run\/containerd\/containerd.sock"/' /var/lib/kubelet/kubeadm-flags.env
-    fi
-  fi
 }
 
 # 安装k8s
@@ -800,14 +783,16 @@ k8s_run() {
           --apiserver-advertise-address "${PUBLIC_IP}" \
           --image-repository "${k8s_mirror}" \
           --service-cidr=10.96.0.0/12 \
-          --pod-network-cidr=10.244.0.0/16 | tee /k8sdata/log/kubeadm-init.log
+          --pod-network-cidr=10.244.0.0/16 \
+          --cri-socket=unix:///var/run/containerd/containerd.sock | tee /k8sdata/log/kubeadm-init.log
       else
         kubeadm init \
           --apiserver-advertise-address "${PUBLIC_IP}" \
           --image-repository "${k8s_mirror}" \
           --kubernetes-version "${K8S_VERSION}" \
           --service-cidr=10.96.0.0/12 \
-          --pod-network-cidr=10.244.0.0/16 | tee /k8sdata/log/kubeadm-init.log
+          --pod-network-cidr=10.244.0.0/16 \
+          --cri-socket=unix:///var/run/containerd/containerd.sock | tee /k8sdata/log/kubeadm-init.log
       fi
 
       if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
