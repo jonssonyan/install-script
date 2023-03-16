@@ -36,7 +36,7 @@ init_var() {
 
   # Docker
   docker_version="20.10.23"
-  docker_mirror='"https://dockerhub.azk8s.cn","https://docker.mirrors.ustc.edu.cn","https://hub-mirror.c.163.com","https://registry.docker-cn.com"'
+  docker_mirror='""https://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://registry.docker-cn.com"'
 }
 
 echo_content() {
@@ -846,6 +846,8 @@ k8s_run() {
 # 重设K8s
 k8s_reset() {
   if [[ $(command -v kubeadm) ]]; then
+    echo_content green "---> 重设K8s"
+
     kubeadm reset -f
     rm -rf /etc/cni /etc/kubernetes /var/lib/dockershim /var/lib/etcd /var/lib/kubelet /var/run/kubernetes "$HOME"/.kube
     iptables -F && iptables -X
@@ -858,6 +860,8 @@ k8s_reset() {
     elif [[ ! $(command -v containerd) ]]; then
       systemctl restart containerd
     fi
+
+    echo_content skyBlue "---> 重设K8s完成"
   else
     echo_content skyBlue "---> 请先安装K8s"
   fi
