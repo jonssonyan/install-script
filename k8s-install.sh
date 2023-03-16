@@ -354,7 +354,6 @@ install_runtime() {
 
   install_docker
 
-
   cho_content skyBlue "---> 运行时安装完成"
 }
 
