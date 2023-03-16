@@ -36,7 +36,7 @@ init_var() {
 
   # Docker
   docker_version="20.10.23"
-  docker_mirror='"https://dockerhub.azk8s.cn","https://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://registry.docker-cn.com"'
+  docker_mirror='"https://dockerhub.azk8s.cn","https://docker.mirrors.ustc.edu.cn","https://hub-mirror.c.163.com","https://registry.docker-cn.com"'
 }
 
 echo_content() {
