@@ -29,6 +29,7 @@ init_var() {
   is_master=1
   k8s_cri_sock="unix:///var/run/containerd/containerd.sock"
   network="flannel"
+  network_file="/k8sdata/network/flannelkube-flannel.yml"
   k8s_mirror="registry.cn-hangzhou.aliyuncs.com/google_containers"
   # kube_flannel_url="https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
   # calico_url="https://docs.projectcalico.org/manifests/calico.yaml"
@@ -427,7 +428,7 @@ k8s_network_install() {
     #    done
 
     if [[ ${network} == "flannel" ]]; then
-      cat >/k8sdata/network/flannelkube-flannel.yml <<EOF
+      cat >"${network_file}" <<EOF
 ---
 kind: Namespace
 apiVersion: v1
@@ -639,8 +640,11 @@ spec:
           path: /run/xtables.lock
           type: FileOrCreate
 EOF
-      # wget --no-check-certificate -O /k8sdata/network/flannelkube-flannel.yml ${kube_flannel_url}
-      kubectl create -f /k8sdata/network/flannelkube-flannel.yml
+      # wget --no-check-certificate -O "${network_file}" ${kube_flannel_url}
+      if [[ ${can_google} == 0 ]]; then
+        sed - i "s/docker.io/${k8s_mirror}/g" "${network_file}"
+      fi
+      kubectl create -f "${network_file}"
     fi
 
     if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
