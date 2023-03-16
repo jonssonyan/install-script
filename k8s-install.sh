@@ -36,7 +36,7 @@ init_var() {
 
   # Docker
   docker_version="20.10.23"
-  docker_mirror='"https://hub-mirror.c.163.com","mirror.baidubce.com","ccr.ccs.tencentyun.com","dockerproxy.com"'
+  docker_mirror='"https://hub-mirror.c.163.com","https://ccr.ccs.tencentyun.com","https://mirror.baidubce.com","https://dockerproxy.com"'
 }
 
 echo_content() {
