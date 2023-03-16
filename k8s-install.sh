@@ -821,10 +821,10 @@ k8s_run() {
         exit 1
       fi
     elif [[ ${IS_MASTER} == 0 ]]; then
+      k8s_network_install
       echo "该节点为从节点, 请手动运行 kubeadm join 命令. 如果你忘记了命令, 可以在主节点上运行 $(
         echo_content yellow "kubeadm token create --print-join-command"
       )"
-      k8s_network_install
     fi
   else
     echo_content skyBlue "---> 请先安装K8s"
