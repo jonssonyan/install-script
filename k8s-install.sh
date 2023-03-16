@@ -788,7 +788,7 @@ k8s_run() {
           --kubernetes-version "${K8S_VERSION}" \
           --service-cidr=10.96.0.0/12 \
           --pod-network-cidr=10.244.0.0/16 \
-          --cri-socket=unix:///var/run/cri-dockerd.sock | tee /k8sdata/log/kubeadm-init.log
+          --cri-socket=unix:///var/run/docker.sock | tee /k8sdata/log/kubeadm-init.log
       fi
 
       if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
