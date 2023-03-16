@@ -26,10 +26,12 @@ init_var() {
 
   k8s_version="1.23.17"
   is_master=1
+  k8s_runtime="cri-dockerd"
+  k8s_cri_sock="unix:///var/run/cri-dockerd.sock"
   network="flannel"
   k8s_mirror="registry.cn-hangzhou.aliyuncs.com/google_containers"
-  kube_flannel_url="https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
-  calico_url="https://docs.projectcalico.org/manifests/calico.yaml"
+  # kube_flannel_url="https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
+  # calico_url="https://docs.projectcalico.org/manifests/calico.yaml"
 
   # Docker
   docker_version="20.10.23"
@@ -347,10 +349,28 @@ install_containerd() {
 install_runtime() {
   echo_content green "---> 安装运行时"
 
-  if [[ -z "${k8s_version}" ]]; then
-    install_containerd
-  else
+  while read -r -p "请选择容器运行时(1/cri-dockerd 2/containerd 默认:1/cri-dockerd): " runtimeNum; do
+    case ${runtimeNum} in
+    1)
+      k8s_runtime="cri-dockerd"
+      k8s_cri_sock="unix:///var/run/cri-dockerd.sock"
+      break
+      ;;
+    2)
+      k8s_runtime="containerd"
+      k8s_cri_sock="unix:///var/run/containerd/containerd.sock"
+      break
+      ;;
+    *)
+      echo_content red "没有这个选项"
+      ;;
+    esac
+  done
+
+  if [[ "${k8s_runtime}" == "cri-dockerd" ]]; then
     install_docker
+  else
+    install_containerd
   fi
 
   cho_content skyBlue "---> 运行时安装完成"
@@ -785,7 +805,7 @@ k8s_run() {
         kubeadm init \
           --apiserver-advertise-address "${PUBLIC_IP}" \
           --image-repository "${k8s_mirror}" \
-          --kubernetes-version "${K8S_VERSION}" \
+          --kubernetes-version "v${K8S_VERSION}" \
           --service-cidr=10.96.0.0/12 \
           --pod-network-cidr=10.244.0.0/16 \
           --cri-socket=/var/run/dockershim.sock | tee /k8sdata/log/kubeadm-init.log
