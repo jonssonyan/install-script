@@ -794,22 +794,13 @@ k8s_run() {
       echo_content green "---> 运行k8s"
 
       # https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
-      if [[ -z ${K8S_VERSION} ]]; then
-        kubeadm init \
-          --apiserver-advertise-address "${PUBLIC_IP}" \
-          --image-repository "${k8s_mirror}" \
-          --service-cidr=10.96.0.0/12 \
-          --pod-network-cidr=10.244.0.0/16 \
-          --cri-socket=${k8s_cri_sock} | tee /k8sdata/log/kubeadm-init.log
-      else
-        kubeadm init \
-          --apiserver-advertise-address "${PUBLIC_IP}" \
-          --image-repository "${k8s_mirror}" \
-          --kubernetes-version "v${K8S_VERSION}" \
-          --service-cidr=10.96.0.0/12 \
-          --pod-network-cidr=10.244.0.0/16 \
-          --cri-socket=${k8s_cri_sock} | tee /k8sdata/log/kubeadm-init.log
-      fi
+      kubeadm init \
+        --apiserver-advertise-address="${PUBLIC_IP}" \
+        --image-repository="${k8s_mirror}" \
+        --kubernetes-version="${K8S_VERSION}" \
+        --service-cidr=10.96.0.0/12 \
+        --pod-network-cidr=10.244.0.0/16 \
+        --cri-socket="${k8s_cri_sock}" | tee /k8sdata/log/kubeadm-init.log
 
       if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
         mkdir -p "$HOME"/.kube
