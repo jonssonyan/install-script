@@ -366,7 +366,7 @@ install_runtime() {
 
   while read -r -p "请选择容器运行时(1/containerd 2/dockershim 默认:1/containerd): " runtimeNum; do
     case ${runtimeNum} in
-    1)
+    "" | 1)
       k8s_cri_sock="unix:///var/run/containerd/containerd.sock"
       install_containerd
       break
