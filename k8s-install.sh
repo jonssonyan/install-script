@@ -23,6 +23,7 @@ init_var() {
   K8S_DATA="/k8sdata"
   K8S_LOG="/k8sdata/log"
   K8S_NETWORK="/k8sdata/network"
+  k8s_lock_file="/k8sdata/k8s.lock"
 
   k8s_version=""
   is_master=1
@@ -76,6 +77,19 @@ can_connect() {
     return 1
   fi
 }
+
+get_config_val() {
+  while read -r line; do
+    k=${line%=*}
+    v=${line#*=}
+    if [[ "${k}" -eq "$1" ]]; then
+      return "${v}"
+    fi
+  done <${k8s_lock_file}
+}
+
+# 比较版本大小
+version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
 
 # 检查系统
 check_sys() {
@@ -344,9 +358,6 @@ install_containerd() {
   fi
 }
 
-# 比较版本大小
-version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
-
 # 安装运行时
 install_runtime() {
   echo_content green "---> 安装运行时"
@@ -378,6 +389,8 @@ install_runtime() {
       ;;
     esac
   done
+
+  echo "k8s_cri_sock=${k8s_cri_sock}" >>${k8s_lock_file}
 
   cho_content skyBlue "---> 运行时安装完成"
 }
@@ -665,7 +678,7 @@ k8s_install() {
         fi
       fi
     done
-    echo "export IS_MASTER=${is_master}" >>"$HOME/.bashrc"
+    echo "is_master=${is_master}" >>${k8s_lock_file}
 
     if [[ $(grep -c "processor" /proc/cpuinfo) == 1 && ${is_master} == 1 ]]; then
       echo_content red "主节点需要CPU 2核心及以上"
@@ -679,7 +692,7 @@ k8s_install() {
         break
       fi
     done
-    echo "export PUBLIC_IP=${public_ip}" >>"$HOME/.bashrc"
+    echo "public_ip=${public_ip}" >>${k8s_lock_file}
 
     # 设置主机名称
     read -r -p "请输入主机名(默认:k8s-master): " host_name
@@ -699,8 +712,7 @@ k8s_install() {
         fi
       fi
     done
-    echo "export K8S_VERSION=${k8s_version}" >>"$HOME/.bashrc"
-    source "$HOME/.bashrc"
+    echo "k8s_version=${k8s_version}" >>${k8s_lock_file}
 
     # 安装运行时
     install_runtime
@@ -796,14 +808,19 @@ EOF
 # 运行k8s
 k8s_run() {
   if [[ $(command -v kubeadm) ]]; then
-    if [[ "${IS_MASTER}" == "1" ]]; then
+    is_master=$(get_config_val is_master)
+    public_ip=$(get_config_val public_ip)
+    k8s_version=$(get_config_val k8s_version)
+    k8s_cri_sock=$(get_config_val k8s_cri_sock)
+
+    if [[ "${is_master}" == "1" ]]; then
       echo_content green "---> 运行k8s"
 
       # https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
       kubeadm init \
-        --apiserver-advertise-address="${PUBLIC_IP}" \
+        --apiserver-advertise-address="${public_ip}" \
         --image-repository="${k8s_mirror}" \
-        --kubernetes-version="${K8S_VERSION}" \
+        --kubernetes-version="${k8s_version}" \
         --service-cidr=10.96.0.0/12 \
         --pod-network-cidr=10.244.0.0/16 \
         --cri-socket="${k8s_cri_sock}" | tee /k8sdata/log/kubeadm-init.log
@@ -818,7 +835,7 @@ k8s_run() {
         echo_content red "---> k8s运行失败"
         exit 1
       fi
-    elif [[ "${IS_MASTER}" == "0" ]]; then
+    elif [[ "${is_master}" == "0" ]]; then
       k8s_network_install
       echo "该节点为从节点, 请手动运行 kubeadm join 命令. 如果你忘记了命令, 可以在主节点上运行 $(
         echo_content yellow "kubeadm token create --print-join-command"
@@ -856,7 +873,6 @@ main() {
   check_sys
   install_depend
   install_prepare
-  source "$HOME/.bashrc"
   clear
   echo_content red "\n=============================================================="
   echo_content skyBlue "System Required: CentOS 7+/Ubuntu 18+/Debian 10+"
