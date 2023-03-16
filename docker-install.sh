@@ -6,7 +6,7 @@ export PATH
 # Version: v1.0.0
 # Description: One click install Docker based Services
 # Author: jonssonyan <https://jonssonyan.com>
-# Github: https://github.com/jonssonyan/install-scipt
+# Github: https://github.com/jonssonyan/install-script
 
 init_var() {
   ECHO_TYPE="echo -e"
@@ -721,7 +721,7 @@ main() {
   echo_content skyBlue "Version: v1.0.0"
   echo_content skyBlue "Description: One click install Docker based Services"
   echo_content skyBlue "Author: jonssonyan <https://jonssonyan.com>"
-  echo_content skyBlue "Github: https://github.com/jonssonyan/install-scipt"
+  echo_content skyBlue "Github: https://github.com/jonssonyan/install-script"
   echo_content red "\n=============================================================="
   echo_content yellow "1. 安装Docker"
   echo_content yellow "2. 安装MySQL"
