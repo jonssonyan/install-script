@@ -800,7 +800,7 @@ k8s_run() {
           --image-repository "${k8s_mirror}" \
           --service-cidr=10.96.0.0/12 \
           --pod-network-cidr=10.244.0.0/16 \
-          --cri-socket=unix:///var/run/containerd/containerd.sock | tee /k8sdata/log/kubeadm-init.log
+          --cri-socket=${k8s_cri_sock} | tee /k8sdata/log/kubeadm-init.log
       else
         kubeadm init \
           --apiserver-advertise-address "${PUBLIC_IP}" \
@@ -808,7 +808,7 @@ k8s_run() {
           --kubernetes-version "v${K8S_VERSION}" \
           --service-cidr=10.96.0.0/12 \
           --pod-network-cidr=10.244.0.0/16 \
-          --cri-socket=/var/run/dockershim.sock | tee /k8sdata/log/kubeadm-init.log
+          --cri-socket=${k8s_cri_sock} | tee /k8sdata/log/kubeadm-init.log
       fi
 
       if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
