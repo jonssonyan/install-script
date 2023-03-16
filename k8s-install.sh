@@ -36,7 +36,7 @@ init_var() {
 
   # Docker
   docker_version="20.10.23"
-  docker_mirror='"https://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://registry.docker-cn.com"'
+  docker_mirror='"https://dockerhub.azk8s.cn","https://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://registry.docker-cn.com"'
 }
 
 echo_content() {
@@ -641,9 +641,6 @@ spec:
           type: FileOrCreate
 EOF
       # wget --no-check-certificate -O "${network_file}" ${kube_flannel_url}
-      if [[ ${can_google} == 0 ]]; then
-        sed - i "s/docker.io/${k8s_mirror}/g" "${network_file}"
-      fi
       kubectl create -f "${network_file}"
     fi
 
