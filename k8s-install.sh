@@ -858,7 +858,6 @@ main() {
   check_sys
   install_depend
   install_prepare
-  source /etc/profile
   clear
   echo_content red "\n=============================================================="
   echo_content skyBlue "System Required: CentOS 7+/Ubuntu 18+/Debian 10+"
