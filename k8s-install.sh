@@ -362,7 +362,7 @@ install_containerd() {
 install_runtime() {
   echo_content green "---> 安装运行时"
 
-  while read -r -p "请选择容器运行时(1/containerd 2/dockershim 3/cri-dockerd 默认:1/containerd): " runtimeNum; do
+  while read -r -p "请选择容器运行时(1/containerd 2/dockershim 默认:1/containerd): " runtimeNum; do
     case ${runtimeNum} in
     1)
       k8s_cri_sock="unix:///var/run/containerd/containerd.sock"
@@ -378,11 +378,6 @@ install_runtime() {
       else
         echo_content red "自1.24版起，Dockershim已从Kubernetes项目中移除，详情：https://kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/"
       fi
-      ;;
-    3)
-      k8s_cri_sock="unix:///var/run/cri-dockerd.sock"
-
-      break
       ;;
     *)
       echo_content red "没有这个选项"
