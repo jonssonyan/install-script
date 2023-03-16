@@ -26,7 +26,6 @@ init_var() {
 
   k8s_version="1.23.17"
   is_master=1
-  k8s_runtime="cri-dockerd"
   k8s_cri_sock="unix:///var/run/cri-dockerd.sock"
   network="flannel"
   k8s_mirror="registry.cn-hangzhou.aliyuncs.com/google_containers"
@@ -345,33 +344,39 @@ install_containerd() {
   fi
 }
 
+# 比较版本大小
+version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
+
 # 安装运行时
 install_runtime() {
   echo_content green "---> 安装运行时"
 
-  while read -r -p "请选择容器运行时(1/cri-dockerd 2/containerd 默认:1/cri-dockerd): " runtimeNum; do
+  while read -r -p "请选择容器运行时(1/cri-dockerd 2/containerd 3/dockershim 默认:1/cri-dockerd): " runtimeNum; do
     case ${runtimeNum} in
     1)
-      k8s_runtime="cri-dockerd"
       k8s_cri_sock="unix:///var/run/cri-dockerd.sock"
       break
       ;;
     2)
-      k8s_runtime="containerd"
       k8s_cri_sock="unix:///var/run/containerd/containerd.sock"
+      install_containerd
       break
+      ;;
+    3)
+      # 自 1.24 版起，Dockershim 已从 Kubernetes 项目中移除
+      if version_lt "${k8s_version}" "1.24.0"; then
+        k8s_cri_sock="/var/run/dockershim.sock"
+        install_docker
+        break
+      else
+        echo_content red "自 1.24 版起，Dockershim 已从 Kubernetes 项目中移除，详情：https://kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/"
+      fi
       ;;
     *)
       echo_content red "没有这个选项"
       ;;
     esac
   done
-
-  if [[ "${k8s_runtime}" == "cri-dockerd" ]]; then
-    install_docker
-  else
-    install_containerd
-  fi
 
   cho_content skyBlue "---> 运行时安装完成"
 }
