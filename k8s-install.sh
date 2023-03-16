@@ -24,9 +24,9 @@ init_var() {
   K8S_LOG="/k8sdata/log"
   K8S_NETWORK="/k8sdata/network"
 
-  k8s_version="1.23.17"
+  k8s_version=""
   is_master=1
-  k8s_cri_sock="unix:///var/run/cri-dockerd.sock"
+  k8s_cri_sock="unix:///var/run/containerd/containerd.sock"
   network="flannel"
   k8s_mirror="registry.cn-hangzhou.aliyuncs.com/google_containers"
   # kube_flannel_url="https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
@@ -351,18 +351,14 @@ version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1";
 install_runtime() {
   echo_content green "---> 安装运行时"
 
-  while read -r -p "请选择容器运行时(1/cri-dockerd 2/containerd 3/dockershim 默认:1/cri-dockerd): " runtimeNum; do
+  while read -r -p "请选择容器运行时(1/containerd 2/dockershim 3/cri-dockerd 默认:1/containerd): " runtimeNum; do
     case ${runtimeNum} in
     1)
-      k8s_cri_sock="unix:///var/run/cri-dockerd.sock"
-      break
-      ;;
-    2)
       k8s_cri_sock="unix:///var/run/containerd/containerd.sock"
       install_containerd
       break
       ;;
-    3)
+    2)
       # 自 1.24 版起，Dockershim 已从 Kubernetes 项目中移除
       if version_lt "${k8s_version}" "1.24.0"; then
         k8s_cri_sock="/var/run/dockershim.sock"
@@ -371,6 +367,11 @@ install_runtime() {
       else
         echo_content red "自1.24版起，Dockershim已从Kubernetes项目中移除，详情：https://kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/"
       fi
+      ;;
+    3)
+      k8s_cri_sock="unix:///var/run/cri-dockerd.sock"
+
+      break
       ;;
     *)
       echo_content red "没有这个选项"
@@ -685,15 +686,15 @@ k8s_install() {
     [[ -z "${host_name}" ]] && host_name="k8s-master"
     set_hostname ${host_name}
 
-    while read -r -p "请输入K8s版本(1/1.23.17 2/latest 默认:1/1.23.17): " k8sVersionNum; do
+    while read -r -p "请输入K8s版本(1/latest 2/1.23.17 默认:1/latest): " k8sVersionNum; do
       if [[ -z "${k8sVersionNum}" || ${k8sVersionNum} == 1 ]]; then
-        k8s_version="1.23.17"
+        k8s_version=""
         break
       else
         if [[ ${k8sVersionNum} != 2 ]]; then
           echo_content red "不可以输入除1和2之外的其他字符"
         else
-          k8s_version=""
+          k8s_version="1.23.17"
           break
         fi
       fi
