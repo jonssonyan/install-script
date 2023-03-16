@@ -83,7 +83,7 @@ get_config_val() {
     k=${line%=*}
     v=${line#*=}
     if [[ "${k}" -eq "$1" ]]; then
-      return "${v}"
+      echo "${v}"
     fi
   done <${k8s_lock_file}
 }
