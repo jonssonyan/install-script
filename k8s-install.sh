@@ -378,19 +378,19 @@ k8s_network_install() {
   if [[ ${PIPESTATUS[0]} -eq 0 && -z $(kubectl get pods -n kube-system | grep -E 'calico|flannel') ]]; then
     echo_content green "---> 安装网络系统"
 
-#    while read -r -p "请输入安装哪个网络系统?(1/flannel 2/calico 默认:1/flannel): " networkNum; do
-#      if [[ -z "${networkNum}" || ${networkNum} == 1 ]]; then
-#        network="flannel"
-#        break
-#      else
-#        if [[ ${networkNum} != 2 ]]; then
-#          echo_content red "不可以输入除1和2之外的其他字符"
-#        else
-#          network="calico"
-#          break
-#        fi
-#      fi
-#    done
+    #    while read -r -p "请输入安装哪个网络系统?(1/flannel 2/calico 默认:1/flannel): " networkNum; do
+    #      if [[ -z "${networkNum}" || ${networkNum} == 1 ]]; then
+    #        network="flannel"
+    #        break
+    #      else
+    #        if [[ ${networkNum} != 2 ]]; then
+    #          echo_content red "不可以输入除1和2之外的其他字符"
+    #        else
+    #          network="calico"
+    #          break
+    #        fi
+    #      fi
+    #    done
 
     if [[ ${network} == "flannel" ]]; then
       cat >/k8sdata/network/flannelkube-flannel.yml <<EOF
@@ -689,12 +689,12 @@ k8s_install() {
         if [[ ${k8sVersionNum} != 2 ]]; then
           echo_content red "不可以输入除1和2之外的其他字符"
         else
-          k8s_version="stable-1"
+          k8s_version=""
           break
         fi
       fi
     done
-    echo "export K8S_VERSION=v${k8s_version}" >>/etc/profile
+    echo "export K8S_VERSION=${k8s_version}" >>/etc/profile
     source /etc/profile
 
     # 安装运行时
@@ -795,28 +795,37 @@ k8s_run() {
       echo_content green "---> 运行k8s"
 
       # https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
-      kubeadm init \
-        --apiserver-advertise-address "${PUBLIC_IP}" \
-        --image-repository "${k8s_mirror}" \
-        --kubernetes-version "${K8S_VERSION}" \
-        --service-cidr=10.96.0.0/12 \
-        --pod-network-cidr=10.244.0.0/16 | tee /k8sdata/log/kubeadm-init.log
+      if [[ -z ${K8S_VERSION} ]]; then
+        kubeadm init \
+          --apiserver-advertise-address "${PUBLIC_IP}" \
+          --image-repository "${k8s_mirror}" \
+          --service-cidr=10.96.0.0/12 \
+          --pod-network-cidr=10.244.0.0/16 | tee /k8sdata/log/kubeadm-init.log
+      else
+        kubeadm init \
+          --apiserver-advertise-address "${PUBLIC_IP}" \
+          --image-repository "${k8s_mirror}" \
+          --kubernetes-version "v${K8S_VERSION}" \
+          --service-cidr=10.96.0.0/12 \
+          --pod-network-cidr=10.244.0.0/16 | tee /k8sdata/log/kubeadm-init.log
+      fi
+
       if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
         mkdir -p "$HOME"/.kube
         cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
         chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
         echo_content skyBlue "---> k8s运行完成"
+        k8s_network_install
       else
         echo_content red "---> k8s运行失败"
         exit 1
       fi
-    else
+    elif [[ ${IS_MASTER} == 0 ]]; then
       echo "该节点为从节点, 请手动运行 kubeadm join 命令. 如果你忘记了命令, 可以在主节点上运行 $(
         echo_content yellow "kubeadm token create --print-join-command"
       )"
+      k8s_network_install
     fi
-
-    k8s_network_install
   else
     echo_content skyBlue "---> 请先安装K8s"
   fi
@@ -849,6 +858,7 @@ main() {
   check_sys
   install_depend
   install_prepare
+  source /etc/profile
   clear
   echo_content red "\n=============================================================="
   echo_content skyBlue "System Required: CentOS 7+/Ubuntu 18+/Debian 10+"
