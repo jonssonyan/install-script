@@ -369,7 +369,7 @@ install_runtime() {
         install_docker
         break
       else
-        echo_content red "自 1.24 版起，Dockershim 已从 Kubernetes 项目中移除，详情：https://kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/"
+        echo_content red "自1.24版起，Dockershim已从Kubernetes项目中移除，详情：https://kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/"
       fi
       ;;
     *)
