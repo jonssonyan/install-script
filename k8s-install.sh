@@ -658,6 +658,7 @@ KUBELET_EXTRA_ARGS="--cgroup-driver=systemd"
 EOF
   if [[ $(command -v crictl) ]]; then
     crictl config --set runtime-endpoint=${k8s_cri_sock}
+    crictl config --set image-endpoint=${k8s_cri_sock}
   fi
   k8s_bash_completion
 }
