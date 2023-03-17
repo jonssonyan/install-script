@@ -656,6 +656,10 @@ setup_k8s() {
   cat >/etc/sysconfig/kubelet <<EOF
 KUBELET_EXTRA_ARGS="--cgroup-driver=systemd"
 EOF
+  if [[ $(command -v crictl) ]]; then
+    crictl config --set runtime-endpoint=${k8s_cri_sock}
+  fi
+  k8s_bash_completion
 }
 
 # 安装k8s
@@ -792,7 +796,6 @@ EOF
 
     if [[ $(command -v kubeadm) ]]; then
       echo_content skyBlue "---> k8s安装完成"
-      k8s_bash_completion
     else
       echo_content red "---> k8s安装失败"
       exit 1
