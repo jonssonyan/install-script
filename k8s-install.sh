@@ -394,7 +394,7 @@ install_runtime() {
 
 # k8s命令行补全
 k8s_bash_completion() {
-  ! grep -q kubectl "$HOME/.bashrc" && echo "source /usr/share/bash-completion/bash_completion" >>"$HOME/.bashrc"
+  ! grep -q bash_completion "$HOME/.bashrc" && echo "source /usr/share/bash-completion/bash_completion" >>"$HOME/.bashrc"
   if [[ $(command -v kubectl) ]]; then
     ! grep -q kubectl "$HOME/.bashrc" && echo "source <(kubectl completion bash)" >>"$HOME/.bashrc"
   fi
