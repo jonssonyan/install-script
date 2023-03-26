@@ -394,7 +394,7 @@ install_runtime() {
 
 # k8s命令行补全
 k8s_bash_completion() {
-  ! grep -q kubectl "$HOME/.bashrc" && echo "source /usr/share/bash-completion/bash_completion" >>"$HOME/.bashrc"
+  ! grep -q bash_completion "$HOME/.bashrc" && echo "source /usr/share/bash-completion/bash_completion" >>"$HOME/.bashrc"
   if [[ $(command -v kubectl) ]]; then
     ! grep -q kubectl "$HOME/.bashrc" && echo "source <(kubectl completion bash)" >>"$HOME/.bashrc"
   fi
@@ -656,6 +656,11 @@ setup_k8s() {
   cat >/etc/sysconfig/kubelet <<EOF
 KUBELET_EXTRA_ARGS="--cgroup-driver=systemd"
 EOF
+  if [[ $(command -v crictl) ]]; then
+    crictl config --set runtime-endpoint=${k8s_cri_sock}
+    crictl config --set image-endpoint=${k8s_cri_sock}
+  fi
+  k8s_bash_completion
 }
 
 # 安装k8s
@@ -792,7 +797,6 @@ EOF
 
     if [[ $(command -v kubeadm) ]]; then
       echo_content skyBlue "---> k8s安装完成"
-      k8s_bash_completion
     else
       echo_content red "---> k8s安装失败"
       exit 1
@@ -833,7 +837,6 @@ k8s_run() {
         exit 1
       fi
     elif [[ "${is_master}" == "0" ]]; then
-      k8s_network_install
       echo "该节点为从节点, 请手动运行 kubeadm join 命令. 如果你忘记了命令, 可以在主节点上运行 $(
         echo_content yellow "kubeadm token create --print-join-command"
       )"

@@ -365,7 +365,7 @@ install_docker() {
 }
 
 install_mysql() {
-  if [[ -z $(docker ps -q -f "name=^js-mysql$") ]]; then
+  if [[ -z $(docker ps -q -f "name=^${mysql_ip}$") ]]; then
     echo_content green "---> 安装MySQL"
 
     read -r -p "请输入数据库的端口(默认:9507): " mysql_port
@@ -406,7 +406,7 @@ install_mysql() {
           --collation-server=utf8mb4_unicode_ci
     fi
 
-    if [[ -n $(docker ps -q -f "name=^js-mysql$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${mysql_ip}$") ]]; then
       echo_content skyBlue "---> MySQL安装完成"
       echo_content yellow "---> MySQL root的数据库密码(请妥善保存): ${mysql_pas}"
       if [[ "${mysql_user}" != "root" ]]; then
@@ -423,7 +423,7 @@ install_mysql() {
 
 # 安装Redis
 install_redis() {
-  if [[ -z $(docker ps -q -f "name=^js-redis$") ]]; then
+  if [[ -z $(docker ps -q -f "name=^${redis_ip}$") ]]; then
     echo_content green "---> 安装Redis"
 
     read -r -p "请输入Redis的端口(默认:6378): " redis_port
@@ -443,7 +443,7 @@ install_redis() {
         -v ${REDIS_DATA}:/data redis:6.2.7 \
         redis-server --requirepass "${redis_pass}"
 
-    if [[ -n $(docker ps -q -f "name=^js-redis$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${redis_ip}$") ]]; then
       echo_content skyBlue "---> Redis安装完成"
       echo_content yellow "---> Redis的数据库密码(请妥善保存): ${redis_pass}"
     else
@@ -456,7 +456,7 @@ install_redis() {
 }
 
 install_minio() {
-  if [[ -z $(docker ps -q -f "name=^js-minio$") ]]; then
+  if [[ -z $(docker ps -q -f "name=^${minio_ip}$") ]]; then
     echo_content green "---> 安装Minio"
 
     read -r -p "请输入Minio的服务端口(默认:9000): " minio_server_port
@@ -484,7 +484,7 @@ install_minio() {
         minio/minio \
         server --address ':9000' \
         --console-address ':8000' /data
-    if [[ -n $(docker ps -q -f "name=^js-minio$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${minio_ip}$") ]]; then
       echo_content skyBlue "---> Minio安装完成"
       echo_content yellow "---> Minio的用户号名(请妥善保存): ${minio_root_user}"
       echo_content yellow "---> Minio的密码(请妥善保存): ${minio_root_password}"
@@ -498,7 +498,7 @@ install_minio() {
 }
 
 install_nacos() {
-  if [[ -z $(docker ps -q -f "name=^js-nacos$") ]]; then
+  if [[ -z $(docker ps -q -f "name=^${nacos_ip}$") ]]; then
     echo_content green "---> 安装Nacos"
 
     docker pull nacos/nacos-server &&
@@ -506,7 +506,7 @@ install_nacos() {
         --network=js-network \
         -p ${nacos_port}:8848 \
         -e MODE=standalone nacos/nacos-server
-    if [[ -n $(docker ps -q -f "name=^js-nacos$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${nacos_ip}$") ]]; then
       echo_content skyBlue "---> Nacos安装完成"
       echo_content yellow "---> Nacos的用户号名(请妥善保存): nacos"
       echo_content yellow "---> Nacos的密码(请妥善保存): nacos"
@@ -520,7 +520,7 @@ install_nacos() {
 }
 
 install_ssr() {
-  if [[ -z $(docker ps -q -f "name=^js-ssr$") ]]; then
+  if [[ -z $(docker ps -q -f "name=^${ssr_ip}$") ]]; then
     echo_content green "---> 安装ShadowsocksR"
 
     read -r -p "请输入ShadowsocksR的密码(默认:123456): " ssr_password
@@ -614,7 +614,7 @@ EOF
         -v ${ssr_config}:/etc/shadowsocks-r/config.json \
         teddysun/shadowsocks-r
 
-    if [[ -n $(docker ps -q -f "name=^js-ssr$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${ssr_ip}$") ]]; then
       echo_content skyBlue "---> ShadowsocksR安装完成"
       echo_content yellow "---> ShadowsocksR的端口: ${ssr_port}"
       echo_content yellow "---> ShadowsocksR的密码(请妥善保存): ${ssr_password}"
@@ -632,7 +632,7 @@ EOF
 
 # 安装Nexus3
 install_nexus3() {
-  if [[ -z $(docker ps -q -f "name=^js-nexus3$") ]]; then
+  if [[ -z $(docker ps -q -f "name=^${nexus3_ip}$") ]]; then
     echo_content green "---> 安装Nexus3"
 
     read -r -p "请输入Nexus3的端口(默认:8081): " nexus3_port
@@ -644,7 +644,7 @@ install_nexus3() {
         -v ${NEXUS3_DATA}:/nexus-data \
         sonatype/nexus3:3.49.0
 
-    if [[ -n $(docker ps -q -f "name=^js-nexus3$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${nexus3_ip}$") ]]; then
       echo_content skyBlue "---> Nexus3安装完成"
     else
       echo_content red "---> Nexus3安装失败"
@@ -657,7 +657,7 @@ install_nexus3() {
 
 # 安装GitLab
 install_gitlab() {
-  if [[ -z $(docker ps -q -f "name=^js-gitlab$") ]]; then
+  if [[ -z $(docker ps -q -f "name=^${gitlab_ip}$") ]]; then
     echo_content green "---> 安装GitLab"
 
     read -r -p "请输入GitLab的HTTP端口(默认:8080): " gitlab_http_port
@@ -685,7 +685,7 @@ nginx['listen_port'] = ${gitlab_http_port}
 gitlab_rails['gitlab_shell_ssh_port'] = ${gitlab_ssh_port}
 EOF
 
-    if [[ -n $(docker ps -q -f "name=^js-gitlab$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${gitlab_ip}$") ]]; then
       echo_content skyBlue "---> GitLab安装完成"
     else
       echo_content red "---> GitLab安装失败"
