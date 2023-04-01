@@ -501,11 +501,11 @@ install_nacos() {
   if [[ -z $(docker ps -q -f "name=^${nacos_ip}$") ]]; then
     echo_content green "---> 安装Nacos"
 
-    docker pull nacos/nacos-server &&
+    docker pull nacos/nacos-server:v2.2.0 &&
       docker run -d --name ${nacos_ip} --restart=always \
         --network=js-network \
         -p ${nacos_port}:8848 \
-        -e MODE=standalone nacos/nacos-server
+        -e MODE=standalone nacos/nacos-server:v2.2.0
     if [[ -n $(docker ps -q -f "name=^${nacos_ip}$") ]]; then
       echo_content skyBlue "---> Nacos安装完成"
       echo_content yellow "---> Nacos的用户号名(请妥善保存): nacos"
@@ -728,10 +728,10 @@ main() {
   echo_content skyBlue "Github: https://github.com/jonssonyan/install-script"
   echo_content red "\n=============================================================="
   echo_content yellow "1. 安装Docker"
-  echo_content yellow "2. 安装MySQL"
-  echo_content yellow "3. 安装Redis"
+  echo_content yellow "2. 安装MySQL 5.7.38"
+  echo_content yellow "3. 安装Redis 6.2.7"
   echo_content yellow "4. 安装Minio"
-  echo_content yellow "5. 安装Nacos"
+  echo_content yellow "5. 安装Nacos v2.2.0"
   echo_content yellow "6. 安装ShadowsocksR"
   echo_content yellow "7. 安装Nexus3"
   echo_content yellow "8. 安装GitLab"
