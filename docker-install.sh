@@ -700,24 +700,33 @@ EOF
 
 # 安装buildx交叉编译
 install_buildx() {
-  echo_content green "---> 安装buildx交叉编译"
+  if [[ $(docker buildx inspect --bootstrap | grep -q "mybuilder") -ne "0" ]]; then
+    echo_content green "---> 安装buildx交叉编译"
 
-  if [[ -d "${DOCKER_CONFIG_PATH}" && -f "${docker_config}" ]]; then
-    jq '.experimental="enabled"' "${docker_config}" >tmp.json && mv tmp.json "${docker_config}"
-  else
-    mkdir -p "${DOCKER_CONFIG_PATH}"
-    cat >"${docker_config}" <<EOF
+    if [[ -d "${DOCKER_CONFIG_PATH}" && -f "${docker_config}" ]]; then
+      jq '.experimental="enabled"' "${docker_config}" >tmp.json && mv tmp.json "${docker_config}"
+    else
+      mkdir -p "${DOCKER_CONFIG_PATH}"
+      cat >"${docker_config}" <<EOF
 {
   "experimental": "enabled"
 }
 EOF
+    fi
+
+    docker buildx create --use --name mybuilder &&
+      docker buildx use mybuilder &&
+      docker run --privileged --rm tonistiigi/binfmt --install all
+
+    if docker buildx inspect --bootstrap | grep -q "mybuilder"; then
+      echo_content skyBlue "---> buildx交叉编译安装完成"
+    else
+      echo_content red "---> buildx交叉编译安装失败"
+      exit 1
+    fi
+  else
+    echo_content skyBlue "---> 你已经安装了buildx交叉编译"
   fi
-
-  docker buildx create --use --name mybuilder &&
-    docker buildx use mybuilder &&
-    docker run --privileged --rm tonistiigi/binfmt --install all
-
-  echo_content skyBlue "---> buildx交叉编译安装完成"
 }
 
 # 卸载Docker
