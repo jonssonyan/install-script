@@ -19,6 +19,8 @@ init_var() {
   # Docker
   docker_version="20.10.23"
   docker_mirror='"https://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://registry.docker-cn.com"'
+  DOCKER_CONFIG_PATH='/root/.docker/'
+  docker_config='/root/.docker/config.json'
 
   JS_DATA="/jsdata/"
 
@@ -696,6 +698,28 @@ EOF
   fi
 }
 
+# 安装buildx交叉编译
+install_buildx() {
+  echo_content green "---> 安装buildx交叉编译"
+
+  if [[ -d "${DOCKER_CONFIG_PATH}" && -f "${docker_config}" ]]; then
+    jq '.experimental="enabled"' "${docker_config}" >tmp.json && mv tmp.json "${docker_config}"
+  else
+    mkdir -p "${DOCKER_CONFIG_PATH}"
+    cat >"${docker_config}" <<EOF
+{
+  "experimental": "enabled"
+}
+EOF
+  fi
+
+  docker buildx create --use --name mybuilder &&
+    docker buildx use mybuilder &&
+    docker run --privileged --rm tonistiigi/binfmt --install all
+
+  echo_content skyBlue "---> buildx交叉编译安装完成"
+}
+
 # 卸载Docker
 uninstall_docker() {
   if [[ $(command -v docker) ]]; then
@@ -735,8 +759,9 @@ main() {
   echo_content yellow "6. 安装ShadowsocksR"
   echo_content yellow "7. 安装Nexus3"
   echo_content yellow "8. 安装GitLab"
+  echo_content yellow "9. 安装buildx交叉编译"
   echo_content green "=============================================================="
-  echo_content yellow "9. 卸载Docker"
+  echo_content yellow "10. 卸载Docker"
   read -r -p "请选择:" selectInstall_type
   case ${selectInstall_type} in
   1)
@@ -771,6 +796,10 @@ main() {
     install_gitlab
     ;;
   9)
+    install_docker
+    install_buildx
+    ;;
+  10)
     uninstall_docker
     ;;
   *)
