@@ -700,7 +700,7 @@ EOF
 
 # 安装buildx交叉编译
 install_buildx() {
-  if [[ $(docker buildx inspect --bootstrap | grep -q "mybuilder") -ne "0" ]]; then
+  if [[ $(docker buildx inspect --bootstrap | grep -q "mybuilder") -eq "0" ]]; then
     echo_content green "---> 安装buildx交叉编译"
 
     if [[ -d "${DOCKER_CONFIG_PATH}" && -f "${docker_config}" ]]; then
