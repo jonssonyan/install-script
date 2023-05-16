@@ -241,7 +241,8 @@ install_depend() {
     curl \
     wget \
     systemd \
-    lrzsz
+    lrzsz \
+    jq
 }
 
 # 环境准备
@@ -700,11 +701,14 @@ EOF
 
 # 安装buildx交叉编译
 install_buildx() {
-  if [[ $(docker buildx inspect --bootstrap | grep -q "mybuilder") -ne "0" ]]; then
+  docker buildx inspect --bootstrap | grep -q "mybuilder"
+  if [[ "$?" != "0" ]]; then
     echo_content green "---> 安装buildx交叉编译"
 
     if [[ -d "${DOCKER_CONFIG_PATH}" && -f "${docker_config}" ]]; then
-      jq '.experimental="enabled"' "${docker_config}" >tmp.json && mv tmp.json "${docker_config}"
+      if ! grep -q "experimental" "${docker_config}"; then
+        jq '.experimental="enabled"' "${docker_config}" >tmp.json && mv tmp.json "${docker_config}"
+      fi
     else
       mkdir -p "${DOCKER_CONFIG_PATH}"
       cat >"${docker_config}" <<EOF
