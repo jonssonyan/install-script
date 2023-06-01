@@ -3,6 +3,8 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
 init_var() {
+  ECHO_TYPE="echo -e"
+
   # buildx
   DOCKER_CONFIG_PATH='/root/.docker/'
   docker_config='/root/.docker/config.json'
