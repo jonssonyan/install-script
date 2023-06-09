@@ -30,6 +30,10 @@ init_var() {
   redis_port=6378
   redis_pass=""
 
+  # es
+  ES_DATA="/jsdata/es/"
+  es_ip="js-es"
+
   #Minio
   MINIO_DATA="/jsdata/minio/"
   MINIO_DATA_DATA="/jsdata/minio/data/"
@@ -339,6 +343,15 @@ install_redis() {
   fi
 }
 
+install_es() {
+  if [[ -z $(docker ps -q -f "name=^${es_ip}$") ]]; then
+    echo_content green "---> 安装Elasticsearch"
+
+  else
+    echo_content skyBlue "---> 你已经安装了Elasticsearch"
+  fi
+}
+
 install_minio() {
   if [[ -z $(docker ps -q -f "name=^${minio_ip}$") ]]; then
     echo_content green "---> 安装Minio"
@@ -606,53 +619,59 @@ main() {
   echo_content skyBlue "Github: https://github.com/jonssonyan/install-script"
   echo_content red "\n=============================================================="
   echo_content yellow "1. 安装Docker"
-  echo_content yellow "2. 安装MySQL 5.7.38"
-  echo_content yellow "3. 安装Redis 6.2.7"
-  echo_content yellow "4. 安装Minio"
-  echo_content yellow "5. 安装Nacos v2.2.0"
-  echo_content yellow "6. 安装ShadowsocksR"
-  echo_content yellow "7. 安装Nexus3"
-  echo_content yellow "8. 安装GitLab"
-  echo_content yellow "9. 安装buildx交叉编译"
+  echo_content yellow "2. 安装buildx交叉编译"
   echo_content green "=============================================================="
-  echo_content yellow "10. 卸载Docker"
+  echo_content yellow "3. 安装MySQL 5.7.38"
+  echo_content yellow "4. 安装Redis 6.2.7"
+  echo_content yellow "5. 安装Elasticsearch"
+  echo_content yellow "6. 安装Minio"
+  echo_content yellow "7. 安装Nacos v2.2.0"
+  echo_content yellow "8. 安装ShadowsocksR"
+  echo_content yellow "9. 安装Nexus3"
+  echo_content yellow "10. 安装GitLab"
+  echo_content green "=============================================================="
+  echo_content yellow "11. 卸载Docker"
   read -r -p "请选择:" selectInstall_type
   case ${selectInstall_type} in
   1)
     install_docker
     ;;
   2)
-    install_docker
-    install_mysql
+    install_buildx
     ;;
   3)
     install_docker
-    install_redis
+    install_mysql
     ;;
   4)
     install_docker
-    install_minio
+    install_redis
     ;;
   5)
     install_docker
-    install_nacos
+    install_es
     ;;
   6)
     install_docker
-    install_ssr
+    install_minio
     ;;
   7)
     install_docker
-    install_nexus3
+    install_nacos
     ;;
   8)
     install_docker
-    install_gitlab
+    install_ssr
     ;;
   9)
-    install_buildx
+    install_docker
+    install_nexus3
     ;;
   10)
+    install_docker
+    install_gitlab
+    ;;
+  11)
     uninstall_docker
     ;;
   *)
