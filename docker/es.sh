@@ -61,6 +61,7 @@ install_es() {
         -p ${es_http_port}:9200 \
         -p ${es_transport_port}:9300 \
         -e discovery.type=single-node \
+        -e TZ=Asia/Shanghai \
         docker.elastic.co/elasticsearch/elasticsearch:7.6.2
 
     if [[ -n $(docker ps -q -f "name=^${es_ip}$") ]]; then

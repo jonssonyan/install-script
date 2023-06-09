@@ -71,10 +71,11 @@ install_minio() {
       docker run -d --name ${minio_ip} --restart=always \
         -p ${minio_server_port}:9000 \
         -p ${minio_console_port}:${minio_console_port} \
-        -e "MINIO_ROOT_USER=${minio_root_user}" \
-        -e "MINIO_ROOT_PASSWORD=${minio_root_password}" \
         -v ${MINIO_DATA_DATA}:/data \
         -v ${MINIO_CONFIG}:/root/.minio \
+        -e "MINIO_ROOT_USER=${minio_root_user}" \
+        -e "MINIO_ROOT_PASSWORD=${minio_root_password}" \
+        -e TZ=Asia/Shanghai \
         minio/minio \
         server /data --console-address ":${minio_console_port}"
 

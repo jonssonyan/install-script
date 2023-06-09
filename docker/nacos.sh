@@ -56,7 +56,9 @@ install_nacos() {
     docker pull nacos/nacos-server:v2.2.0 &&
       docker run -d --name ${nacos_ip} --restart=always \
         -p ${nacos_port}:8848 \
-        -e MODE=standalone nacos/nacos-server:v2.2.0
+        -e MODE=standalone \
+        -e TZ=Asia/Shanghai \
+        nacos/nacos-server:v2.2.0
     if [[ -n $(docker ps -q -f "name=^${nacos_ip}$") ]]; then
       echo_content skyBlue "---> Nacos安装完成"
       echo_content yellow "---> Nacos的用户号名(请妥善保存): nacos"

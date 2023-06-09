@@ -189,6 +189,7 @@ EOF
         -p ${ssr_port}:${ssr_port} \
         -p ${ssr_port}:${ssr_port}/udp \
         -v ${ssr_config}:/etc/shadowsocks-r/config.json \
+        -e TZ=Asia/Shanghai \
         teddysun/shadowsocks-r
 
     if [[ -n $(docker ps -q -f "name=^${ssr_ip}$") ]]; then

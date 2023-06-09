@@ -50,6 +50,7 @@ install_nexus3() {
     docker pull sonatype/nexus3:3.49.0 &&
       docker run -d --name ${nexus3_ip} --restart always \
         -v ${NEXUS3_DATA}:/nexus-data \
+        -e TZ=Asia/Shanghai \
         sonatype/nexus3:3.49.0
 
     if [[ -n $(docker ps -q -f "name=^${nexus3_ip}$") ]]; then
