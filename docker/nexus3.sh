@@ -49,7 +49,6 @@ install_nexus3() {
     docker pull sonatype/nexus3:3.49.0 &&
       docker run -d --name ${nexus3_ip} --restart always \
         --network=js-network \
-        -p ${nexus3_port}:8081 \
         -v ${NEXUS3_DATA}:/nexus-data \
         sonatype/nexus3:3.49.0
 

@@ -65,14 +65,11 @@ install_gitlab() {
         -v ${GITLAB_CONFIG}:/etc/gitlab \
         -v ${GITLAB_LOG}:/var/log/gitlab \
         -v ${GITLAB_OPT}:/var/opt/gitlab \
+        -e GITLAB_HTTP_PORT=${gitlab_http_port} \
+        -e GITLAB_HTTPS_PORT=${gitlab_https_port} \
+        -e GITLAB_SSH_PORT=${gitlab_ssh_port} \
         -e TZ=Asia/Shanghai \
         gitlab/gitlab-ce:15.9.3-ce.0
-    # todo
-    cat >>/etc/gitlab/gitlab.rb <<EOF
-external_url 'http://localhost:${gitlab_http_port}'
-nginx['listen_port'] = ${gitlab_http_port}
-gitlab_rails['gitlab_shell_ssh_port'] = ${gitlab_ssh_port}
-EOF
 
     if [[ -n $(docker ps -q -f "name=^${gitlab_ip}$") ]]; then
       echo_content skyBlue "---> GitLab安装完成"
