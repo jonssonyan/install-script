@@ -46,9 +46,9 @@ install_nexus3() {
 
     read -r -p "请输入Nexus3的端口(默认:8081): " nexus3_port
     [[ -z "${nexus3_port}" ]] && nexus3_port=8081
+
     docker pull sonatype/nexus3:3.49.0 &&
       docker run -d --name ${nexus3_ip} --restart always \
-        --network=js-network \
         -v ${NEXUS3_DATA}:/nexus-data \
         sonatype/nexus3:3.49.0
 

@@ -62,10 +62,10 @@ install_redis() {
 
     docker pull redis:6.2.7 &&
       docker run -d --name ${redis_ip} --restart always \
-        --network=host \
+        -p ${redis_port}:6379 \
         -v ${REDIS_DATA}:/data \
         redis:6.2.7 \
-        redis-server --requirepass "${redis_pass}" --port "${redis_port}"
+        redis-server --requirepass "${redis_pass}"
 
     if [[ -n $(docker ps -q -f "name=^${redis_ip}$") ]]; then
       echo_content skyBlue "---> Redis安装完成"

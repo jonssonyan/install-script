@@ -215,7 +215,7 @@ install_docker() {
 
     setup_docker
 
-    systemctl enable docker && systemctl restart docker && docker network create js-network
+    systemctl enable docker && systemctl restart docker
 
     if [[ $(command -v docker) ]]; then
       echo_content skyBlue "---> Docker安装完成"

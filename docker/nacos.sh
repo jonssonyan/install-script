@@ -8,7 +8,7 @@ init_var() {
   # Nacos
   NACOS_DATA="/jsdata/nacos/"
   nacos_ip="js-nacos"
-  # nacos_port=8848
+  nacos_port=8848
 }
 
 echo_content() {
@@ -50,9 +50,12 @@ install_nacos() {
   if [[ -z $(docker ps -q -f "name=^${nacos_ip}$") ]]; then
     echo_content green "---> 安装Nacos"
 
+    read -r -p "请输入Nacos的端口(默认:8848): " nacos_port
+    [[ -z "${nacos_port}" ]] && nacos_port=8848
+
     docker pull nacos/nacos-server:v2.2.0 &&
       docker run -d --name ${nacos_ip} --restart=always \
-        --network=js-network \
+        -p ${nacos_port}:8848 \
         -e MODE=standalone nacos/nacos-server:v2.2.0
     if [[ -n $(docker ps -q -f "name=^${nacos_ip}$") ]]; then
       echo_content skyBlue "---> Nacos安装完成"

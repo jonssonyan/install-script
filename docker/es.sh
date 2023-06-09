@@ -8,6 +8,8 @@ init_var() {
   # ES
   ES_DATA="/jsdata/es/"
   es_ip="js-es"
+  es_http_port=9200
+  es_transport_port=9300
 }
 
 echo_content() {
@@ -49,6 +51,24 @@ install_es() {
   if [[ -z $(docker ps -q -f "name=^${es_ip}$") ]]; then
     echo_content green "---> 安装Elasticsearch"
 
+    read -r -p "请输入ES的HTTP端口(默认:9200): " es_http_port
+    [[ -z "${es_http_port}" ]] && es_http_port=9200
+    read -r -p "请输入ES的传输端口(默认:9300): " es_transport_port
+    [[ -z "${es_transport_port}" ]] && es_transport_port=9300
+
+    docker pull docker.elastic.co/elasticsearch/elasticsearch:7.6.2 &&
+      docker run -d --name ${es_ip} --restart always \
+        -p ${es_http_port}:9200 \
+        -p ${es_transport_port}:9300 \
+        -e discovery.type=single-node \
+        docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+
+    if [[ -n $(docker ps -q -f "name=^${es_ip}$") ]]; then
+      echo_content skyBlue "---> Elasticsearch安装完成"
+    else
+      echo_content red "---> Elasticsearch安装失败或运行异常,请尝试修复或卸载重装"
+      exit 1
+    fi
   else
     echo_content skyBlue "---> 你已经安装了Elasticsearch"
   fi

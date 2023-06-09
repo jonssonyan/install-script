@@ -55,8 +55,8 @@ install_minio() {
 
     read -r -p "请输入Minio的服务端口(默认:9000): " minio_server_port
     [[ -z "${minio_server_port}" ]] && minio_server_port=9000
-    read -r -p "请输入Minio的控制台端口(默认:8000): " minio_console_port
-    [[ -z "${minio_console_port}" ]] && minio_console_port=8000
+    read -r -p "请输入Minio的控制台端口(默认:9090): " minio_console_port
+    [[ -z "${minio_console_port}" ]] && minio_console_port=9090
     read -r -p "请输入Minio的控制台用户名(默认:admin): " minio_root_user
     [[ -z "${minio_root_user}" ]] && minio_root_user="admin"
     while read -r -p "请输入Minio的控制台密码(默认:12345678): " minio_root_password; do
@@ -69,14 +69,15 @@ install_minio() {
 
     docker pull minio/minio &&
       docker run -d --name ${minio_ip} --restart=always \
-        --network=js-network \
+        -p ${minio_server_port}:9000 \
+        -p ${minio_console_port}:${minio_console_port} \
         -e "MINIO_ROOT_USER=${minio_root_user}" \
         -e "MINIO_ROOT_PASSWORD=${minio_root_password}" \
         -v ${MINIO_DATA_DATA}:/data \
         -v ${MINIO_CONFIG}:/root/.minio \
         minio/minio \
-        server --address ":${minio_server_port}" \
-        --console-address ":${minio_root_user}" /data
+        server /data --console-address ":${minio_console_port}"
+
     if [[ -n $(docker ps -q -f "name=^${minio_ip}$") ]]; then
       echo_content skyBlue "---> Minio安装完成"
       echo_content yellow "---> Minio的用户号名(请妥善保存): ${minio_root_user}"
