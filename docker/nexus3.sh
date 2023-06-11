@@ -49,12 +49,15 @@ install_nexus3() {
 
     docker pull sonatype/nexus3:3.49.0 &&
       docker run -d --name ${nexus3_ip} --restart always \
+        - p ${nexus3_port}:8081 \
         -v ${NEXUS3_DATA}:/nexus-data \
         -e TZ=Asia/Shanghai \
         sonatype/nexus3:3.49.0
 
     if [[ -n $(docker ps -q -f "name=^${nexus3_ip}$") ]]; then
+      password=$(docker exec ${nexus3_ip} cat /nexus-data/admin.password)
       echo_content skyBlue "---> Nexus3安装完成"
+      echo_content yellow "---> Nexus3 admin的密码(请妥善保存): ${password}"
     else
       echo_content red "---> Nexus3安装失败或运行异常,请尝试修复或卸载重装"
       exit 1
