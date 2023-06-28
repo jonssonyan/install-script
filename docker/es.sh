@@ -10,6 +10,11 @@ init_var() {
   es_ip="js-es"
   es_http_port=9200
   es_transport_port=9300
+
+  # Kibana
+  KIBANA_DATA="/jsdata/kibana/"
+  kibana_ip="js-kibana"
+  kibana_port="5601"
 }
 
 echo_content() {
@@ -56,13 +61,18 @@ install_es() {
     read -r -p "请输入ES的传输端口(默认:9300): " es_transport_port
     [[ -z "${es_transport_port}" ]] && es_transport_port=9300
 
-    docker pull docker.elastic.co/elasticsearch/elasticsearch:7.6.2 &&
+    docker pull elasticsearch:7.6.2 &&
       docker run -d --name ${es_ip} --restart always \
         -p ${es_http_port}:9200 \
         -p ${es_transport_port}:9300 \
         -e discovery.type=single-node \
+        -e ES_JAVA_OPTS="-Xms512m -Xmx512m" \
         -e TZ=Asia/Shanghai \
-        docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+        -v ${ES_DATA}logs:/usr/share/elasticsearch/logs \
+        -v ${ES_DATA}data:/usr/share/elasticsearch/data \
+        -v ${ES_DATA}plugins:/usr/share/elasticsearch/plugins \
+        -v ${ES_DATA}config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+        elasticsearch:7.6.2
 
     if [[ -n $(docker ps -q -f "name=^${es_ip}$") ]]; then
       echo_content skyBlue "---> Elasticsearch安装完成"
@@ -75,8 +85,24 @@ install_es() {
   fi
 }
 
+install_kibana() {
+  if [[ -z $(docker ps -q -f "name=^${kibana_ip}$") ]]; then
+    echo_content green "---> 安装Kibana"
+
+    read -r -p "请输入Kibana的端口(默认:5601): " kibana_port
+    [[ -z "${kibana_port}" ]] && kibana_port=5601
+
+    docker pull kibana:7.6.2 &&
+      docker run -d --name ${kibana_ip} --restart always \
+        -p ${kibana_port}:5601 \
+        -v ${KIBANA_DATA}config//kibana.yml:/data/kibana/config/kibana.ymll \
+        kibana:7.6.2
+  fi
+}
+
 cd "$HOME" || exit 0
 init_var
 clear
 install_docker
 install_es
+install_kibana
