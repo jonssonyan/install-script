@@ -55,14 +55,24 @@ install_kibana() {
 
     docker pull kibana:7.6.2 &&
       docker run -d --name ${kibana_ip} --restart always \
+        -e TZ=Asia/Shanghai \
         -p ${kibana_port}:5601 \
-        -v ${KIBANA_DATA}config//kibana.yml:/data/kibana/config/kibana.ymll \
+        -v ${KIBANA_DATA}config//kibana.yml:/data/kibana/config/kibana.yml \
         kibana:7.6.2
+
+    if [[ -n $(docker ps -q -f "name=^${kibana_ip}$") ]]; then
+      echo_content skyBlue "---> Kibana安装完成"
+    else
+      echo_content red "---> Kibana安装失败或运行异常,请尝试修复或卸载重装"
+      exit 1
+    fi
+  else
+    echo_content skyBlue "---> 你已经安装了Kibana"
   fi
 }
 
 cd "$HOME" || exit 0
 init_var
 clear
-install_dockerl
+install_docker
 install_kibana

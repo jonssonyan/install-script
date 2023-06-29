@@ -58,11 +58,11 @@ install_es() {
 
     docker pull elasticsearch:7.6.2 &&
       docker run -d --name ${es_ip} --restart always \
-        -p ${es_http_port}:9200 \
-        -p ${es_transport_port}:9300 \
         -e discovery.type=single-node \
         -e ES_JAVA_OPTS="-Xms512m -Xmx512m" \
         -e TZ=Asia/Shanghai \
+        -p ${es_http_port}:9200 \
+        -p ${es_transport_port}:9300 \
         -v ${ES_DATA}logs:/usr/share/elasticsearch/logs \
         -v ${ES_DATA}data:/usr/share/elasticsearch/data \
         -v ${ES_DATA}plugins:/usr/share/elasticsearch/plugins \
