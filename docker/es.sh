@@ -64,12 +64,12 @@ install_es() {
         -e "http.host=0.0.0.0" \
         -e ES_JAVA_OPTS="-Xms512m -Xmx512m" \
         -e TZ=Asia/Shanghai \
+        --privileged \
         -p ${es_http_port}:9200 \
         -p ${es_transport_port}:9300 \
         -v ${ES_DATA}logs/:/usr/share/elasticsearch/logs/ \
         -v ${ES_DATA}data/:/usr/share/elasticsearch/data/ \
         -v ${ES_DATA}plugins/:/usr/share/elasticsearch/plugins/ \
-        -v ${ES_DATA}config/:/usr/share/elasticsearch/config/ \
         elasticsearch:7.6.2
 
     if [[ -n $(docker ps -q -f "name=^${es_ip}$") ]]; then
