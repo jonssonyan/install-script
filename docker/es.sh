@@ -2,6 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+# 官方文档：https://www.elastic.co/guide/en/elasticsearch/reference/7.6/docker.html#docker
+
 init_var() {
   ECHO_TYPE="echo -e"
 
@@ -59,6 +61,7 @@ install_es() {
     docker pull elasticsearch:7.6.2 &&
       docker run -d --name ${es_ip} --restart always \
         -e discovery.type=single-node \
+        -e "http.host=0.0.0.0" \
         -e ES_JAVA_OPTS="-Xms512m -Xmx512m" \
         -e TZ=Asia/Shanghai \
         -p ${es_http_port}:9200 \
