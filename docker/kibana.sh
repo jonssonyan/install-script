@@ -9,6 +9,7 @@ init_var() {
   KIBANA_DATA="/jsdata/kibana/"
   kibana_ip="js-kibana"
   kibana_port=5601
+  es_ip_port="127.0.0.1:9200"
 }
 
 echo_content() {
@@ -53,8 +54,12 @@ install_kibana() {
     read -r -p "请输入Kibana的端口(默认:5601): " kibana_port
     [[ -z "${kibana_port}" ]] && kibana_port=5601
 
+    read -r -p "请输入Elasticsearch的地址(默认:127.0.0.1:9200): " es_ip_port
+    [[ -z "${es_ip_port}" ]] && es_ip_port="127.0.0.1:9200"
+
     docker pull kibana:7.6.2 &&
       docker run -d --name ${kibana_ip} --restart always \
+        -e ELASTICSEARCH_HOSTS="${es_ip_port}" \
         -e TZ=Asia/Shanghai \
         -p ${kibana_port}:5601 \
         -v ${KIBANA_DATA}config/:/data/kibana/config/ \
