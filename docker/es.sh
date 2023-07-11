@@ -58,7 +58,7 @@ install_es() {
     read -r -p "请输入ES的传输端口(默认:9300): " es_transport_port
     [[ -z "${es_transport_port}" ]] && es_transport_port=9300
 
-    docker pull elasticsearch:7.6.2 &&
+    docker pull elasticsearch:7.17.10 &&
       docker run -d --name ${es_ip} --restart always \
         -e "discovery.type=single-node" \
         -e "http.host=0.0.0.0" \
@@ -66,10 +66,11 @@ install_es() {
         -e TZ=Asia/Shanghai \
         -p ${es_http_port}:9200 \
         -p ${es_transport_port}:9300 \
+        -v ${ES_DATA}config/:/usr/share/elasticsearch/config/ \
         -v ${ES_DATA}logs/:/usr/share/elasticsearch/logs/ \
         -v ${ES_DATA}data/:/usr/share/elasticsearch/data/ \
         -v ${ES_DATA}plugins/:/usr/share/elasticsearch/plugins/ \
-        elasticsearch:7.6.2
+        elasticsearch:7.17.10
 
     if [[ -n $(docker ps -q -f "name=^${es_ip}$") ]]; then
       echo_content skyBlue "---> Elasticsearch安装完成"
