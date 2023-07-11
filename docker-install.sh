@@ -188,7 +188,7 @@ main() {
   echo_content yellow "2. 安装buildx交叉编译"
   echo_content green "=============================================================="
   echo_content yellow "3. 安装MySQL 5.7.38"
-  echo_content yellow "4. 安装Redis 6.2.7"
+  echo_content yellow "4. 安装Redis 6.2.13"
   echo_content yellow "5. 安装Elasticsearch 7.17.10"
   echo_content yellow "6. 安装Minio"
   echo_content yellow "7. 安装Nacos v2.2.0"
