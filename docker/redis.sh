@@ -62,9 +62,9 @@ install_redis() {
 
     docker pull redis:6.2.7 &&
       docker run -d --name ${redis_ip} --restart always \
-        -p ${redis_port}:6379 \
-        -v ${REDIS_DATA}:/data \
         -e TZ=Asia/Shanghai \
+        -p ${redis_port}:6379 \
+        -v ${REDIS_DATA}/data:/data/ \
         redis:6.2.7 \
         redis-server --requirepass "${redis_pass}"
 
