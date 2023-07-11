@@ -62,7 +62,7 @@ install_es() {
       docker run -d --name ${es_ip} --restart always \
         -e "discovery.type=single-node" \
         -e "http.host=0.0.0.0" \
-        -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
+        -e ES_JAVA_OPTS="-Xms512m -Xmx512m" \
         -e TZ=Asia/Shanghai \
         --privileged \
         -p ${es_http_port}:9200 \
