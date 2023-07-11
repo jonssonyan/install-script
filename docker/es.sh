@@ -64,7 +64,6 @@ install_es() {
         -e "http.host=0.0.0.0" \
         -e ES_JAVA_OPTS="-Xms512m -Xmx512m" \
         -e TZ=Asia/Shanghai \
-        --privileged \
         -p ${es_http_port}:9200 \
         -p ${es_transport_port}:9300 \
         -v ${ES_DATA}logs/:/usr/share/elasticsearch/logs/ \

@@ -57,7 +57,7 @@ install_kibana() {
       docker run -d --name ${kibana_ip} --restart always \
         -e TZ=Asia/Shanghai \
         -p ${kibana_port}:5601 \
-        -v ${KIBANA_DATA}config//kibana.yml:/data/kibana/config/kibana.yml \
+        -v ${KIBANA_DATA}config/:/data/kibana/config/ \
         kibana:7.6.2
 
     if [[ -n $(docker ps -q -f "name=^${kibana_ip}$") ]]; then
