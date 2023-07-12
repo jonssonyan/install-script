@@ -72,7 +72,9 @@ http.port: ${es_http_port}
 transport.port: ${es_transport_port}
 http.cors.enabled: true
 http.cors.allow-origin: "*"
+http.cors.allow-headers: Authorization
 xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
 EOF
 
     docker pull elasticsearch:7.17.10 &&
