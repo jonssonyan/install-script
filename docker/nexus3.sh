@@ -69,6 +69,7 @@ install_nexus3() {
 
 cd "$HOME" || exit 0
 init_var
+mkdir_tools
 clear
 install_docker
 install_nexus3

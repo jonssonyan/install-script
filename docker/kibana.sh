@@ -7,7 +7,6 @@ export PATH
 init_var() {
   ECHO_TYPE="echo -e"
 
-  # Kibana
   KIBANA_DATA="/jsdata/kibana/"
   KIBANA_DATA_CONFIG="${KIBANA_DATA}config/"
   kibana_ip="js-kibana"
@@ -45,7 +44,6 @@ echo_content() {
 }
 
 mkdir_tools() {
-  # Kibana
   mkdir -p ${KIBANA_DATA}
   mkdir -p ${KIBANA_DATA}config/
 }

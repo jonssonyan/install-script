@@ -5,7 +5,6 @@ export PATH
 init_var() {
   ECHO_TYPE="echo -e"
 
-  # Nacos
   NACOS_DATA="/jsdata/nacos/"
   nacos_ip="js-nacos"
   nacos_port=8848
@@ -38,7 +37,6 @@ echo_content() {
 }
 
 mkdir_tools() {
-  # Nacos
   mkdir -p ${NACOS_DATA}
 }
 
@@ -74,6 +72,7 @@ install_nacos() {
 
 cd "$HOME" || exit 0
 init_var
+mkdir_tools
 clear
 install_docker
 install_nacos
