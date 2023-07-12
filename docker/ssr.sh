@@ -10,7 +10,6 @@ init_var() {
   ssr_ip="js-ssr"
   ssr_port=80
   ssr_password="123456"
-  ssr_config="/jsdata/ssr/config.json"
   ssr_method=""
   ssr_protocols=""
   ssr_obfs=""
@@ -163,7 +162,7 @@ install_ssr() {
       break
     done
 
-    cat >${ssr_config} <<EOF
+    cat >${SSR_DATA}config.json <<EOF
 {
     "server":"0.0.0.0",
     "server_ipv6":"::",
@@ -186,19 +185,18 @@ EOF
 
     docker pull teddysun/shadowsocks-r &&
       docker run -d --name ${ssr_ip} --restart=always \
-        -p ${ssr_port}:${ssr_port} \
-        -p ${ssr_port}:${ssr_port}/udp \
-        -v ${ssr_config}:/etc/shadowsocks-r/config.json \
+        --network=host \
         -e TZ=Asia/Shanghai \
+        -v ${SSR_DATA}config.json:/etc/shadowsocks-r/config.json \
         teddysun/shadowsocks-r
 
     if [[ -n $(docker ps -q -f "name=^${ssr_ip}$") ]]; then
       echo_content skyBlue "---> ShadowsocksR安装完成"
-      echo_content yellow "---> ShadowsocksR的端口: ${ssr_port}"
-      echo_content yellow "---> ShadowsocksR的密码(请妥善保存): ${ssr_password}"
-      echo_content yellow "---> ShadowsocksR的加密类型: ${ssr_method}"
-      echo_content yellow "---> ShadowsocksR的协议: ${ssr_protocols}"
-      echo_content yellow "---> ShadowsocksR的混淆方式: ${ssr_obfs}"
+      echo_content yellow "---> 端口: ${ssr_port}"
+      echo_content yellow "---> 密码(请妥善保存): ${ssr_password}"
+      echo_content yellow "---> 加密类型: ${ssr_method}"
+      echo_content yellow "---> 协议: ${ssr_protocols}"
+      echo_content yellow "---> 混淆方式: ${ssr_obfs}"
     else
       echo_content red "---> ShadowsocksR安装失败或运行异常,请尝试修复或卸载重装"
       exit 1
@@ -210,6 +208,7 @@ EOF
 
 cd "$HOME" || exit 0
 init_var
+mkdir_tools
 clear
 install_docker
 install_ssr
