@@ -12,6 +12,7 @@ init_var() {
   KIBANA_CONFIG="${KIBANA_DATA}config/"
   kibana_ip="js-kibana"
   kibana_server_port=5601
+  kibana_server_name="js-kibana"
   es_ip_port="http://127.0.0.1:9200"
   es_username="elastic"
   es_password="elastic"
@@ -59,6 +60,8 @@ install_kibana() {
 
     read -r -p "请输入Kibana的端口(默认:5601): " kibana_server_port
     [[ -z "${kibana_server_port}" ]] && kibana_server_port=5601
+    read -r -p "请输入Kibana的主机名(默认:js-kibana): " kibana_server_name
+    [[ -z "${kibana_server_name}" ]] && kibana_server_name="js-kibana"
 
     read -r -p "请输入Elasticsearch的URL(默认:http://127.0.0.1:9200): " es_ip_port
     [[ -z "${es_ip_port}" ]] && es_ip_port="http://127.0.0.1:9200"
@@ -68,6 +71,7 @@ install_kibana() {
     [[ -z "${es_password}" ]] && es_password="elastic"
 
     cat >${KIBANA_DATA}config/kibana.yml <<EOF
+server.name: ${kibana_server_name}
 server.port: ${kibana_server_port}
 elasticsearch.url: "${es_ip_port}"
 elasticsearch.username: "${es_username}"
