@@ -45,6 +45,7 @@ mkdir_tools() {
   # ES
   mkdir -p ${ES_DATA}
   mkdir -p ${ES_DATA}config/ ${ES_DATA}data/ ${ES_DATA}logs/ ${ES_DATA}plugins/
+  chmod -R g+rwx ${ES_DATA}
 }
 
 install_docker() {
@@ -65,16 +66,16 @@ install_es() {
     cat >${ES_DATA}config/elasticsearch.yml <<EOF
 node.name: ${es_node_name}
 http.host: 0.0.0.0
+http.port: ${es_http_port}
+transport.port: ${es_transport_port}
 EOF
-    chmod -R g+rwx ${ES_DATA}
 
     docker pull elasticsearch:7.17.10 &&
       docker run -d --name ${es_ip} --restart always \
+        --network=host \
         -e "discovery.type=single-node" \
         -e ES_JAVA_OPTS="-Xms512m -Xmx512m" \
         -e TZ=Asia/Shanghai \
-        -p ${es_http_port}:9200 \
-        -p ${es_transport_port}:9300 \
         -v ${ES_DATA}config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
         -v ${ES_DATA}logs/:/usr/share/elasticsearch/logs/ \
         -v ${ES_DATA}data/:/usr/share/elasticsearch/data/ \

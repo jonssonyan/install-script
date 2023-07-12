@@ -2,14 +2,19 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+# 官方文档：https://www.elastic.co/guide/cn/kibana/current/docker.html
+
 init_var() {
   ECHO_TYPE="echo -e"
 
   # Kibana
   KIBANA_DATA="/jsdata/kibana/"
+  KIBANA_CONFIG="${KIBANA_DATA}config/"
   kibana_ip="js-kibana"
-  kibana_port=5601
-  es_ip_port="127.0.0.1:9200"
+  kibana_server_port=5601
+  es_ip_port="http://127.0.0.1:9200"
+  es_username="elastic"
+  es_password="elastic"
 }
 
 echo_content() {
@@ -41,6 +46,7 @@ echo_content() {
 mkdir_tools() {
   # Kibana
   mkdir -p ${KIBANA_DATA}
+  mkdir -p ${KIBANA_CONFIG}
 }
 
 install_docker() {
@@ -51,19 +57,30 @@ install_kibana() {
   if [[ -z $(docker ps -q -f "name=^${kibana_ip}$") ]]; then
     echo_content green "---> 安装Kibana"
 
-    read -r -p "请输入Kibana的端口(默认:5601): " kibana_port
-    [[ -z "${kibana_port}" ]] && kibana_port=5601
+    read -r -p "请输入Kibana的端口(默认:5601): " kibana_server_port
+    [[ -z "${kibana_server_port}" ]] && kibana_server_port=5601
 
-    read -r -p "请输入Elasticsearch的地址(默认:127.0.0.1:9200): " es_ip_port
-    [[ -z "${es_ip_port}" ]] && es_ip_port="127.0.0.1:9200"
+    read -r -p "请输入Elasticsearch的URL(默认:http://127.0.0.1:9200): " es_ip_port
+    [[ -z "${es_ip_port}" ]] && es_ip_port="http://127.0.0.1:9200"
+    read -r -p "请输入Elasticsearch的用户名(默认:elastic): " es_username
+    [[ -z "${es_username}" ]] && es_username="elastic"
+    read -r -p "请输入Elasticsearch的密码(默认:elastic): " es_password
+    [[ -z "${es_password}" ]] && es_password="elastic"
 
-    docker pull kibana:7.6.2 &&
+    cat >${KIBANA_DATA}config/kibana.yml <<EOF
+server.port: ${kibana_server_port}
+elasticsearch.url: "${es_ip_port}"
+elasticsearch.username: "${es_username}"
+elasticsearch.password: "${es_password}"
+i18n.locale: "zh-CN"
+EOF
+
+    docker pull kibana:7.17.10 &&
       docker run -d --name ${kibana_ip} --restart always \
-        -e ELASTICSEARCH_HOSTS="${es_ip_port}" \
+        --network=host \
         -e TZ=Asia/Shanghai \
-        -p ${kibana_port}:5601 \
-        -v ${KIBANA_DATA}config/:/data/kibana/config/ \
-        kibana:7.6.2
+        -v ${KIBANA_DATA}config/kibana.yml:/usr/share/kibana/config/kibana.yml \
+        kibana:7.17.10
 
     if [[ -n $(docker ps -q -f "name=^${kibana_ip}$") ]]; then
       echo_content skyBlue "---> Kibana安装完成"
@@ -78,6 +95,7 @@ install_kibana() {
 
 cd "$HOME" || exit 0
 init_var
+mkdir_tools
 clear
 install_docker
 install_kibana
