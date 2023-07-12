@@ -43,6 +43,7 @@ echo_content() {
 mkdir_tools() {
   # ES
   mkdir -p ${ES_DATA}
+  mkdir -p ${ES_DATA}config/ ${ES_DATA}data/ ${ES_DATA}logs/ ${ES_DATA}plugins/
 }
 
 install_docker() {
@@ -58,15 +59,19 @@ install_es() {
     read -r -p "请输入ES的传输端口(默认:9300): " es_transport_port
     [[ -z "${es_transport_port}" ]] && es_transport_port=9300
 
+    cat >${ES_DATA}config/elasticsearch.yml <<EOF
+http.host: 0.0.0.0
+EOF
+    chmod g+rwx ${ES_DATA}
+
     docker pull elasticsearch:7.17.10 &&
       docker run -d --name ${es_ip} --restart always \
         -e "discovery.type=single-node" \
-        -e "http.host=0.0.0.0" \
         -e ES_JAVA_OPTS="-Xms512m -Xmx512m" \
         -e TZ=Asia/Shanghai \
         -p ${es_http_port}:9200 \
         -p ${es_transport_port}:9300 \
-        -v ${ES_DATA}config/:/usr/share/elasticsearch/config/ \
+        -v ${ES_DATA}config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
         -v ${ES_DATA}logs/:/usr/share/elasticsearch/logs/ \
         -v ${ES_DATA}data/:/usr/share/elasticsearch/data/ \
         -v ${ES_DATA}plugins/:/usr/share/elasticsearch/plugins/ \
@@ -85,6 +90,7 @@ install_es() {
 
 cd "$HOME" || exit 0
 init_var
+mkdir_tools
 clear
-# install_docker
+install_docker
 install_es
