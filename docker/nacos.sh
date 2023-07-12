@@ -51,12 +51,13 @@ install_nacos() {
     read -r -p "请输入Nacos的端口(默认:8848): " nacos_port
     [[ -z "${nacos_port}" ]] && nacos_port=8848
 
-    docker pull nacos/nacos-server:v2.2.0 &&
+    docker pull nacos/nacos-server:v2.1.2 &&
       docker run -d --name ${nacos_ip} --restart=always \
-        -p ${nacos_port}:8848 \
+        --network=host \
         -e MODE=standalone \
+        -e NACOS_SERVER_PORT=${nacos_port} \
         -e TZ=Asia/Shanghai \
-        nacos/nacos-server:v2.2.0
+        nacos/nacos-server:v2.1.2
     if [[ -n $(docker ps -q -f "name=^${nacos_ip}$") ]]; then
       echo_content skyBlue "---> Nacos安装完成"
       echo_content yellow "---> Nacos的用户号名(请妥善保存): nacos"
