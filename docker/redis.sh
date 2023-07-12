@@ -65,7 +65,7 @@ install_redis() {
       docker run -d --name ${redis_ip} --restart always \
         --network=host \
         -e TZ=Asia/Shanghai \
-        -v ${REDIS_DATA}/data:/data/ \
+        -v ${REDIS_DATA}data/:/data/ \
         redis:6.2.13 \
         redis-server --requirepass "${redis_pass}" --port "${redis_port}"
 
