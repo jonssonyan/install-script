@@ -12,6 +12,7 @@ init_var() {
   es_ip="js-es"
   es_http_port=9200
   es_transport_port=9300
+  es_node_name='node-1'
 }
 
 echo_content() {
@@ -58,8 +59,11 @@ install_es() {
     [[ -z "${es_http_port}" ]] && es_http_port=9200
     read -r -p "请输入ES的传输端口(默认:9300): " es_transport_port
     [[ -z "${es_transport_port}" ]] && es_transport_port=9300
+    read -r -p "请输入ES的节点名称(默认:node-1): " es_node_name
+    [[ -z "${es_node_name}" ]] && es_node_name='node-1'
 
     cat >${ES_DATA}config/elasticsearch.yml <<EOF
+node.name: ${es_node_name}
 http.host: 0.0.0.0
 EOF
     chmod -R g+rwx ${ES_DATA}
