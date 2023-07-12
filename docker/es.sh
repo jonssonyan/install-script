@@ -62,7 +62,7 @@ install_es() {
     cat >${ES_DATA}config/elasticsearch.yml <<EOF
 http.host: 0.0.0.0
 EOF
-    chmod g+rwx ${ES_DATA}
+    chmod -R g+rwx ${ES_DATA}
 
     docker pull elasticsearch:7.17.10 &&
       docker run -d --name ${es_ip} --restart always \
