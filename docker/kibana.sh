@@ -74,6 +74,7 @@ server.port: ${kibana_server_port}
 elasticsearch.url: "${es_ip_port}"
 elasticsearch.username: "${es_username}"
 elasticsearch.password: "${es_password}"
+xpack.monitoring.ui.container.elasticsearch.enabled: true
 i18n.locale: "zh-CN"
 EOF
 

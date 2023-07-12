@@ -2,13 +2,15 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+# 官方文档：https://docs.gitlab.com/ee/install/docker.html
+
 init_var() {
   ECHO_TYPE="echo -e"
 
   GITLAB_DATA="/jsdata/gitlab/"
-  GITLAB_CONFIG="/jsdata/gitlab/config/"
-  GITLAB_LOG="/jsdata/gitlab/logs/"
-  GITLAB_OPT="/jsdata/gitlab/opt/"
+  GITLAB_CONFIG="${GITLAB_DATA}config/"
+  GITLAB_LOG="${GITLAB_DATA}logs/"
+  GITLAB_OPT="${GITLAB_DATA}opt/"
   gitlab_ip="js-gitlab"
   gitlab_http_port=80
   gitlab_https_port=443
@@ -59,19 +61,27 @@ install_gitlab() {
     read -r -p "请输入GitLab的SSH端口(默认:22): " gitlab_ssh_port
     [[ -z "${gitlab_ssh_port}" ]] && gitlab_ssh_port=22
 
-    docker pull gitlab/gitlab-ce:15.9.3-ce.0 &&
+    cat >${GITLAB_CONFIG}gitlab.rb <<EOF
+external_url 'http://0.0.0.0:${gitlab_http_port}'
+nginx['redirect_http_to_https_port'] = ${gitlab_https_port}
+nginx['listen_port'] = ${gitlab_http_port}
+gitlab_rails['gitlab_shell_ssh_port'] = ${gitlab_ssh_port}
+EOF
+
+    docker pull gitlab/gitlab-ce:15.11.11-ce.0 &&
       docker run -d --name ${gitlab_ip} --restart always \
-        -p ${gitlab_http_port}:80 \
-        -p ${gitlab_https_port}:443 \
-        -p ${gitlab_ssh_port}:22 \
-        -v ${GITLAB_CONFIG}:/etc/gitlab \
+        --network=host \
+        -e TZ=Asia/Shanghai \
+        -v ${GITLAB_CONFIG}gitlab.rb:/etc/gitlab/gitlab.rb \
         -v ${GITLAB_LOG}:/var/log/gitlab \
         -v ${GITLAB_OPT}:/var/opt/gitlab \
-        -e TZ=Asia/Shanghai \
-        gitlab/gitlab-ce:15.9.3-ce.0
+        gitlab/gitlab-ce:15.11.11-ce.0
 
     if [[ -n $(docker ps -q -f "name=^${gitlab_ip}$") ]]; then
+      gitlab_password=$(docker exec cat ${GITLAB_CONFIG}initial_root_password)
       echo_content skyBlue "---> GitLab安装完成"
+      echo_content yellow "---> GitLab的用户号名(请妥善保存): root"
+      echo_content yellow "---> GitLab的密码(请妥善保存): ${gitlab_password}"
     else
       echo_content red "---> GitLab安装失败或运行异常,请尝试修复或卸载重装"
       exit 1
