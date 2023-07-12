@@ -70,6 +70,9 @@ node.name: ${es_node_name}
 http.host: 0.0.0.0
 http.port: ${es_http_port}
 transport.port: ${es_transport_port}
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+xpack.security.enabled: true
 EOF
 
     docker pull elasticsearch:7.17.10 &&
