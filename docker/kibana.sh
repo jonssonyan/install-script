@@ -9,7 +9,6 @@ init_var() {
 
   # Kibana
   KIBANA_DATA="/jsdata/kibana/"
-  KIBANA_CONFIG="${KIBANA_DATA}config/"
   kibana_ip="js-kibana"
   kibana_server_port=5601
   kibana_server_name="js-kibana"
@@ -47,7 +46,7 @@ echo_content() {
 mkdir_tools() {
   # Kibana
   mkdir -p ${KIBANA_DATA}
-  mkdir -p ${KIBANA_CONFIG}
+  mkdir -p ${KIBANA_DATA}config/
 }
 
 install_docker() {

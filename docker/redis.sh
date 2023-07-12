@@ -40,6 +40,7 @@ echo_content() {
 
 mkdir_tools() {
   mkdir -p ${REDIS_DATA}
+  mkdir -p ${REDIS_DATA}data/
 }
 
 install_docker() {
@@ -62,11 +63,11 @@ install_redis() {
 
     docker pull redis:6.2.13 &&
       docker run -d --name ${redis_ip} --restart always \
+        --network=host \
         -e TZ=Asia/Shanghai \
-        -p ${redis_port}:6379 \
         -v ${REDIS_DATA}/data:/data/ \
         redis:6.2.13 \
-        redis-server --requirepass "${redis_pass}"
+        redis-server --requirepass "${redis_pass}" --port "${redis_port}"
 
     if [[ -n $(docker ps -q -f "name=^${redis_ip}$") ]]; then
       echo_content skyBlue "---> Redis安装完成"
@@ -82,6 +83,7 @@ install_redis() {
 
 cd "$HOME" || exit 0
 init_var
+mkdir_tools
 clear
 install_docker
 install_redis
