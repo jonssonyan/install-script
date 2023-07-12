@@ -61,17 +61,12 @@ install_gitlab() {
     read -r -p "请输入GitLab的SSH端口(默认:22): " gitlab_ssh_port
     [[ -z "${gitlab_ssh_port}" ]] && gitlab_ssh_port=22
 
-    cat >${GITLAB_CONFIG}gitlab.rb <<EOF
-external_url 'http://0.0.0.0:${gitlab_http_port}'
-nginx['redirect_http_to_https_port'] = ${gitlab_https_port}
-nginx['listen_port'] = ${gitlab_http_port}
-gitlab_rails['gitlab_shell_ssh_port'] = ${gitlab_ssh_port}
-EOF
-
     docker pull gitlab/gitlab-ce:15.11.11-ce.0 &&
       docker run -d --name ${gitlab_ip} --restart always \
-        --network=host \
         -e TZ=Asia/Shanghai \
+        -p ${gitlab_http_port}:80 \
+        -p ${gitlab_https_port}:443 \
+        -p ${gitlab_ssh_port}:22 \
         -v ${GITLAB_CONFIG}gitlab.rb:/etc/gitlab/gitlab.rb \
         -v ${GITLAB_LOG}:/var/log/gitlab \
         -v ${GITLAB_OPT}:/var/opt/gitlab \
