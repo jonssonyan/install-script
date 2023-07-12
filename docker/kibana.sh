@@ -9,6 +9,7 @@ init_var() {
 
   # Kibana
   KIBANA_DATA="/jsdata/kibana/"
+  KIBANA_DATA_CONFIG="${KIBANA_DATA}config/"
   kibana_ip="js-kibana"
   kibana_server_port=5601
   kibana_server_name="js-kibana"
@@ -82,7 +83,7 @@ EOF
       docker run -d --name ${kibana_ip} --restart always \
         --network=host \
         -e TZ=Asia/Shanghai \
-        -v ${KIBANA_DATA}config/kibana.yml:/usr/share/kibana/config/kibana.yml \
+        -v ${KIBANA_DATA_CONFIG}/kibana.yml:/usr/share/kibana/config/kibana.yml \
         kibana:7.17.10
 
     if [[ -n $(docker ps -q -f "name=^${kibana_ip}$") ]]; then

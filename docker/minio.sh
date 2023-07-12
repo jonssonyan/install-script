@@ -6,11 +6,11 @@ init_var() {
   ECHO_TYPE="echo -e"
 
   MINIO_DATA="/jsdata/minio/"
-  MINIO_DATA_DATA="/jsdata/minio/data/"
-  MINIO_CONFIG="/jsdata/minio/config/"
+  MINIO_DATA_DATA="${MINIO_DATA}data/"
+  MINIO_DATA_CONFIG="${MINIO_DATA}config/"
   minio_ip="js-minio"
   minio_server_port=9000
-  minio_console_port=8000
+  minio_console_port=9001
   minio_root_user="admin"
   minio_root_password="12345678"
 }
@@ -43,6 +43,8 @@ echo_content() {
 
 mkdir_tools() {
   mkdir -p ${MINIO_DATA}
+  mkdir -p ${MINIO_DATA_DATA}
+  mkdir -p ${MINIO_DATA_CONFIG}
 }
 
 install_docker() {
@@ -55,8 +57,8 @@ install_minio() {
 
     read -r -p "请输入Minio的服务端口(默认:9000): " minio_server_port
     [[ -z "${minio_server_port}" ]] && minio_server_port=9000
-    read -r -p "请输入Minio的控制台端口(默认:9090): " minio_console_port
-    [[ -z "${minio_console_port}" ]] && minio_console_port=9090
+    read -r -p "请输入Minio的控制台端口(默认:9001): " minio_console_port
+    [[ -z "${minio_console_port}" ]] && minio_console_port=9001
     read -r -p "请输入Minio的控制台用户名(默认:admin): " minio_root_user
     [[ -z "${minio_root_user}" ]] && minio_root_user="admin"
     while read -r -p "请输入Minio的控制台密码(默认:12345678): " minio_root_password; do
@@ -69,15 +71,14 @@ install_minio() {
 
     docker pull minio/minio &&
       docker run -d --name ${minio_ip} --restart=always \
-        -p ${minio_server_port}:9000 \
-        -p ${minio_console_port}:${minio_console_port} \
-        -v ${MINIO_DATA_DATA}:/data \
-        -v ${MINIO_CONFIG}:/root/.minio \
+        --network=host \
         -e "MINIO_ROOT_USER=${minio_root_user}" \
         -e "MINIO_ROOT_PASSWORD=${minio_root_password}" \
         -e TZ=Asia/Shanghai \
+        -v ${MINIO_DATA_DATA}:/data \
+        -v ${MINIO_DATA_CONFIG}:/root/.minio \
         minio/minio \
-        server /data --console-address ":${minio_console_port}"
+        server /data --address ":${minio_server_port}" --console-address ":${minio_console_port}"
 
     if [[ -n $(docker ps -q -f "name=^${minio_ip}$") ]]; then
       echo_content skyBlue "---> Minio安装完成"
