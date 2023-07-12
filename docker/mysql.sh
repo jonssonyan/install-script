@@ -63,25 +63,27 @@ install_mysql() {
     done
 
     if [[ "${mysql_user}" == "root" ]]; then
-      docker pull mysql:5.7.38 &&
+      docker pull mysql:5.7.42 &&
         docker run -d --name ${mysql_ip} --restart always \
-          -p ${mysql_port}:3306 \
-          -v ${MySQL_DATA}:/var/lib/mysql \
+          --network=host \
           -e MYSQL_ROOT_PASSWORD="${mysql_pas}" \
           -e TZ=Asia/Shanghai \
-          mysql:5.7.38 \
+          -v ${MySQL_DATA}:/var/lib/mysql \
+          mysql:5.7.42 \
+          --port ${mysql_port} \
           --character-set-server=utf8mb4 \
           --collation-server=utf8mb4_unicode_ci
     else
-      docker pull mysql:5.7.38 &&
+      docker pull mysql:5.7.42 &&
         docker run -d --name ${mysql_ip} --restart always \
-          -p ${mysql_port}:3306 \
-          -v ${MySQL_DATA}:/var/lib/mysql \
+          --network=host \
           -e MYSQL_ROOT_PASSWORD="${mysql_pas}" \
           -e MYSQL_USER="${mysql_user}" \
           -e MYSQL_PASSWORD="${mysql_pas}" \
           -e TZ=Asia/Shanghai \
-          mysql:5.7.38 \
+          -v ${MySQL_DATA}:/var/lib/mysql \
+          mysql:5.7.42 \
+          --port ${mysql_port} \
           --character-set-server=utf8mb4 \
           --collation-server=utf8mb4_unicode_ci
     fi
@@ -103,6 +105,7 @@ install_mysql() {
 
 cd "$HOME" || exit 0
 init_var
+mkdir_tools
 clear
 install_docker
 install_mysql
