@@ -25,3 +25,7 @@ source <(curl -L https://github.com/jonssonyan/install-script/raw/main/k8s-insta
 ```bash
 source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker-install.sh)
 ```
+
+# Telegram
+
+[jonssonya's News](https://t.me/jonssonyan_news)

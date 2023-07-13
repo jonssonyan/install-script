@@ -748,7 +748,7 @@ EOF
         cat >/etc/yum.repos.d/kubernetes.repo <<EOF
 [kubernetes]
 name=Kubernetes
-baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-$(arch)/
 enabled=1
 gpgcheck=0
 repo_gpgcheck=0
@@ -758,7 +758,7 @@ EOF
         cat >/etc/yum.repos.d/kubernetes.repo <<EOF
 [kubernetes]
 name=Kubernetes
-baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$(arch)
 enabled=1
 gpgcheck=0
 repo_gpgcheck=0
