@@ -2,7 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-# 官方文档：https://www.elastic.co/guide/cn/kibana/current/docker.html
+# 官方文档：https://www.elastic.co/guide/en/kibana/7.17/settings.html
 
 init_var() {
   ECHO_TYPE="echo -e"
@@ -72,10 +72,9 @@ install_kibana() {
 server.name: "${kibana_server_name}"
 server.host: "0.0.0.0"
 server.port: ${kibana_server_port}
-elasticsearch.url: "${es_ip_port}"
+elasticsearch.hosts: ["${es_ip_port}"]
 elasticsearch.username: "${es_username}"
 elasticsearch.password: "${es_password}"
-xpack.monitoring.ui.container.elasticsearch.enabled: true
 i18n.locale: "zh-CN"
 EOF
 
