@@ -124,6 +124,11 @@ install_docker() {
   source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
 }
 
+# 安装buildx交叉编译
+install_buildx() {
+  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/buildx.sh)
+}
+
 install_mysql() {
   source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/mysql.sh)
 }
@@ -163,11 +168,6 @@ install_gitlab() {
   source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/gitlab.sh)
 }
 
-# 安装buildx交叉编译
-install_buildx() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/buildx.sh)
-}
-
 # 卸载Docker
 uninstall_docker() {
   source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/uninstall.sh)
@@ -196,7 +196,7 @@ main() {
   echo_content yellow "5. 安装Elasticsearch 7.17.10"
   echo_content yellow "6. 安装Kibana 7.17.10"
   echo_content yellow "7. 安装Minio"
-  echo_content yellow "8. 安装Nacos v2.2.0"
+  echo_content yellow "8. 安装Nacos v2.1.2"
   echo_content yellow "9. 安装ShadowsocksR"
   echo_content yellow "10. 安装Nexus3"
   echo_content yellow "11. 安装GitLab"
