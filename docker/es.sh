@@ -92,6 +92,7 @@ EOF
 
     if [[ -n $(docker ps -q -f "name=^${es_ip}$") ]]; then
       echo_content skyBlue "---> Elasticsearch安装完成"
+      echo_content yellow "---> 设置密码请进入容器执行: elasticsearch-setup-passwords interactive"
     else
       echo_content red "---> Elasticsearch安装失败或运行异常,请尝试修复或卸载重装"
       exit 1
