@@ -70,6 +70,7 @@ install_kibana() {
 
     cat >${KIBANA_DATA}config/kibana.yml <<EOF
 server.name: "${kibana_server_name}"
+server.host: "0.0.0.0"
 server.port: ${kibana_server_port}
 elasticsearch.url: "${es_ip_port}"
 elasticsearch.username: "${es_username}"
