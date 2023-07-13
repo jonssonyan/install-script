@@ -12,7 +12,7 @@ init_var() {
   minio_server_port=9000
   minio_console_port=9001
   minio_root_user="admin"
-  minio_root_password="12345678"
+  minio_root_password=""
 }
 
 echo_content() {
@@ -61,7 +61,7 @@ install_minio() {
     [[ -z "${minio_console_port}" ]] && minio_console_port=9001
     read -r -p "请输入Minio的控制台用户名(默认:admin): " minio_root_user
     [[ -z "${minio_root_user}" ]] && minio_root_user="admin"
-    while read -r -p "请输入Minio的控制台密码(默认:12345678): " minio_root_password; do
+    while read -r -p "请输入Minio的控制台密码: " minio_root_password; do
       if [[ -z "${minio_root_password}" ]]; then
         echo_content red "密码不能为空"
       else
