@@ -69,7 +69,7 @@ install_kibana() {
     [[ -z "${es_password}" ]] && es_password="elastic"
 
     cat >${KIBANA_DATA}config/kibana.yml <<EOF
-server.name: ${kibana_server_name}
+server.name: "${kibana_server_name}"
 server.port: ${kibana_server_port}
 elasticsearch.url: "${es_ip_port}"
 elasticsearch.username: "${es_username}"
