@@ -60,6 +60,7 @@ install_nacos() {
         nacos/nacos-server:v2.1.2
     if [[ -n $(docker ps -q -f "name=^${nacos_ip}$") ]]; then
       echo_content skyBlue "---> Nacos安装完成"
+      echo_content yellow "---> Nacos的登录地址: http://ip:${nacos_port}/nacos/#/login"
       echo_content yellow "---> Nacos的用户号名(请妥善保存): nacos"
       echo_content yellow "---> Nacos的密码(请妥善保存): nacos"
     else
