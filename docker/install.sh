@@ -203,7 +203,7 @@ install_docker() {
       ${package_manager} update -y
     fi
 
-    if [[ -z "${docker_version}" ]]; then
+    if [[ "${docker_version}" == "latest" ]]; then
       ${package_manager} install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
     else
       if [[ ${package_manager} == "yum" || ${package_manager} == "dnf" ]]; then
