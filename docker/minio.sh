@@ -64,6 +64,8 @@ install_minio() {
     while read -r -p "请输入Minio的控制台密码: " minio_root_password; do
       if [[ -z "${minio_root_password}" ]]; then
         echo_content red "密码不能为空"
+      elif [[ ${#minio_root_password} -lt 8 ]]; then
+        echo_content red "密码长度不能小于8位"
       else
         break
       fi
