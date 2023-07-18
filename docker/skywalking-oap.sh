@@ -87,7 +87,7 @@ install_skywalking() {
       [[ -z "${es_password}" ]] && es_password="elastic"
 
       docker pull apache/skywalking-oap-server:9.5.0 &&
-        docker run --name ${sw_oap_ip} --restart always \
+        docker run -d --name ${sw_oap_ip} --restart always \
           --network=host \
           -e TZ=Asia/Shanghai \
           -e SW_CORE_REST_PORT=${sw_oap_http} \
@@ -121,7 +121,7 @@ install_skywalking() {
         wget -c ${mysql_connector_java_url} -O ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.jar
       fi
       docker pull apache/skywalking-oap-server:9.5.0 &&
-        docker run --name ${sw_oap_ip} --restart always \
+        docker run -d --name ${sw_oap_ip} --restart always \
           --network=host \
           -e TZ=Asia/Shanghai \
           -e SW_CORE_REST_PORT=${sw_oap_http} \
