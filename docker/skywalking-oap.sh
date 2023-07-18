@@ -113,8 +113,9 @@ install_skywalking() {
       can_connect www.google.com && can_google=1
 
       if [[ ${can_google} == 0 ]]; then
-        wget -c ${mysql_connector_java_url_aliyun} -O ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.tar.gz
-        tar -zxvf ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.tar.gz -C ${SW_DATA_OAP_LIBS}
+        wget -c ${mysql_connector_java_url_aliyun} -O ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.tar.gz &&
+          tar -zxvf ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.tar.gz -C ${SW_DATA_OAP_LIBS} &&
+          cp ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28/mysql-connector-java-8.0.28.jar ${SW_DATA_OAP_LIBS}
       else
         wget -c ${mysql_connector_java_url} -O ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.jar
       fi
