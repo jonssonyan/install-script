@@ -80,7 +80,7 @@ install_skywalking() {
         -e TZ=Asia/Shanghai \
         -e SW_CORE_REST_PORT=${sw_oap_http} \
         -e SW_CORE_GRPC_PORT=${sw_oap_grpc} \
-        -e SW_STORAGE=elasticsearch7 \
+        -e SW_STORAGE=elasticsearch \
         -e SW_STORAGE_ES_CLUSTER_NODES="${es_url}" \
         -e SW_ES_USER="${es_username}" \
         -e SW_ES_PASSWORD="${es_password}" \
