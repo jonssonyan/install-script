@@ -5,6 +5,8 @@ export PATH
 init_var() {
   ECHO_TYPE="echo -e"
 
+  can_google=0
+
   SW_DATA="/jsdata/skywalking/"
   SW_DATA_OAP_LIBS="${SW_DATA}oap-libs/"
   sw_oap_ip="js-skywalking-oap"
@@ -19,6 +21,7 @@ init_var() {
   mysql_user="root"
   mysql_pass="123456"
 
+  mysql_connector_java_url_aliyun="https://mirrors.aliyun.com/mysql/Connector-J/mysql-connector-java-8.0.28.tar.gz"
   mysql_connector_java_url="https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.28/mysql-connector-java-8.0.28.jar"
 }
 
@@ -46,6 +49,14 @@ echo_content() {
     ${ECHO_TYPE} "\033[37m$2\033[0m"
     ;;
   esac
+}
+
+can_connect() {
+  if ping -c2 -i0.3 -W1 "$1" &>/dev/null; then
+    return 0
+  else
+    return 1
+  fi
 }
 
 mkdir_tools() {
@@ -99,7 +110,14 @@ install_skywalking() {
       done
 
       # 下载MySQL驱动
-      wget -c ${mysql_connector_java_url} -O ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.jar
+      can_connect www.google.com && can_google=1
+
+      if [[ ${can_google} == 0 ]]; then
+        wget -c ${mysql_connector_java_url_aliyun} -O ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.tar.gz
+        tar -zxvf ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.tar.gz -C ${SW_DATA_OAP_LIBS}
+      else
+        wget -c ${mysql_connector_java_url} -O ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.jar
+      fi
 
       docker run --name ${sw_oap_ip} --restart always \
         --network=host \
