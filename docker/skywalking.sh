@@ -123,12 +123,15 @@ install_skywalking() {
   if [[ -z $(docker ps -q -f "name=^${sw_ui_ip}$") ]]; then
     echo_content green "---> 安装SkyWalking UI"
 
+    read -r -p "请输入SkyWalking UI的端口(默认:8080): " sw_ui_port
+    [[ -z "${sw_ui_port}" ]] && sw_ui_port=8080
     read -r -p "请输入SkyWalking OAP的URL(默认:http://127.0.0.1:12800): " sw_oap_url
     [[ -z "${sw_oap_url}" ]] && sw_oap_url="http://127.0.0.1:12800"
 
     docker run -d --name ${sw_ui_ip} --restart always \
       --network=host \
       -e TZ=Asia/Shanghai \
+      -e SW_SERVER_PORT=${sw_ui_port} \
       -e SW_OAP_ADDRESS="${sw_oap_url}" \
       apache/skywalking-ui:9.5.0
 
