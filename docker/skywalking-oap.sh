@@ -6,6 +6,7 @@ init_var() {
   ECHO_TYPE="echo -e"
 
   SW_DATA="/jsdata/skywalking/"
+  SW_DATA_OAP_LIBS="${SW_DATA}oap-libs/"
   sw_oap_ip="js-skywalking-oap"
   sw_oap_http=12800
   sw_oap_grpc=11800
@@ -17,6 +18,8 @@ init_var() {
   mysql_jdbc_url="jdbc:mysql://127.0.0.1:9507/skywalking"
   mysql_user="root"
   mysql_pass="123456"
+
+  mysql_connector_java_url="https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.28/mysql-connector-java-8.0.28.jar"
 }
 
 echo_content() {
@@ -47,6 +50,7 @@ echo_content() {
 
 mkdir_tools() {
   mkdir -p ${SW_DATA}
+  mkdir -p ${SW_DATA_OAP_LIBS}
 }
 
 install_docker() {
@@ -94,6 +98,9 @@ install_skywalking() {
         fi
       done
 
+      # 下载MySQL驱动
+      wget -c ${mysql_connector_java_url} -O ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.jar
+
       docker run --name ${sw_oap_ip} --restart always \
         --network=host \
         -e TZ=Asia/Shanghai \
@@ -103,6 +110,7 @@ install_skywalking() {
         -e SW_JDBC_URL="${mysql_jdbc_url}" \
         -e SW_DATA_SOURCE_USER="${mysql_user}" \
         -e SW_DATA_SOURCE_PASSWORD="${mysql_pass}" \
+        -v ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.jar:/skywalking/oap-libs/mysql-connector-java-8.0.28.jar \
         apache/skywalking-oap-server:9.5.0
     fi
 
