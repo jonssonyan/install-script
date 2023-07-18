@@ -86,16 +86,17 @@ install_skywalking() {
       read -r -p "请输入Elasticsearch的密码(默认:elastic): " es_password
       [[ -z "${es_password}" ]] && es_password="elastic"
 
-      docker run --name ${sw_oap_ip} --restart always \
-        --network=host \
-        -e TZ=Asia/Shanghai \
-        -e SW_CORE_REST_PORT=${sw_oap_http} \
-        -e SW_CORE_GRPC_PORT=${sw_oap_grpc} \
-        -e SW_STORAGE=elasticsearch \
-        -e SW_STORAGE_ES_CLUSTER_NODES="${es_url}" \
-        -e SW_ES_USER="${es_username}" \
-        -e SW_ES_PASSWORD="${es_password}" \
-        apache/skywalking-oap-server:9.5.0
+      docker pull apache/skywalking-oap-server:9.5.0 &&
+        docker run --name ${sw_oap_ip} --restart always \
+          --network=host \
+          -e TZ=Asia/Shanghai \
+          -e SW_CORE_REST_PORT=${sw_oap_http} \
+          -e SW_CORE_GRPC_PORT=${sw_oap_grpc} \
+          -e SW_STORAGE=elasticsearch \
+          -e SW_STORAGE_ES_CLUSTER_NODES="${es_url}" \
+          -e SW_ES_USER="${es_username}" \
+          -e SW_ES_PASSWORD="${es_password}" \
+          apache/skywalking-oap-server:9.5.0
     elif [[ "${sw_storage}" == "2" ]]; then
       read -r -p "请输入MySQL的JDBC URL(默认:jdbc:mysql://127.0.0.1:9507/skywalking): " mysql_jdbc_url
       [[ -z "${mysql_jdbc_url}" ]] && mysql_jdbc_url="jdbc:mysql://127.0.0.1:9507/skywalking"
@@ -119,18 +120,18 @@ install_skywalking() {
       else
         wget -c ${mysql_connector_java_url} -O ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.jar
       fi
-
-      docker run --name ${sw_oap_ip} --restart always \
-        --network=host \
-        -e TZ=Asia/Shanghai \
-        -e SW_CORE_REST_PORT=${sw_oap_http} \
-        -e SW_CORE_GRPC_PORT=${sw_oap_grpc} \
-        -e SW_STORAGE=mysql \
-        -e SW_JDBC_URL="${mysql_jdbc_url}" \
-        -e SW_DATA_SOURCE_USER="${mysql_user}" \
-        -e SW_DATA_SOURCE_PASSWORD="${mysql_pass}" \
-        -v ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.jar:/skywalking/oap-libs/mysql-connector-java-8.0.28.jar \
-        apache/skywalking-oap-server:9.5.0
+      docker pull apache/skywalking-oap-server:9.5.0 &&
+        docker run --name ${sw_oap_ip} --restart always \
+          --network=host \
+          -e TZ=Asia/Shanghai \
+          -e SW_CORE_REST_PORT=${sw_oap_http} \
+          -e SW_CORE_GRPC_PORT=${sw_oap_grpc} \
+          -e SW_STORAGE=mysql \
+          -e SW_JDBC_URL="${mysql_jdbc_url}" \
+          -e SW_DATA_SOURCE_USER="${mysql_user}" \
+          -e SW_DATA_SOURCE_PASSWORD="${mysql_pass}" \
+          -v ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.jar:/skywalking/oap-libs/mysql-connector-java-8.0.28.jar \
+          apache/skywalking-oap-server:9.5.0
     fi
 
     if [[ -n $(docker ps -q -f "name=^${sw_oap_ip}$" -f "status=running") ]]; then
