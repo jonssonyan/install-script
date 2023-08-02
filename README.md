@@ -8,6 +8,10 @@ OS version: CentOS Stream 8/Ubuntu 20.04 LTS/Debian 11.1
 
 CPU Architecture: x86_64/amd64
 
+# Author
+
+[jonssonyan](https://jonssonyan.com)
+
 ## install K8s
 
 - OS version: CentOS 7+/Ubuntu 18+/Debian 10+
@@ -28,7 +32,3 @@ source <(curl -L https://github.com/jonssonyan/install-script/raw/main/k8s-insta
 ```bash
 source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker-install.sh)
 ```
-
-# Author
-
-[jonssonyan](https://jonssonyan.com)
