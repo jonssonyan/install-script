@@ -1,6 +1,6 @@
 # Install Script
 
-Software quick installation script for Linux platform / Linux平台软件一键安装脚本
+Software quick installation script for Linux platform
 
 # Recommended OS
 
