@@ -1,4 +1,6 @@
-# install-script
+# Install Script
+
+Linux平台软件一键安装脚本
 
 # Recommended OS
 
@@ -26,6 +28,6 @@ source <(curl -L https://github.com/jonssonyan/install-script/raw/main/k8s-insta
 source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker-install.sh)
 ```
 
-# Telegram
+# Author
 
-[jonssonya's News](https://t.me/jonssonyan_news)
+[jonssonya](https://jonssonyan.com)
