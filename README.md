@@ -1,10 +1,11 @@
 # Install Script
 
-Linux平台软件一键安装脚本
+Software quick installation script for Linux platform / Linux平台软件一键安装脚本
 
 # Recommended OS
 
 OS version: CentOS Stream 8/Ubuntu 20.04 LTS/Debian 11.1
+
 CPU Architecture: x86_64/amd64
 
 ## install K8s
@@ -30,4 +31,4 @@ source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker-in
 
 # Author
 
-[jonssonya](https://jonssonyan.com)
+[jonssonyan](https://jonssonyan.com)
