@@ -129,6 +129,11 @@ install_buildx() {
   source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/buildx.sh)
 }
 
+# 卸载Docker
+uninstall_docker() {
+  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/uninstall.sh)
+}
+
 install_mysql() {
   source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/mysql.sh)
 }
@@ -168,9 +173,12 @@ install_gitlab() {
   source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/gitlab.sh)
 }
 
-# 卸载Docker
-uninstall_docker() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/uninstall.sh)
+install_skywalking_oap() {
+  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/skywalking-oap.sh)
+}
+
+install_skywalking_ui() {
+  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/skywalking-ui.sh)
 }
 
 main() {
@@ -190,18 +198,19 @@ main() {
   echo_content red "\n=============================================================="
   echo_content yellow "1. 安装Docker"
   echo_content yellow "2. 安装buildx交叉编译"
+  echo_content yellow "3. 卸载Docker"
   echo_content green "=============================================================="
-  echo_content yellow "3. 安装MySQL 5.7.38"
-  echo_content yellow "4. 安装Redis 6.2.13"
-  echo_content yellow "5. 安装Elasticsearch 7.17.10"
-  echo_content yellow "6. 安装Kibana 7.17.10"
-  echo_content yellow "7. 安装Minio"
-  echo_content yellow "8. 安装Nacos v2.1.2"
-  echo_content yellow "9. 安装ShadowsocksR"
-  echo_content yellow "10. 安装Nexus3"
-  echo_content yellow "11. 安装GitLab"
-  echo_content green "=============================================================="
-  echo_content yellow "12. 卸载Docker"
+  echo_content yellow "4. 安装MySQL 5.7.38"
+  echo_content yellow "5. 安装Redis 6.2.13"
+  echo_content yellow "6. 安装Elasticsearch 7.17.10"
+  echo_content yellow "7. 安装Kibana 7.17.10"
+  echo_content yellow "8. 安装Minio"
+  echo_content yellow "9. 安装Nacos v2.1.2"
+  echo_content yellow "10. 安装ShadowsocksR"
+  echo_content yellow "11. 安装Nexus3"
+  echo_content yellow "12. 安装GitLab"
+  echo_content yellow "13. 安装SkyWalking OAP"
+  echo_content yellow "14. 安装SkyWalking UI"
   read -r -p "请选择:" selectInstall_type
   case ${selectInstall_type} in
   1)
@@ -211,43 +220,51 @@ main() {
     install_buildx
     ;;
   3)
-    install_docker
-    install_mysql
+    uninstall_docker
     ;;
   4)
     install_docker
-    install_redis
+    install_mysql
     ;;
   5)
     install_docker
-    install_es
+    install_redis
     ;;
   6)
     install_docker
-    install_kibana
+    install_es
     ;;
   7)
     install_docker
-    install_minio
+    install_kibana
     ;;
   8)
     install_docker
-    install_nacos
+    install_minio
     ;;
   9)
     install_docker
-    install_ssr
+    install_nacos
     ;;
   10)
     install_docker
-    install_nexus3
+    install_ssr
     ;;
   11)
     install_docker
-    install_gitlab
+    install_nexus3
     ;;
   12)
-    uninstall_docker
+    install_docker
+    install_gitlab
+    ;;
+  13)
+    install_docker
+    install_skywalking_oap
+    ;;
+  14)
+    install_docker
+    install_skywalking_ui
     ;;
   *)
     echo_content red "没有这个选项"
