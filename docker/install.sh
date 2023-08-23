@@ -154,13 +154,11 @@ install_docker() {
       if [[ -z "${dockerVersionNum}" || ${dockerVersionNum} == 1 ]]; then
         docker_version="20.10.23"
         break
+      elif [[ ${dockerVersionNum} == 2 ]]; then
+        docker_version="latest"
+        break
       else
-        if [[ ${dockerVersionNum} != 2 ]]; then
-          echo_content red "不可以输入除1和2之外的其他字符"
-        else
-          docker_version=""
-          break
-        fi
+        echo_content red "不可以输入除1和2之外的其他字符"
       fi
     done
 
