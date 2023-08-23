@@ -150,12 +150,12 @@ install_docker() {
   if [[ ! $(command -v docker) ]]; then
     echo_content green "---> 安装Docker"
 
-    while read -r -p "请输入Docker版本(1/20.10.23 2/latest 默认:1/20.10.23): " dockerVersionNum; do
+    while read -r -p "请输入Docker版本(1/latest 2/20.10.23 默认:1): " dockerVersionNum; do
       if [[ -z "${dockerVersionNum}" || ${dockerVersionNum} == 1 ]]; then
-        docker_version="20.10.23"
+        docker_version="latest"
         break
       elif [[ ${dockerVersionNum} == 2 ]]; then
-        docker_version="latest"
+        docker_version="20.10.23"
         break
       else
         echo_content red "不可以输入除1和2之外的其他字符"
