@@ -174,122 +174,6 @@ install_prepare() {
   fi
 }
 
-setup_docker() {
-  mkdir -p /etc/docker
-  if [[ ${can_google} == 0 ]]; then
-    cat >/etc/docker/daemon.json <<EOF
-{
-  "exec-opts": ["native.cgroupdriver=systemd"],
-    "log-driver": "json-file",
-    "log-opts": {
-      "max-size": "100m"
-    },
-    "storage-driver": "overlay2",
-    "storage-opts": [
-      "overlay2.override_kernel_check=true"
-    ],
-    "registry-mirrors":[${docker_mirror}]
-}
-EOF
-  else
-    cat >/etc/docker/daemon.json <<EOF
-{
-    "exec-opts": ["native.cgroupdriver=systemd"],
-    "log-driver": "json-file",
-    "log-opts": {
-        "max-size": "100m"
-    },
-    "storage-driver": "overlay2",
-    "storage-opts": [
-        "overlay2.override_kernel_check=true"
-    ]
-}
-EOF
-  fi
-  systemctl daemon-reload
-}
-
-# 安装Docker
-install_docker() {
-  if [[ ! $(command -v docker) ]]; then
-    echo_content green "---> 安装Docker"
-
-    while read -r -p "请输入Docker版本(1/20.10.23 2/latest 默认:1/20.10.23): " dockerVersionNum; do
-      if [[ -z "${dockerVersionNum}" || ${dockerVersionNum} == 1 ]]; then
-        docker_version="20.10.23"
-        break
-      else
-        if [[ ${dockerVersionNum} != 2 ]]; then
-          echo_content red "不可以输入除1和2之外的其他字符"
-        else
-          docker_version=""
-          break
-        fi
-      fi
-    done
-
-    if [[ "${release}" == "centos" ]]; then
-      ${package_manager} remove docker \
-        docker-client \
-        docker-client-latest \
-        docker-common \
-        docker-latest \
-        docker-latest-logrotate \
-        docker-logrotate \
-        docker-engine
-      ${package_manager} install -y yum-utils
-      if [[ ${can_google} == 0 ]]; then
-        ${package_manager}-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
-      else
-        ${package_manager}-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-      fi
-      ${package_manager} makecache || ${package_manager} makecache fast
-    elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
-      ${package_manager} remove docker docker-engine docker.io containerd runc
-      ${package_manager} update -y
-      ${package_manager} install -y \
-        apt-transport-https \
-        ca-certificates
-      mkdir -p /etc/apt/keyrings
-      if [[ ${can_google} == 0 ]]; then
-        curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/${release}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        echo \
-          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] http://mirrors.aliyun.com/docker-ce/linux/${release} \
-              $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-      else
-        curl -fsSL https://download.docker.com/linux/${release}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        echo \
-          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/${release} \
-              $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-      fi
-      ${package_manager} update -y
-    fi
-
-    if [[ -z "${docker_version}" ]]; then
-      ${package_manager} install -y docker-ce docker-ce-cli
-    else
-      if [[ ${package_manager} == "yum" || ${package_manager} == "dnf" ]]; then
-        ${package_manager} install -y docker-ce-"${docker_version}" docker-ce-cli-"${docker_version}"
-      elif [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
-        ${package_manager} install -y docker-ce=5:"${docker_version}"~3-0~${release}-"$(lsb_release -c --short)" docker-ce-cli=5:"${docker_version}"~3-0~${release}-"$(lsb_release -c --short)"
-      fi
-    fi
-
-    setup_docker
-
-    systemctl enable docker && systemctl restart docker
-
-    if [[ $(command -v docker) ]]; then
-      echo_content skyBlue "---> Docker安装完成"
-    else
-      echo_content red "---> Docker安装失败"
-      exit 1
-    fi
-  else
-    echo_content skyBlue "---> 你已经安装了Docker"
-  fi
-}
-
 setup_containerd() {
   mkdir -p /etc/containerd
   containerd config default >/etc/containerd/config.toml
@@ -375,7 +259,7 @@ install_runtime() {
       # 自 1.24 版起，Dockershim 已从 Kubernetes 项目中移除
       if version_lt "${k8s_version}" "1.24.0"; then
         k8s_cri_sock="/var/run/dockershim.sock"
-        install_docker
+        source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
         break
       else
         echo_content red "自1.24版起，Dockershim已从Kubernetes项目中移除，详情：https://kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/"
