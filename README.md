@@ -1,3 +1,5 @@
+[中文](EADME_ZH.md)
+
 # Install Script
 
 Software quick installation script for Linux platform
