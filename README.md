@@ -4,15 +4,11 @@
 
 Software quick installation script for Linux platform
 
-# Recommended OS
+## Recommended OS
 
 OS version: CentOS Stream 8/Ubuntu 20.04 LTS/Debian 11.1
 
 CPU Architecture: x86_64/amd64
-
-# Author
-
-[jonssonyan](https://jonssonyan.com)
 
 ## install K8s
 
@@ -34,3 +30,7 @@ source <(curl -L https://github.com/jonssonyan/install-script/raw/main/k8s-insta
 ```bash
 source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker-install.sh)
 ```
+
+## Other
+
+you can contact me at Telegram: https://t.me/jonssonyan_news

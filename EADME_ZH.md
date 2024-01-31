@@ -1,18 +1,14 @@
 [English](README.md)
 
-# Install Script
+# 一键安装脚本
 
 Linux平台软件一键安装脚本
 
-# 系统要求
+## 系统要求
 
 系统: CentOS Stream 8/Ubuntu 20.04 LTS/Debian 11.1
 
 CPU: x86_64/amd64
-
-# 作者
-
-[jonssonyan](https://jonssonyan.com)
 
 ## 安装K8s
 
@@ -34,3 +30,7 @@ source <(curl -L https://github.com/jonssonyan/install-script/raw/main/k8s-insta
 ```bash
 source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker-install.sh)
 ```
+
+## 其他
+
+你可以在 Telegram 上关注我: https://t.me/jonssonyan_news
