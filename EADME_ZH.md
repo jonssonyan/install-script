@@ -33,4 +33,4 @@ source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker-in
 
 ## 其他
 
-你可以在 Telegram 上关注我: https://t.me/jonssonyan_news
+你可以在哔哩哔哩上关注我: https://space.bilibili.com/374864141
