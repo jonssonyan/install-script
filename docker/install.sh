@@ -155,7 +155,7 @@ install_docker() {
         docker_version="latest"
         break
       elif [[ ${dockerVersionNum} == 2 ]]; then
-        docker_version="20.10.23"
+        docker_version="25.0.5"
         break
       else
         echo_content red "不可以输入除1和2之外的其他字符"
