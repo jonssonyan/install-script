@@ -5,9 +5,9 @@ export PATH
 init_var() {
   ECHO_TYPE="echo -e"
 
-  SW_DATA="/jsdata/skywalking/"
+  SW_DATA="/jydata/skywalking/"
 
-  sw_ui_ip="js-skywalking-ui"
+  sw_ui_ip="jy-skywalking-ui"
   sw_ui_port=8080
   sw_oap_url="http://127.0.0.1:12800"
 }

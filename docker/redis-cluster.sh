@@ -6,8 +6,8 @@ init_var() {
   ECHO_TYPE="echo -e"
 
   # Redis
-  REDIS_CLUSTER_DATA="/jsdata/redis-cluster/"
-  redis_cluster_ip="js-redis-cluster"
+  REDIS_CLUSTER_DATA="/jydata/redis-cluster/"
+  redis_cluster_ip="jy-redis-cluster"
   redis_cluster_port=6378
   redis_cluster_pass=""
 }

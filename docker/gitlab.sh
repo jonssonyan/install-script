@@ -7,11 +7,11 @@ export PATH
 init_var() {
   ECHO_TYPE="echo -e"
 
-  GITLAB_DATA="/jsdata/gitlab/"
+  GITLAB_DATA="/jydata/gitlab/"
   GITLAB_CONFIG="${GITLAB_DATA}config/"
   GITLAB_LOG="${GITLAB_DATA}logs/"
   GITLAB_OPT="${GITLAB_DATA}opt/"
-  gitlab_ip="js-gitlab"
+  gitlab_ip="jy-gitlab"
   gitlab_http_port=80
   gitlab_https_port=443
   gitlab_ssh_port=22

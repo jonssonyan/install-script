@@ -5,8 +5,8 @@ export PATH
 init_var() {
   ECHO_TYPE="echo -e"
 
-  NEXUS3_DATA="/jsdata/nexus3/"
-  nexus3_ip="js-nexus3"
+  NEXUS3_DATA="/jydata/nexus3/"
+  nexus3_ip="jy-nexus3"
   nexus3_port=8081
 }
 

@@ -7,11 +7,11 @@ export PATH
 init_var() {
   ECHO_TYPE="echo -e"
 
-  KIBANA_DATA="/jsdata/kibana/"
+  KIBANA_DATA="/jydata/kibana/"
   KIBANA_DATA_CONFIG="${KIBANA_DATA}config/"
-  kibana_ip="js-kibana"
+  kibana_ip="jy-kibana"
   kibana_server_port=5601
-  kibana_server_name="js-kibana"
+  kibana_server_name="jy-kibana"
   es_url="http://127.0.0.1:9200"
   es_username="elastic"
   es_password="elastic"
@@ -58,8 +58,8 @@ install_kibana() {
 
     read -r -p "请输入Kibana的端口(默认:5601): " kibana_server_port
     [[ -z "${kibana_server_port}" ]] && kibana_server_port=5601
-    read -r -p "请输入Kibana的主机名(默认:js-kibana): " kibana_server_name
-    [[ -z "${kibana_server_name}" ]] && kibana_server_name="js-kibana"
+    read -r -p "请输入Kibana的主机名(默认:jy-kibana): " kibana_server_name
+    [[ -z "${kibana_server_name}" ]] && kibana_server_name="jy-kibana"
 
     read -r -p "请输入Elasticsearch的URL(默认:http://127.0.0.1:9200): " es_url
     [[ -z "${es_url}" ]] && es_url="http://127.0.0.1:9200"

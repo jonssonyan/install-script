@@ -8,12 +8,12 @@ export PATH
 init_var() {
   ECHO_TYPE="echo -e"
 
-  ES_DATA="/jsdata/es/"
+  ES_DATA="/jydata/es/"
   ES_DATA_CONFIG="${ES_DATA}config/"
   ES_DATA_LOGS="${ES_DATA}logs/"
   ES_DATA_DATA="${ES_DATA}data/"
   ES_DATA_PLUGINS="${ES_DATA}plugins/"
-  es_ip="js-es"
+  es_ip="jy-es"
   es_http_port=9200
   es_transport_port=9300
   es_node_name='node-1'

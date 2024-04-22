@@ -5,8 +5,8 @@ export PATH
 init_var() {
   ECHO_TYPE="echo -e"
 
-  NACOS_DATA="/jsdata/nacos/"
-  nacos_ip="js-nacos"
+  NACOS_DATA="/jydata/nacos/"
+  nacos_ip="jy-nacos"
   nacos_port=8848
 }
 

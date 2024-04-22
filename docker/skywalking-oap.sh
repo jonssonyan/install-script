@@ -7,9 +7,9 @@ init_var() {
 
   can_google=0
 
-  SW_DATA="/jsdata/skywalking/"
+  SW_DATA="/jydata/skywalking/"
   SW_DATA_OAP_LIBS="${SW_DATA}oap-libs/"
-  sw_oap_ip="js-skywalking-oap"
+  sw_oap_ip="jy-skywalking-oap"
   sw_oap_http=12800
   sw_oap_grpc=11800
 

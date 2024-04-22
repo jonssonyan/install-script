@@ -5,10 +5,10 @@ export PATH
 init_var() {
   ECHO_TYPE="echo -e"
 
-  MINIO_DATA="/jsdata/minio/"
+  MINIO_DATA="/jydata/minio/"
   MINIO_DATA_DATA="${MINIO_DATA}data/"
   MINIO_DATA_CONFIG="${MINIO_DATA}config/"
-  minio_ip="js-minio"
+  minio_ip="jy-minio"
   minio_server_port=9000
   minio_console_port=9001
   minio_root_user="admin"

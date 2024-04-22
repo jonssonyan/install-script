@@ -15,7 +15,7 @@ init_var() {
   release=""
   get_arch=""
 
-  JS_DATA="/jsdata/"
+  JY_DATA="/jydata/"
 
 }
 
@@ -47,7 +47,7 @@ echo_content() {
 
 mkdir_tools() {
   # 项目目录
-  mkdir -p ${JS_DATA}
+  mkdir -p ${JY_DATA}
 }
 
 # 检查系统

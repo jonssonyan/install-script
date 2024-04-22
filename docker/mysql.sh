@@ -5,8 +5,8 @@ export PATH
 init_var() {
   ECHO_TYPE="echo -e"
 
-  MySQL_DATA="/jsdata/mysql/"
-  mysql_ip="js-mysql"
+  MySQL_DATA="/jydata/mysql/"
+  mysql_ip="jy-mysql"
   mysql_port=9507
   mysql_user="root"
   mysql_pas=""

@@ -6,8 +6,8 @@ init_var() {
   ECHO_TYPE="echo -e"
 
   # Redis
-  REDIS_DATA="/jsdata/redis/"
-  redis_ip="js-redis"
+  REDIS_DATA="/jydata/redis/"
+  redis_ip="jy-redis"
   redis_port=6378
   redis_pass=""
 }
