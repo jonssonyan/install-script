@@ -4,9 +4,9 @@
 
 Linux平台软件一键安装脚本
 
-## 系统要求
+## 建议系统
 
-系统: CentOS Stream 8/Ubuntu 20.04 LTS/Debian 11.1
+系统: CentOS 8+/Ubuntu 20+/Debian 11+
 
 CPU: x86_64/amd64
 
