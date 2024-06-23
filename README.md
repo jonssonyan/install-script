@@ -6,7 +6,7 @@ Software quick installation script for Linux platform
 
 ## Recommended OS
 
-OS version: CentOS Stream 8/Ubuntu 20.04 LTS/Debian 11.1
+OS version: CentOS 8+/Ubuntu 20+/Debian 11+
 
 CPU Architecture: x86_64/amd64
 
