@@ -15,7 +15,7 @@ CPU: x86_64/amd64 arm64/aarch64
 - 系统: CentOS 8+/Ubuntu 20+/Debian 11+
 - CPU: x86_64/amd64 arm64/aarch64
 - K8s版本: 1.23.17/latest
-- Docker版本: 20.10.23/latest
+- Docker版本: 25.0.5/latest
 
 ```bash
 bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/k8s-install.sh)
@@ -25,7 +25,7 @@ bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/k8s-inst
 
 - 系统: CentOS 8+/Ubuntu 20+/Debian 11+
 - CPU: x86_64/amd64 arm64/aarch64
-- Docker版本: 20.10.23/latest
+- Docker版本: 25.0.5/latest
 
 ```bash
 bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker-install.sh)

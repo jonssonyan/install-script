@@ -15,7 +15,7 @@ CPU Architecture: x86_64/amd64 arm64/aarch64
 - OS version: CentOS 7+/Ubuntu 18+/Debian 10+
 - CPU Architecture: x86_64/amd64 arm64/aarch64
 - K8s version: 1.23.17/latest
-- Docker version: 20.10.23/latest
+- Docker version: 25.0.5/latest
 
 ```bash
 bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/k8s-install.sh)
@@ -25,7 +25,7 @@ bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/k8s-inst
 
 - OS version: CentOS 7+/Ubuntu 18+/Debian 10+
 - CPU Architecture: x86_64/amd64 arm64/aarch64
-- Docker version: 20.10.23/latest
+- Docker version: 25.0.5/latest
 
 ```bash
 bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker-install.sh)

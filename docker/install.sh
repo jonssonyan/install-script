@@ -150,7 +150,7 @@ install_docker() {
   if [[ ! $(command -v docker) ]]; then
     echo_content green "---> 安装Docker"
 
-    while read -r -p "请输入Docker版本(1/latest 2/20.10.23 默认:1): " dockerVersionNum; do
+    while read -r -p "请输入Docker版本(1/latest 2/25.0.5 默认:1): " dockerVersionNum; do
       if [[ -z "${dockerVersionNum}" || ${dockerVersionNum} == 1 ]]; then
         docker_version="latest"
         break
