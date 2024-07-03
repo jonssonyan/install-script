@@ -39,7 +39,7 @@ echo_content() {
 # 检查系统
 check_sys() {
   if [[ $(id -u) != "0" ]]; then
-    echo_content red "必须是 root 才能运行此脚本"
+    echo_content red "You must be root to run this script"
     exit 1
   fi
 
@@ -54,7 +54,7 @@ check_sys() {
   fi
 
   if [[ -z "${package_manager}" ]]; then
-    echo_content red "暂不支持该系统"
+    echo_content red "This system is not currently supported"
     exit 1
   fi
 
@@ -67,7 +67,7 @@ check_sys() {
   fi
 
   if [[ -z "${release}" ]]; then
-    echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
+    echo_content red "Only supports CentOS 7+/Ubuntu 18+/Debian 10+"
     exit 1
   fi
 
@@ -76,7 +76,7 @@ check_sys() {
   fi
 
   if [[ -z "${get_arch}" ]]; then
-    echo_content red "仅支持x86_64/amd64和arm64/aarch64处理器架构"
+    echo_content red "Only supports x86_64/amd64 arm64/aarch64"
     exit 1
   fi
 }
