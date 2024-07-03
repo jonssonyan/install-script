@@ -3,7 +3,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
 # System Required: CentOS 7+/Ubuntu 18+/Debian 10+
-# Version: v1.0.0
+# Version: v0.0.1
 # Description: One click install Docker based Services
 # Author: jonssonyan <https://jonssonyan.com>
 # Github: https://github.com/jonssonyan/install-script

@@ -12,7 +12,7 @@ CPU Architecture: x86_64/amd64 arm64/aarch64
 
 ## install K8s
 
-- OS version: CentOS 8+/Ubuntu 20+/Debian 11+
+- OS version: CentOS 7+/Ubuntu 18+/Debian 10+
 - CPU Architecture: x86_64/amd64 arm64/aarch64
 - K8s version: 1.23.17/latest
 - Docker version: 20.10.23/latest
@@ -23,7 +23,7 @@ bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/k8s-inst
 
 ## install Docker based Services
 
-- OS version: CentOS 8+/Ubuntu 20+/Debian 11+
+- OS version: CentOS 7+/Ubuntu 18+/Debian 10+
 - CPU Architecture: x86_64/amd64 arm64/aarch64
 - Docker version: 20.10.23/latest
 
