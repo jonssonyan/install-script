@@ -121,64 +121,64 @@ install_prepare() {
 }
 
 install_docker() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
 }
 
 # 安装buildx交叉编译
 install_buildx() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/buildx.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/buildx.sh)
 }
 
 # 卸载Docker
 uninstall_docker() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/uninstall.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/uninstall.sh)
 }
 
 install_mysql() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/mysql.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/mysql.sh)
 }
 
 # 安装Redis
 install_redis() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/redis.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/redis.sh)
 }
 
 install_es() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/es.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/es.sh)
 }
 
 install_kibana() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/kibana.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/kibana.sh)
 }
 
 install_minio() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/minio.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/minio.sh)
 }
 
 install_nacos() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/nacos.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/nacos.sh)
 }
 
 install_ssr() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/ssr.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/ssr.sh)
 }
 
 # 安装Nexus3
 install_nexus3() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/nexus3.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/nexus3.sh)
 }
 
 # 安装GitLab
 install_gitlab() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/gitlab.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/gitlab.sh)
 }
 
 install_skywalking_oap() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/skywalking-oap.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/skywalking-oap.sh)
 }
 
 install_skywalking_ui() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/skywalking-ui.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/skywalking-ui.sh)
 }
 
 main() {

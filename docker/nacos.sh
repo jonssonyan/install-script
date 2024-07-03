@@ -41,7 +41,7 @@ mkdir_tools() {
 }
 
 install_docker() {
-  source <(curl -L https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
 }
 
 install_nacos() {
