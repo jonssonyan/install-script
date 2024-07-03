@@ -35,7 +35,6 @@ init_var() {
   # calico_url="https://docs.projectcalico.org/manifests/calico.yaml"
 
   # Docker
-  docker_version="20.10.23"
   docker_mirror='"https://hub-mirror.c.163.com","https://ccr.ccs.tencentyun.com","https://dockerproxy.com"'
 }
 

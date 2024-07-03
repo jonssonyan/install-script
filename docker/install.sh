@@ -11,7 +11,7 @@ init_var() {
   can_google=0
 
   # Docker
-  docker_version="20.10.23"
+  docker_version="latest"
   docker_mirror='"https://hub-mirror.c.163.com","https://ccr.ccs.tencentyun.com","https://dockerproxy.com"'
 }
 
