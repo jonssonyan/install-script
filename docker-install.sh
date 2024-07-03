@@ -53,7 +53,7 @@ mkdir_tools() {
 # 检查系统
 check_sys() {
   if [[ $(id -u) != "0" ]]; then
-    echo_content red "必须是 root 才能运行此脚本"
+    echo_content red "You must be root to run this script"
     exit 1
   fi
 
@@ -68,7 +68,7 @@ check_sys() {
   fi
 
   if [[ -z "${package_manager}" ]]; then
-    echo_content red "暂不支持该系统"
+    echo_content red "This system is not currently supported"
     exit 1
   fi
 
@@ -81,7 +81,7 @@ check_sys() {
   fi
 
   if [[ -z "${release}" ]]; then
-    echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
+    echo_content red "Only supports CentOS 7+/Ubuntu 18+/Debian 10+"
     exit 1
   fi
 
@@ -90,7 +90,7 @@ check_sys() {
   fi
 
   if [[ -z "${get_arch}" ]]; then
-    echo_content red "仅支持x86_64/amd64和arm64/aarch64处理器架构"
+    echo_content red "Only supports x86_64/amd64 arm64/aarch64"
     exit 1
   fi
 }
@@ -110,26 +110,24 @@ install_depend() {
 
 # 环境准备
 install_prepare() {
-  echo_content green "---> 环境准备"
+  echo_content green "---> Prepare the environment"
 
   # 同步时间
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
   systemctl restart rsyslog
   systemctl restart crond
 
-  echo_content skyBlue "---> 环境准备完成"
+  echo_content skyBlue "---> Environment preparation is complete"
 }
 
 install_docker() {
   bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
 }
 
-# 安装buildx交叉编译
 install_buildx() {
   bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/buildx.sh)
 }
 
-# 卸载Docker
 uninstall_docker() {
   bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/uninstall.sh)
 }
@@ -138,7 +136,6 @@ install_mysql() {
   bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/mysql.sh)
 }
 
-# 安装Redis
 install_redis() {
   bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/redis.sh)
 }
@@ -163,12 +160,10 @@ install_ssr() {
   bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/ssr.sh)
 }
 
-# 安装Nexus3
 install_nexus3() {
   bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/nexus3.sh)
 }
 
-# 安装GitLab
 install_gitlab() {
   bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/gitlab.sh)
 }
@@ -196,22 +191,22 @@ main() {
   echo_content skyBlue "Author: jonssonyan <https://jonssonyan.com>"
   echo_content skyBlue "Github: https://github.com/jonssonyan/install-script"
   echo_content red "\n=============================================================="
-  echo_content yellow "1. 安装 Docker"
-  echo_content yellow "2. 安装 buildx 交叉编译"
-  echo_content yellow "3. 卸载 Docker"
+  echo_content yellow "1. Install Docker"
+  echo_content yellow "2. Install buildx cross compiler"
+  echo_content yellow "3. Uninstall Docker"
   echo_content green "=============================================================="
-  echo_content yellow "4. 安装 MySQL 5.7.38"
-  echo_content yellow "5. 安装 Redis 6.2.13"
-  echo_content yellow "6. 安装 Elasticsearch 7.17.10"
-  echo_content yellow "7. 安装 Kibana 7.17.10"
-  echo_content yellow "8. 安装 Minio"
-  echo_content yellow "9. 安装 Nacos v2.1.2"
-  echo_content yellow "10. 安装 ShadowsocksR"
-  echo_content yellow "11. 安装 Nexus3"
-  echo_content yellow "12. 安装 GitLab"
-  echo_content yellow "13. 安装 SkyWalking OAP"
-  echo_content yellow "14. 安装 SkyWalking UI"
-  read -r -p "请选择:" selectInstall_type
+  echo_content yellow "4. Install MySQL 5.7.38"
+  echo_content yellow "5. Install Redis 6.2.13"
+  echo_content yellow "6. Install Elasticsearch 7.17.10"
+  echo_content yellow "7. Install Kibana 7.17.10"
+  echo_content yellow "8. Install Minio"
+  echo_content yellow "9. Install Nacos v2.1.2"
+  echo_content yellow "10. Install ShadowsocksR"
+  echo_content yellow "11. Install Nexus3"
+  echo_content yellow "12. Install GitLab"
+  echo_content yellow "13. Install SkyWalking OAP"
+  echo_content yellow "14. Install SkyWalking UI"
+  read -r -p "Please choose:" selectInstall_type
   case ${selectInstall_type} in
   1)
     install_docker
@@ -267,7 +262,7 @@ main() {
     install_skywalking_ui
     ;;
   *)
-    echo_content red "没有这个选项"
+    echo_content red "No such option"
     ;;
   esac
 }
