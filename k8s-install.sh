@@ -96,7 +96,7 @@ version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1";
 # 检查系统
 check_sys() {
   if [[ $(id -u) != "0" ]]; then
-    echo_content red "必须是 root 才能运行此脚本"
+    echo_content red "You must be root to run this script"
     exit 1
   fi
 
@@ -111,7 +111,7 @@ check_sys() {
   fi
 
   if [[ -z "${package_manager}" ]]; then
-    echo_content red "暂不支持该系统"
+    echo_content red "This system is not currently supported"
     exit 1
   fi
 
@@ -124,7 +124,7 @@ check_sys() {
   fi
 
   if [[ -z "${release}" ]]; then
-    echo_content red "仅支持CentOS 7+/Ubuntu 18+/Debian 10+系统"
+    echo_content red "Only supports CentOS 7+/Ubuntu 18+/Debian 10+"
     exit 1
   fi
 
@@ -133,7 +133,7 @@ check_sys() {
   fi
 
   if [[ -z "${get_arch}" ]]; then
-    echo_content red "仅支持x86_64/amd64和arm64/aarch64处理器架构"
+    echo_content red "Only supports x86_64/amd64 arm64/aarch64"
     exit 1
   fi
 
@@ -195,7 +195,7 @@ setup_containerd() {
 # 安装Containerd
 install_containerd() {
   if [[ ! $(command -v containerd) ]]; then
-    echo_content green "---> 安装Containerd"
+    echo_content green "---> 安装 Containerd"
 
     if [[ "${release}" == "centos" ]]; then
       ${package_manager} install -y yum-utils
@@ -234,13 +234,13 @@ install_containerd() {
     systemctl enable containerd && systemctl restart containerd
 
     if [[ $(command -v containerd) ]]; then
-      echo_content skyBlue "---> Containerd安装完成"
+      echo_content skyBlue "---> Containerd 安装完成"
     else
-      echo_content red "---> Containerd安装失败"
+      echo_content red "---> Containerd 安装失败"
       exit 1
     fi
   else
-    echo_content skyBlue "---> 你已经安装了Containerd"
+    echo_content skyBlue "---> 你已经安装了 Containerd"
   fi
 }
 
@@ -262,7 +262,7 @@ install_runtime() {
         bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
         break
       else
-        echo_content red "自1.24版起，Dockershim已从Kubernetes项目中移除，详情：https://kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/"
+        echo_content red "自1.24版起，Dockershim 已从 Kubernetes 项目中移除，详情：https://kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/"
       fi
       ;;
     *)
@@ -547,7 +547,7 @@ EOF
   k8s_bash_completion
 }
 
-# 安装k8s
+# 安装 k8s
 k8s_install() {
   if [[ ! $(command -v kubeadm) ]]; then
     echo_content green "---> 安装k8s"
@@ -585,7 +585,7 @@ k8s_install() {
     [[ -z "${host_name}" ]] && host_name="k8s-master"
     set_hostname ${host_name}
 
-    while read -r -p "请输入K8s版本(1/latest 2/1.23.17 默认:1/latest): " k8sVersionNum; do
+    while read -r -p "请输入 K8s 版本(1/latest 2/1.23.17 默认:1/latest): " k8sVersionNum; do
       if [[ -z "${k8sVersionNum}" || ${k8sVersionNum} == 1 ]]; then
         k8s_version=""
         break
@@ -680,17 +680,17 @@ EOF
     systemctl enable --now kubelet
 
     if [[ $(command -v kubeadm) ]]; then
-      echo_content skyBlue "---> k8s安装完成"
+      echo_content skyBlue "---> k8s 安装完成"
     else
-      echo_content red "---> k8s安装失败"
+      echo_content red "---> k8s 安装失败"
       exit 1
     fi
   else
-    echo_content skyBlue "---> 你已经安装了k8s"
+    echo_content skyBlue "---> 你已经安装了 k8s"
   fi
 }
 
-# 运行k8s
+# 运行 k8s
 k8s_run() {
   if [[ $(command -v kubeadm) ]]; then
     is_master=$(get_config_val is_master)
@@ -714,10 +714,10 @@ k8s_run() {
         mkdir -p "$HOME"/.kube
         cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
         chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
-        echo_content skyBlue "---> k8s运行完成"
+        echo_content skyBlue "---> k8s 运行完成"
         k8s_network_install
       else
-        echo_content red "---> k8s运行失败"
+        echo_content red "---> k8s 运行失败"
         exit 1
       fi
     elif [[ "${is_master}" == "0" ]]; then
@@ -726,14 +726,14 @@ k8s_run() {
       )"
     fi
   else
-    echo_content skyBlue "---> 请先安装K8s"
+    echo_content skyBlue "---> 请先安装 K8s"
   fi
 }
 
-# 重设K8s
+# 重设 K8s
 k8s_reset() {
   if [[ $(command -v kubeadm) ]]; then
-    echo_content green "---> 重设K8s"
+    echo_content green "---> 重设 K8s"
 
     kubeadm reset -f
     rm -rf /etc/cni /etc/kubernetes /var/lib/dockershim /var/lib/etcd /var/lib/kubelet /var/run/kubernetes "$HOME"/.kube
@@ -748,9 +748,9 @@ k8s_reset() {
       systemctl restart containerd
     fi
 
-    echo_content skyBlue "---> 重设K8s完成"
+    echo_content skyBlue "---> 重设 K8s 完成"
   else
-    echo_content skyBlue "---> 请先安装K8s"
+    echo_content skyBlue "---> 请先安装 K8s"
   fi
 }
 
