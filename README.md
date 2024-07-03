@@ -1,4 +1,4 @@
-[中文](README_ZH.md)
+[简体中文](README_ZH.md)
 
 # Install Script
 

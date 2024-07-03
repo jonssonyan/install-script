@@ -768,10 +768,10 @@ main() {
   echo_content skyBlue "Author: jonssonyan <https://jonssonyan.com>"
   echo_content skyBlue "Github: https://github.com/jonssonyan/install-script"
   echo_content red "\n=============================================================="
-  echo_content yellow "1. 安装K8s"
-  echo_content yellow "2. 运行K8s"
+  echo_content yellow "1. 安装 K8s"
+  echo_content yellow "2. 运行 K8s"
   echo_content green "=============================================================="
-  echo_content yellow "3. 重设K8s"
+  echo_content yellow "3. 重设 K8s"
   read -r -p "请选择:" selectInstall_type
   case ${selectInstall_type} in
   1)
