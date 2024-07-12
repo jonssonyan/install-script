@@ -73,19 +73,52 @@ check_sys() {
 
   if [[ -n $(find /etc -name "redhat-release") ]] || grep </proc/version -q -i "centos"; then
     release="centos"
+    version=$(rpm -q --queryformat '%{VERSION}' centos-release)
   elif grep </etc/issue -q -i "debian" && [[ -f "/etc/issue" ]] || grep </etc/issue -q -i "debian" && [[ -f "/proc/version" ]]; then
     release="debian"
+    version=$(cat /etc/debian_version)
   elif grep </etc/issue -q -i "ubuntu" && [[ -f "/etc/issue" ]] || grep </etc/issue -q -i "ubuntu" && [[ -f "/proc/version" ]]; then
     release="ubuntu"
+    version=$(lsb_release -sr)
   fi
 
-  if [[ -z "${release}" ]]; then
-    echo_content red "Only supports CentOS 7+/Ubuntu 18+/Debian 10+"
+  major_version=$(echo "${version}" | cut -d. -f1)
+
+  case $release in
+  centos)
+    if [[ $major_version -ge 6 ]]; then
+      echo_content green "Supported CentOS version detected: $version"
+    else
+      echo_content red "Unsupported CentOS version: $version. Only supports CentOS 6+."
+      exit 1
+    fi
+    ;;
+  ubuntu)
+    if [[ $major_version -ge 16 ]]; then
+      echo_content green "Supported Ubuntu version detected: $version"
+    else
+      echo_content red "Unsupported Ubuntu version: $version. Only supports Ubuntu 16+."
+      exit 1
+    fi
+    ;;
+  debian)
+    if [[ $major_version -ge 8 ]]; then
+      echo_content green "Supported Debian version detected: $version"
+    else
+      echo_content red "Unsupported Debian version: $version. Only supports Debian 8+."
+      exit 1
+    fi
+    ;;
+  *)
+    echo_content red "Only supports CentOS 6+/Ubuntu 16+/Debian 8+"
     exit 1
-  fi
+    ;;
+  esac
 
-  if [[ $(arch) =~ ("x86_64"|"amd64"|"arm64"|"aarch64") ]]; then
-    get_arch=$(arch)
+  if [[ $(arch) =~ ("x86_64"|"amd64") ]]; then
+    get_arch="amd64"
+  elif [[ $(arch) =~ ("aarch64"|"arm64") ]]; then
+    get_arch="arm64"
   fi
 
   if [[ -z "${get_arch}" ]]; then
@@ -116,7 +149,11 @@ install_prepare() {
   # 同步时间
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
   systemctl restart rsyslog
-  systemctl restart crond
+  if [[ "${release}" == "centos" ]]; then
+    systemctl restart crond
+  elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
+    systemctl restart cron
+  fi
 
   echo_content skyBlue "---> 环境准备完成"
 }
