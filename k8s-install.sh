@@ -2,18 +2,14 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-# System Required: CentOS 7+/Ubuntu 18+/Debian 10+
-# Version: v0.0.1
-# Description: One click install K8s
-# Author: jonssonyan <https://jonssonyan.com>
-# Github: https://github.com/jonssonyan/install-script
-
 init_var() {
   ECHO_TYPE="echo -e"
 
   package_manager=""
   release=""
+  version=""
   get_arch=""
+
   can_google=0
 
   host_name="k8s-master"
@@ -116,19 +112,52 @@ check_sys() {
 
   if [[ -n $(find /etc -name "redhat-release") ]] || grep </proc/version -q -i "centos"; then
     release="centos"
+    version=$(rpm -q --queryformat '%{VERSION}' centos-release)
   elif grep </etc/issue -q -i "debian" && [[ -f "/etc/issue" ]] || grep </etc/issue -q -i "debian" && [[ -f "/proc/version" ]]; then
     release="debian"
+    version=$(cat /etc/debian_version)
   elif grep </etc/issue -q -i "ubuntu" && [[ -f "/etc/issue" ]] || grep </etc/issue -q -i "ubuntu" && [[ -f "/proc/version" ]]; then
     release="ubuntu"
+    version=$(lsb_release -sr)
   fi
 
-  if [[ -z "${release}" ]]; then
-    echo_content red "Only supports CentOS 7+/Ubuntu 18+/Debian 10+"
+  major_version=$(echo "${version}" | cut -d. -f1)
+
+  case $release in
+  centos)
+    if [[ $major_version -ge 6 ]]; then
+      echo_content green "Supported CentOS version detected: $version"
+    else
+      echo_content red "Unsupported CentOS version: $version. Only supports CentOS 6+."
+      exit 1
+    fi
+    ;;
+  ubuntu)
+    if [[ $major_version -ge 16 ]]; then
+      echo_content green "Supported Ubuntu version detected: $version"
+    else
+      echo_content red "Unsupported Ubuntu version: $version. Only supports Ubuntu 16+."
+      exit 1
+    fi
+    ;;
+  debian)
+    if [[ $major_version -ge 8 ]]; then
+      echo_content green "Supported Debian version detected: $version"
+    else
+      echo_content red "Unsupported Debian version: $version. Only supports Debian 8+."
+      exit 1
+    fi
+    ;;
+  *)
+    echo_content red "Only supports CentOS 6+/Ubuntu 16+/Debian 8+"
     exit 1
-  fi
+    ;;
+  esac
 
-  if [[ $(arch) =~ ("x86_64"|"amd64"|"arm64"|"aarch64") ]]; then
-    get_arch=$(arch)
+  if [[ $(arch) =~ ("x86_64"|"amd64") ]]; then
+    get_arch="amd64"
+  elif [[ $(arch) =~ ("aarch64"|"arm64") ]]; then
+    get_arch="arm64"
   fi
 
   if [[ -z "${get_arch}" ]]; then
@@ -162,15 +191,23 @@ install_depend() {
 install_prepare() {
   # 同步时间
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
-  systemctl restart rsyslog
-  systemctl restart crond
 
-  # 关闭防火墙
-  if [[ "${release}" == "centos" ]]; then
-    systemctl disable firewalld.service && systemctl stop firewalld.service
-  elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
-    ufw disable
+  if service_exists "rsyslog"; then
+    systemctl restart rsyslog
   fi
+
+  case "${release}" in
+  centos)
+    if service_exists "crond"; then
+      systemctl restart crond
+    fi
+    ;;
+  debian | ubuntu)
+    if service_exists "cron"; then
+      systemctl restart cron
+    fi
+    ;;
+  esac
 }
 
 setup_containerd() {
@@ -191,7 +228,7 @@ setup_containerd() {
   systemctl daemon-reload
 }
 
-# 安装Containerd
+# 安装 Containerd
 install_containerd() {
   if [[ ! $(command -v containerd) ]]; then
     echo_content green "---> 安装 Containerd"
@@ -275,7 +312,7 @@ install_runtime() {
   cho_content skyBlue "---> 运行时安装完成"
 }
 
-# k8s命令行补全
+# k8s 命令行补全
 k8s_bash_completion() {
   ! grep -q bash_completion "$HOME/.bashrc" && echo "source /usr/share/bash-completion/bash_completion" >>"$HOME/.bashrc"
   if [[ $(command -v kubectl) ]]; then
@@ -761,9 +798,8 @@ main() {
   install_depend
   clear
   echo_content red "\n=============================================================="
-  echo_content skyBlue "System Required: CentOS 7+/Ubuntu 18+/Debian 10+"
-  echo_content skyBlue "Version: v0.0.1"
-  echo_content skyBlue "Description: One click install K8s"
+  echo_content skyBlue "Recommended OS: CentOS 8+/Ubuntu 20+/Debian 11+"
+  echo_content skyBlue "Description: Install K8s"
   echo_content skyBlue "Author: jonssonyan <https://jonssonyan.com>"
   echo_content skyBlue "Github: https://github.com/jonssonyan/install-script"
   echo_content red "\n=============================================================="
@@ -771,8 +807,8 @@ main() {
   echo_content yellow "2. 运行 K8s"
   echo_content green "=============================================================="
   echo_content yellow "3. 重设 K8s"
-  read -r -p "请选择:" selectInstall_type
-  case ${selectInstall_type} in
+  read -r -p "Please choose:" input_option
+  case ${input_option} in
   1)
     install_prepare
     k8s_install
@@ -784,7 +820,7 @@ main() {
     k8s_reset
     ;;
   *)
-    echo_content red "没有这个选项"
+    echo_content red "No such option"
     ;;
   esac
 }

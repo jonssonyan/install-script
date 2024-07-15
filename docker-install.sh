@@ -136,7 +136,6 @@ install_depend() {
     curl \
     wget \
     systemd \
-    nftables \
     lrzsz
 }
 
