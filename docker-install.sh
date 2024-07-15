@@ -2,17 +2,12 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-# System Required: CentOS 7+/Ubuntu 18+/Debian 10+
-# Version: v0.0.1
-# Description: One click install Docker based Services
-# Author: jonssonyan <https://jonssonyan.com>
-# Github: https://github.com/jonssonyan/install-script
-
 init_var() {
   ECHO_TYPE="echo -e"
 
   package_manager=""
   release=""
+  version=""
   get_arch=""
 
   JY_DATA="/jydata/"
@@ -50,6 +45,10 @@ mkdir_tools() {
   mkdir -p ${JY_DATA}
 }
 
+service_exists() {
+  systemctl list-units --type=service --all | grep -Fq "$1.service"
+}
+
 # 检查系统
 check_sys() {
   if [[ $(id -u) != "0" ]]; then
@@ -74,19 +73,52 @@ check_sys() {
 
   if [[ -n $(find /etc -name "redhat-release") ]] || grep </proc/version -q -i "centos"; then
     release="centos"
+    version=$(rpm -q --queryformat '%{VERSION}' centos-release)
   elif grep </etc/issue -q -i "debian" && [[ -f "/etc/issue" ]] || grep </etc/issue -q -i "debian" && [[ -f "/proc/version" ]]; then
     release="debian"
+    version=$(cat /etc/debian_version)
   elif grep </etc/issue -q -i "ubuntu" && [[ -f "/etc/issue" ]] || grep </etc/issue -q -i "ubuntu" && [[ -f "/proc/version" ]]; then
     release="ubuntu"
+    version=$(lsb_release -sr)
   fi
 
-  if [[ -z "${release}" ]]; then
-    echo_content red "Only supports CentOS 7+/Ubuntu 18+/Debian 10+"
+  major_version=$(echo "${version}" | cut -d. -f1)
+
+  case $release in
+  centos)
+    if [[ $major_version -ge 6 ]]; then
+      echo_content green "Supported CentOS version detected: $version"
+    else
+      echo_content red "Unsupported CentOS version: $version. Only supports CentOS 6+."
+      exit 1
+    fi
+    ;;
+  ubuntu)
+    if [[ $major_version -ge 16 ]]; then
+      echo_content green "Supported Ubuntu version detected: $version"
+    else
+      echo_content red "Unsupported Ubuntu version: $version. Only supports Ubuntu 16+."
+      exit 1
+    fi
+    ;;
+  debian)
+    if [[ $major_version -ge 8 ]]; then
+      echo_content green "Supported Debian version detected: $version"
+    else
+      echo_content red "Unsupported Debian version: $version. Only supports Debian 8+."
+      exit 1
+    fi
+    ;;
+  *)
+    echo_content red "Only supports CentOS 6+/Ubuntu 16+/Debian 8+"
     exit 1
-  fi
+    ;;
+  esac
 
-  if [[ $(arch) =~ ("x86_64"|"amd64"|"arm64"|"aarch64") ]]; then
-    get_arch=$(arch)
+  if [[ $(arch) =~ ("x86_64"|"amd64") ]]; then
+    get_arch="amd64"
+  elif [[ $(arch) =~ ("aarch64"|"arm64") ]]; then
+    get_arch="arm64"
   fi
 
   if [[ -z "${get_arch}" ]]; then
@@ -104,20 +136,31 @@ install_depend() {
     curl \
     wget \
     systemd \
-    lrzsz \
-    jq
+    nftables \
+    lrzsz
 }
 
 # 环境准备
 install_prepare() {
-  echo_content green "---> Prepare the environment"
-
   # 同步时间
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
-  systemctl restart rsyslog
-  systemctl restart crond
 
-  echo_content skyBlue "---> Environment preparation is complete"
+  if service_exists "rsyslog"; then
+    systemctl restart rsyslog
+  fi
+
+  case "${release}" in
+  centos)
+    if service_exists "crond"; then
+      systemctl restart crond
+    fi
+    ;;
+  debian | ubuntu)
+    if service_exists "cron"; then
+      systemctl restart cron
+    fi
+    ;;
+  esac
 }
 
 install_docker() {
@@ -185,14 +228,13 @@ main() {
   install_prepare
   clear
   echo_content red "\n=============================================================="
-  echo_content skyBlue "System Required: CentOS 7+/Ubuntu 18+/Debian 10+"
-  echo_content skyBlue "Version: v0.0.1"
-  echo_content skyBlue "Description: One click install Docker based Services"
+  echo_content skyBlue "Recommended OS: CentOS 8+/Ubuntu 20+/Debian 11+"
+  echo_content skyBlue "Description: Install Docker based Services"
   echo_content skyBlue "Author: jonssonyan <https://jonssonyan.com>"
   echo_content skyBlue "Github: https://github.com/jonssonyan/install-script"
   echo_content red "\n=============================================================="
   echo_content yellow "1. Install Docker"
-  echo_content yellow "2. Install buildx cross compiler"
+  echo_content yellow "2. Install Docker buildx"
   echo_content yellow "3. Uninstall Docker"
   echo_content green "=============================================================="
   echo_content yellow "4. Install MySQL 5.7.38"
@@ -206,8 +248,8 @@ main() {
   echo_content yellow "12. Install GitLab"
   echo_content yellow "13. Install SkyWalking OAP"
   echo_content yellow "14. Install SkyWalking UI"
-  read -r -p "Please choose:" selectInstall_type
-  case ${selectInstall_type} in
+  read -r -p "Please choose:" input_option
+  case ${input_option} in
   1)
     install_docker
     ;;
