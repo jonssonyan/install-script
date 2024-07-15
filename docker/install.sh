@@ -212,14 +212,6 @@ install_docker() {
     done
 
     if [[ "${release}" == "centos" ]]; then
-      ${package_manager} remove docker \
-        docker-client \
-        docker-client-latest \
-        docker-common \
-        docker-latest \
-        docker-latest-logrotate \
-        docker-logrotate \
-        docker-engine
       ${package_manager} install -y yum-utils
       if [[ ${can_google} == 0 ]]; then
         ${package_manager}-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
@@ -228,7 +220,6 @@ install_docker() {
       fi
       ${package_manager} makecache || ${package_manager} makecache fast
     elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
-      ${package_manager} remove docker docker-engine docker.io containerd runc
       ${package_manager} update -y
       ${package_manager} install -y \
         ca-certificates \
