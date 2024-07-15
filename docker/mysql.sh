@@ -48,7 +48,7 @@ install_docker() {
 
 install_mysql() {
   if [[ -z $(docker ps -q -f "name=^${mysql_ip}$") ]]; then
-    echo_content green "---> 安装MySQL"
+    echo_content green "---> 安装 MySQL"
 
     read -r -p "请输入数据库的端口(默认:9507): " mysql_port
     [[ -z "${mysql_port}" ]] && mysql_port=9507
@@ -89,17 +89,17 @@ install_mysql() {
     fi
 
     if [[ -n $(docker ps -q -f "name=^${mysql_ip}$") ]]; then
-      echo_content skyBlue "---> MySQL安装完成"
-      echo_content yellow "---> MySQL root的数据库密码(请妥善保存): ${mysql_pas}"
+      echo_content skyBlue "---> MySQL 安装完成"
+      echo_content yellow "---> MySQL root 的数据库密码(请妥善保存): ${mysql_pas}"
       if [[ "${mysql_user}" != "root" ]]; then
         echo_content yellow "---> MySQL ${mysql_user}的数据库密码(请妥善保存): ${mysql_pas}"
       fi
     else
-      echo_content red "---> MySQL安装失败或运行异常,请尝试修复或卸载重装"
+      echo_content red "---> MySQL 安装失败或运行异常,请尝试修复或卸载重装"
       exit 1
     fi
   else
-    echo_content skyBlue "---> 你已经安装了MySQL"
+    echo_content skyBlue "---> 你已经安装了 MySQL"
   fi
 }
 
