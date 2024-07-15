@@ -49,11 +49,11 @@ install_docker() {
 
 install_redis() {
   if [[ -z $(docker ps -q -f "name=^${redis_ip}$") ]]; then
-    echo_content green "---> 安装Redis"
+    echo_content green "---> 安装 Redis"
 
-    read -r -p "请输入Redis的端口(默认:6378): " redis_port
+    read -r -p "请输入 Redis 的端口(默认:6378): " redis_port
     [[ -z "${redis_port}" ]] && redis_port=6378
-    while read -r -p "请输入Redis的密码(必填): " redis_pass; do
+    while read -r -p "请输入 Redis 的密码(必填): " redis_pass; do
       if [[ -z "${redis_pass}" ]]; then
         echo_content red "密码不能为空"
       else
@@ -70,14 +70,14 @@ install_redis() {
         redis-server --requirepass "${redis_pass}" --port "${redis_port}"
 
     if [[ -n $(docker ps -q -f "name=^${redis_ip}$") ]]; then
-      echo_content skyBlue "---> Redis安装完成"
-      echo_content yellow "---> Redis的数据库密码(请妥善保存): ${redis_pass}"
+      echo_content skyBlue "---> Redis 安装完成"
+      echo_content yellow "---> Redis 的数据库密码(请妥善保存): ${redis_pass}"
     else
-      echo_content red "---> Redis安装失败或运行异常,请尝试修复或卸载重装"
+      echo_content red "---> Redis 安装失败或运行异常,请尝试修复或卸载重装"
       exit 1
     fi
   else
-    echo_content skyBlue "---> 你已经安装了Redis"
+    echo_content skyBlue "---> 你已经安装了 Redis"
   fi
 }
 
