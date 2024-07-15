@@ -7,7 +7,9 @@ init_var() {
 
   package_manager=""
   release=""
+  version=""
   get_arch=""
+
   can_google=0
 
   # Docker
@@ -47,6 +49,10 @@ can_connect() {
   else
     return 1
   fi
+}
+
+service_exists() {
+  systemctl list-units --type=service --all | grep -Fq "$1.service"
 }
 
 # 检查系统
@@ -138,24 +144,30 @@ install_depend() {
     curl \
     wget \
     systemd \
-    lrzsz \
-    jq
+    lrzsz
 }
 
 # 环境准备
 install_prepare() {
-  echo_content green "---> 环境准备"
-
   # 同步时间
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
-  systemctl restart rsyslog
-  if [[ "${release}" == "centos" ]]; then
-    systemctl restart crond
-  elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
-    systemctl restart cron
+
+  if service_exists "rsyslog"; then
+    systemctl restart rsyslog
   fi
 
-  echo_content skyBlue "---> 环境准备完成"
+  case "${release}" in
+  centos)
+    if service_exists "crond"; then
+      systemctl restart crond
+    fi
+    ;;
+  debian | ubuntu)
+    if service_exists "cron"; then
+      systemctl restart cron
+    fi
+    ;;
+  esac
 }
 
 setup_docker() {
@@ -185,9 +197,9 @@ EOF
 
 install_docker() {
   if [[ ! $(command -v docker) ]]; then
-    echo_content green "---> 安装Docker"
+    echo_content green "---> 安装 Docker"
 
-    while read -r -p "请输入Docker版本(1/latest 2/25.0.5 默认:1): " dockerVersionNum; do
+    while read -r -p "请输入 Docker 版本(1/latest 2/25.0.5 默认:1): " dockerVersionNum; do
       if [[ -z "${dockerVersionNum}" || ${dockerVersionNum} == 1 ]]; then
         docker_version="latest"
         break
@@ -253,13 +265,13 @@ install_docker() {
     systemctl enable docker && systemctl restart docker
 
     if [[ $(command -v docker) ]]; then
-      echo_content skyBlue "---> Docker安装完成"
+      echo_content skyBlue "---> Docker 安装完成"
     else
-      echo_content red "---> Docker安装失败"
+      echo_content red "---> Docker 安装失败"
       exit 1
     fi
   else
-    echo_content skyBlue "---> 你已经安装了Docker"
+    echo_content skyBlue "---> 你已经安装了 Docker"
   fi
 }
 
