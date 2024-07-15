@@ -40,7 +40,7 @@ install_docker() {
   bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
 }
 
-# 安装buildx交叉编译
+# 安装 buildx 交叉编译
 install_buildx() {
   docker buildx inspect --bootstrap | grep -q "mybuilder"
   if [[ "$?" != "0" ]]; then
