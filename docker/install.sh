@@ -14,7 +14,7 @@ init_var() {
 
   # Docker
   docker_version="latest"
-  docker_mirror='"https://hub-mirror.c.163.com","https://ccr.ccs.tencentyun.com","https://dockerproxy.com"'
+  docker_mirror='"https://docker.jonssonyan.com"'
 }
 
 echo_content() {
