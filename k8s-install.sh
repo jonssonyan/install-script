@@ -241,7 +241,6 @@ install_containerd() {
         ${package_manager}-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
       fi
       ${package_manager} makecache || ${package_manager} makecache fast
-      ${package_manager} install -y containerd.io
     elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
       ${package_manager} update -y
       ${package_manager} install -y \
@@ -262,8 +261,9 @@ install_containerd() {
               $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
       fi
       ${package_manager} update -y
-      ${package_manager} install -y containerd.io
     fi
+
+    ${package_manager} install -y containerd.io
 
     setup_containerd
 
