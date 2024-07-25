@@ -18,7 +18,7 @@ CPU Architecture: x86_64/amd64 arm64/aarch64
 - Docker version: 25.0.5/latest
 
 ```bash
-bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/k8s-install.sh)
+bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/k8s-install.sh)
 ```
 
 ## install Docker based Services
@@ -28,7 +28,7 @@ bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/k8s-inst
 - Docker version: 25.0.5/latest
 
 ```bash
-bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker-install.sh)
+bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker-install.sh)
 ```
 
 ## Other

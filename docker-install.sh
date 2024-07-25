@@ -163,59 +163,59 @@ install_prepare() {
 }
 
 install_docker() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
+  bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker/install.sh)
 }
 
 install_buildx() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/buildx.sh)
+  bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker/buildx.sh)
 }
 
 uninstall_docker() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/uninstall.sh)
+  bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker/uninstall.sh)
 }
 
 install_mysql() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/mysql.sh)
+  bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker/mysql.sh)
 }
 
 install_redis() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/redis.sh)
+  bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker/redis.sh)
 }
 
 install_es() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/es.sh)
+  bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker/es.sh)
 }
 
 install_kibana() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/kibana.sh)
+  bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker/kibana.sh)
 }
 
 install_minio() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/minio.sh)
+  bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker/minio.sh)
 }
 
 install_nacos() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/nacos.sh)
+  bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker/nacos.sh)
 }
 
 install_ssr() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/ssr.sh)
+  bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker/ssr.sh)
 }
 
 install_nexus3() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/nexus3.sh)
+  bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker/nexus3.sh)
 }
 
 install_gitlab() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/gitlab.sh)
+  bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker/gitlab.sh)
 }
 
 install_skywalking_oap() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/skywalking-oap.sh)
+  bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker/skywalking-oap.sh)
 }
 
 install_skywalking_ui() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/skywalking-ui.sh)
+  bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker/skywalking-ui.sh)
 }
 
 main() {
