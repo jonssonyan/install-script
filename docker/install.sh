@@ -13,7 +13,6 @@ init_var() {
   can_google=0
 
   # Docker
-  docker_version="latest"
   docker_mirror='"https://docker.jonssonyan.com"'
 }
 
@@ -199,18 +198,6 @@ install_docker() {
   if [[ ! $(command -v docker) ]]; then
     echo_content green "---> 安装 Docker"
 
-    while read -r -p "请输入 Docker 版本(1/latest 2/25.0.5 默认:1): " dockerVersionNum; do
-      if [[ -z "${dockerVersionNum}" || ${dockerVersionNum} == 1 ]]; then
-        docker_version="latest"
-        break
-      elif [[ ${dockerVersionNum} == 2 ]]; then
-        docker_version="25.0.5"
-        break
-      else
-        echo_content red "不可以输入除1和2之外的其他字符"
-      fi
-    done
-
     if [[ "${release}" == "centos" ]]; then
 #      ${package_manager} remove docker \
 #        docker-client \
@@ -250,15 +237,7 @@ install_docker() {
       ${package_manager} update -y
     fi
 
-    if [[ "${docker_version}" == "latest" ]]; then
-      ${package_manager} install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-    else
-      if [[ ${package_manager} == "yum" || ${package_manager} == "dnf" ]]; then
-        ${package_manager} install -y docker-ce-"${docker_version}" docker-ce-cli-"${docker_version}" containerd.io docker-compose-plugin
-      elif [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
-        ${package_manager} install -y docker-ce=5:"${docker_version}"~3-0~${release}-"$(lsb_release -c --short)" docker-ce-cli=5:"${docker_version}"~3-0~${release}-"$(lsb_release -c --short)" containerd.io docker-compose-plugin
-      fi
-    fi
+    ${package_manager} install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
     setup_docker
 
