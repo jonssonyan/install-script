@@ -295,7 +295,7 @@ install_runtime() {
       # 自 1.24 版起，Dockershim 已从 Kubernetes 项目中移除
       if version_lt "${k8s_version}" "1.24.0"; then
         k8s_cri_sock="/var/run/dockershim.sock"
-        bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker/install.sh)
+        bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
         break
       else
         echo_content red "自1.24版起，Dockershim 已从 Kubernetes 项目中移除，详情：https://kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/"
