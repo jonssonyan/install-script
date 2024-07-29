@@ -18,7 +18,7 @@ CPU: x86_64/amd64 arm64/aarch64
 - Docker版本: 25.0.5/latest
 
 ```bash
-bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/k8s-install.sh)
+bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/k8s-install.sh)
 ```
 
 ## 安装Docker
@@ -28,7 +28,7 @@ bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/ma
 - Docker版本: 25.0.5/latest
 
 ```bash
-bash <(curl -fsSL https://github.jonssonyan.com/jonssonyan/install-script/raw/main/docker-install.sh)
+bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker-install.sh)
 ```
 
 ## 其他

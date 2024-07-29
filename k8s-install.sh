@@ -31,7 +31,7 @@ init_var() {
   # calico_url="https://docs.projectcalico.org/manifests/calico.yaml"
 
   # Docker
-  docker_mirror='"https://docker.jonssonyan.com"'
+  docker_mirror='"https://docker.m.daocloud.io","https://atomhub.openatom.cn"'
 }
 
 echo_content() {
