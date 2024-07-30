@@ -88,6 +88,10 @@ get_config_val() {
 # 比较版本大小
 version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
 
+service_exists() {
+  systemctl list-units --type=service --all | grep -Fq "$1.service"
+}
+
 # 检查系统
 check_sys() {
   if [[ $(id -u) != "0" ]]; then
