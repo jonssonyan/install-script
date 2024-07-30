@@ -666,10 +666,12 @@ net.ipv4.ip_forward=1
 EOF
     sysctl --system
 
-    # https://developer.aliyun.com/mirror/kubernetes
-    if [[ "${release}" == "centos" ]]; then
-      if [[ ${can_google} == 0 ]]; then
-        cat >/etc/yum.repos.d/kubernetes.repo <<EOF
+    # https://developer.aliyun.com/mirror/kubernete
+    # k8s version >= v1.24.0软件包仓库变更
+    if version_lt "${k8s_version}" "1.24.0"; then
+      if [[ "${release}" == "centos" ]]; then
+        if [[ ${can_google} == 0 ]]; then
+          cat >/etc/yum.repos.d/kubernetes.repo <<EOF
 [kubernetes]
 name=Kubernetes
 baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-$(arch)/
@@ -678,8 +680,8 @@ gpgcheck=0
 repo_gpgcheck=0
 gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
-      else
-        cat >/etc/yum.repos.d/kubernetes.repo <<EOF
+        else
+          cat >/etc/yum.repos.d/kubernetes.repo <<EOF
 [kubernetes]
 name=Kubernetes
 baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$(arch)
@@ -688,21 +690,25 @@ gpgcheck=0
 repo_gpgcheck=0
 gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOF
-      fi
-    elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
-      ${package_manager} install -y apt-transport-https ca-certificates
-      if [[ ${can_google} == 0 ]]; then
-        curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg
-        cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
+        fi
+      elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
+        ${package_manager} install -y apt-transport-https ca-certificates
+        if [[ ${can_google} == 0 ]]; then
+          curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg
+          cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
 deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
 EOF
-      else
-        curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
+        else
+          curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+          cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
 deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
+        fi
+        ${package_manager} update -y
       fi
-      ${package_manager} update -y
+    else
+      echo_content red "k8s version >= v1.24.0"
+      exit 1
     fi
 
     if [[ -z "${k8s_version}" ]]; then
