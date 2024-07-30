@@ -313,7 +313,7 @@ install_runtime() {
 
   echo "k8s_cri_sock=${k8s_cri_sock}" >>${k8s_lock_file}
 
-  cho_content skyBlue "---> 运行时安装完成"
+  echo_content skyBlue "---> 运行时安装完成"
 }
 
 # k8s 命令行补全
