@@ -22,6 +22,7 @@ init_var() {
   k8s_lock_file="/k8sdata/k8s.lock"
 
   k8s_version=""
+  k8s_versions="1.23.17 1.24 1.25 1.26 1.27 1.28 1.29 1.30"
   is_master=1
   k8s_cri_sock="unix:///var/run/containerd/containerd.sock"
   network="flannel"
