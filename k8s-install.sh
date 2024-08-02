@@ -683,9 +683,6 @@ k8s_install() {
     done
     echo "k8s_version=${k8s_version}" >>${k8s_lock_file}
 
-    # 安装运行时
-    install_runtime
-
     # 关闭selinux
     if [ -s /etc/selinux/config ] && grep 'SELINUX=enforcing' /etc/selinux/config; then
       setenforce 0 && sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
@@ -708,6 +705,9 @@ net.bridge.bridge-nf-call-ip6tables=1
 net.ipv4.ip_forward=1
 EOF
     sysctl --system
+
+    # 安装运行时
+    install_runtime
 
     if version_lt "${k8s_version}" "1.24"; then
       k8s_lt_1_24
