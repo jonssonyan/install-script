@@ -626,17 +626,12 @@ k8s_install() {
     [[ -z "${host_name}" ]] && host_name="k8s-master"
     set_hostname ${host_name}
 
-    while read -r -p "请输入 K8s 版本(1/latest 2/1.23.17 默认:1/latest): " k8sVersionNum; do
-      if [[ -z "${k8sVersionNum}" || ${k8sVersionNum} == 1 ]]; then
-        k8s_version=""
+    while read -r -p "请输入 K8s 版本(1.23.17,1.24-1.30 默认:1.30): " k8s_version; do
+      [[ -z "${k8s_version}" ]] && k8s_version="1.30"
+      if echo "${k8s_versions}" | grep -w -q "${k8s_version}"; then
         break
       else
-        if [[ ${k8sVersionNum} != 2 ]]; then
-          echo_content red "不可以输入除1和2之外的其他字符"
-        else
-          k8s_version="1.23.17"
-          break
-        fi
+        echo_content red "不支持 ${k8s_version}"
       fi
     done
     echo "k8s_version=${k8s_version}" >>${k8s_lock_file}
