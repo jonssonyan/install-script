@@ -707,7 +707,7 @@ EOF
       if [[ ${package_manager} == "yum" || ${package_manager} == "dnf" ]]; then
         ${package_manager} install -y kubelet-"${k8s_version}" kubeadm-"${k8s_version}" kubectl-"${k8s_version}" --disableexcludes=kubernetes
       elif [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
-        ${package_manager} install -y kubelet="${k8s_version}" kubeadm="${k8s_version}" kubectl="${k8s_version}"
+        ${package_manager} install -y kubelet="${k8s_version}" kubeadm="${k8s_version}" kubectl="${k8s_version}" --disableexcludes=kubernetes
       fi
     fi
 
