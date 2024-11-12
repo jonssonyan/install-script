@@ -189,7 +189,8 @@ install_depend() {
     wget \
     systemd \
     lrzsz \
-    bash-completion
+    bash-completion \
+    gpg
 }
 
 # 环境准备
@@ -643,17 +644,27 @@ gpgcheck=1
 gpgkey=https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_version}/rpm/repodata/repomd.xml.key
 EOF
     else
-
+      cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://pkgs.k8s.io/core:/stable:/v${k8s_version}/rpm/
+enabled=1
+gpgcheck=1
+gpgkey=https://pkgs.k8s.io/core:/stable:/v${k8s_version}/rpm/repodata/repomd.xml.key
+exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
+EOF
     fi
   elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
     ${package_manager} install -y apt-transport-https ca-certificates
     if [[ ${can_google} == 0 ]]; then
-      curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_version}/deb/Release.key |
+      curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v"${k8s_version}"/deb/Release.key |
         gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
       echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_version}/deb/ /" |
         tee /etc/apt/sources.list.d/kubernetes.list
     else
-
+      mkdir -p -m 755 /etc/apt/keyrings
+      curl -fsSL https://pkgs.k8s.io/core:/stable:/v"${k8s_version}"/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+      echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v${k8s_version}/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
     fi
     ${package_manager} update -y
   fi
