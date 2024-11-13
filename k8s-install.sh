@@ -22,7 +22,7 @@ init_var() {
   k8s_lock_file="/k8sdata/k8s.lock"
 
   k8s_version=""
-  k8s_versions="1.23.17 1.24 1.25 1.26 1.27 1.28 1.29 1.30"
+  k8s_versions="1.23.17 1.24 1.25 1.26 1.27 1.28 1.29 1.30 1.31"
   is_master=1
   k8s_cri_sock="unix:///var/run/containerd/containerd.sock"
   network="flannel"
@@ -708,8 +708,8 @@ k8s_install() {
     [[ -z "${host_name}" ]] && host_name="k8s-master"
     set_hostname ${host_name}
 
-    while read -r -p "请输入 K8s 版本(1.23.17,1.24-1.30 默认:1.30): " k8s_version; do
-      [[ -z "${k8s_version}" ]] && k8s_version="1.30"
+    while read -r -p "请输入 K8s 版本(1.23.17,1.24-1.31 默认:1.30): " k8s_version; do
+      [[ -z "${k8s_version}" ]] && k8s_version="1.31"
       if echo "${k8s_versions}" | grep -w -q "${k8s_version}"; then
         break
       else
