@@ -67,7 +67,8 @@ install_postgresql() {
         -e POSTGRES_PASSWORD="${postgresql_pas}" \
         -e TZ="Asia/Shanghai" \
         -v ${POSTGRESQL_DATA}:/var/lib/postgresql/data \
-        postgres:13
+        postgres:13 \
+        -c "port=${postgresql_port}"
 
     if [[ -n $(docker ps -q -f "name=^${postgresql_ip}$") ]]; then
       echo_content skyBlue "---> PostgreSQL 安装完成"
