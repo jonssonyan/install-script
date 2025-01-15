@@ -61,7 +61,8 @@ install_postgresql() {
       docker run -d --name ${postgresql_ip} --restart always \
         --network=host \
         -e POSTGRES_PASSWORD="${postgresql_pas}" \
-        -v ${POSTGRESQL_DATA}:/var/lib/postgresql \
+        -e TZ="Asia/Shanghai" \
+        -v ${POSTGRESQL_DATA}:/var/lib/postgresql/data \
         postgres:13
 
     if [[ -n $(docker ps -q -f "name=^${postgresql_ip}$") ]]; then
