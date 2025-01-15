@@ -8,6 +8,7 @@ init_var() {
   POSTGRESQL_DATA="/jydata/postgresql/"
   postgresql_ip="jy-postgresql"
   postgresql_port=9876
+  postgresql_user="postgres"
   postgresql_pas=""
 }
 
@@ -49,6 +50,8 @@ install_postgresql() {
   if [[ -z $(docker ps -q -f "name=^${postgresql_ip}$") ]]; then
     read -r -p "请输入数据库的端口(默认:9876): " postgresql_port
     [[ -z "${postgresql_port}" ]] && postgresql_port=9876
+    read -r -p "请输入数据库的用户名(默认:postgres): " postgresql_user
+    [[ -z "${postgresql_user}" ]] && postgresql_user="postgres"
     while read -r -p "请输入数据库的密码(必填): " postgresql_pas; do
       if [[ -z "${postgresql_pas}" ]]; then
         echo_content red "密码不能为空"
@@ -60,6 +63,7 @@ install_postgresql() {
     docker pull postgres:13 &&
       docker run -d --name ${postgresql_ip} --restart always \
         --network=host \
+        -e POSTGRES_USER="${postgresql_user}" \
         -e POSTGRES_PASSWORD="${postgresql_pas}" \
         -e TZ="Asia/Shanghai" \
         -v ${POSTGRESQL_DATA}:/var/lib/postgresql/data \
