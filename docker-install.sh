@@ -179,7 +179,7 @@ install_mysql() {
 }
 
 install_postgreql() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/postgreql.sh)
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/postgresql.sh)
 }
 
 install_redis() {
