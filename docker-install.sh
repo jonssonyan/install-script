@@ -178,6 +178,10 @@ install_mysql() {
   bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/mysql.sh)
 }
 
+install_postgreql() {
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/postgreql.sh)
+}
+
 install_redis() {
   bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/redis.sh)
 }
@@ -237,16 +241,17 @@ main() {
   echo_content yellow "3. Uninstall Docker"
   echo_content green "=============================================================="
   echo_content yellow "4. Install MySQL 5.7.38"
-  echo_content yellow "5. Install Redis 6.2.13"
-  echo_content yellow "6. Install Elasticsearch 7.17.10"
-  echo_content yellow "7. Install Kibana 7.17.10"
-  echo_content yellow "8. Install Minio"
-  echo_content yellow "9. Install Nacos v2.1.2"
-  echo_content yellow "10. Install ShadowsocksR"
-  echo_content yellow "11. Install Nexus3"
-  echo_content yellow "12. Install GitLab"
-  echo_content yellow "13. Install SkyWalking OAP"
-  echo_content yellow "14. Install SkyWalking UI"
+  echo_content yellow "5. Install PostgreSQL 13"
+  echo_content yellow "6. Install Redis 6.2.13"
+  echo_content yellow "7. Install Elasticsearch 7.17.10"
+  echo_content yellow "8. Install Kibana 7.17.10"
+  echo_content yellow "9. Install Minio"
+  echo_content yellow "10. Install Nacos v2.1.2"
+  echo_content yellow "11. Install ShadowsocksR"
+  echo_content yellow "12. Install Nexus3"
+  echo_content yellow "13. Install GitLab"
+  echo_content yellow "14. Install SkyWalking OAP"
+  echo_content yellow "15. Install SkyWalking UI"
   read -r -p "Please choose:" input_option
   case ${input_option} in
   1)
@@ -264,41 +269,45 @@ main() {
     ;;
   5)
     install_docker
-    install_redis
+    install_postgreql
     ;;
   6)
     install_docker
-    install_es
+    install_redis
     ;;
   7)
     install_docker
-    install_kibana
+    install_es
     ;;
   8)
     install_docker
-    install_minio
+    install_kibana
     ;;
   9)
     install_docker
-    install_nacos
+    install_minio
     ;;
   10)
     install_docker
-    install_ssr
+    install_nacos
     ;;
   11)
     install_docker
-    install_nexus3
+    install_ssr
     ;;
   12)
     install_docker
-    install_gitlab
+    install_nexus3
     ;;
   13)
     install_docker
-    install_skywalking_oap
+    install_gitlab
     ;;
   14)
+    install_docker
+    install_skywalking_oap
+    ;;
+  15)
     install_docker
     install_skywalking_ui
     ;;
