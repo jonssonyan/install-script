@@ -222,6 +222,10 @@ install_skywalking_ui() {
   bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/skywalking-ui.sh)
 }
 
+install_rustdesk_server() {
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/rustdesk-server.sh)
+}
+
 main() {
   cd "$HOME" || exit 0
   init_var
@@ -310,6 +314,10 @@ main() {
   15)
     install_docker
     install_skywalking_ui
+    ;;
+  16)
+    install_docker
+    install_rustdesk_server
     ;;
   *)
     echo_content red "No such option"
