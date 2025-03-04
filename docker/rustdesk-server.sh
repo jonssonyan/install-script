@@ -8,7 +8,7 @@ init_var() {
   # RustDesk Server
   RUSTDESK_SERVER="/jydata/rustdesk-server/"
   # bbr
-  rustdesk_server_hbbr="jy-rustdesk-server-bbr"
+  rustdesk_server_hbbr="jy-rustdesk-server-hbbr"
   # hbbs
   rustdesk_server_hbbs="jy-rustdesk-server-hbbs"
 }
