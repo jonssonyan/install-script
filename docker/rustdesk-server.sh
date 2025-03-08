@@ -9,7 +9,7 @@ init_var() {
 
   # RustDesk Server
   RUSTDESK_SERVER="/jydata/rustdesk-server/"
-  # bbr
+  # hbbr
   rustdesk_server_hbbr="jy-rustdesk-server-hbbr"
   # hbbs
   rustdesk_server_hbbs="jy-rustdesk-server-hbbs"
@@ -52,7 +52,7 @@ install_docker() {
 
 install_rustdesk_bbr() {
   if [[ -z $(docker ps -q -f "name=^${rustdesk_server_hbbr}$") ]]; then
-    echo_content green "---> 安装 RustDesk Server bbr"
+    echo_content green "---> 安装 RustDesk Server hbbr"
 
     docker run -d --name ${rustdesk_server_hbbr} --restart always \
       --network=host \
@@ -61,7 +61,7 @@ install_rustdesk_bbr() {
       rustdesk/rustdesk-server
 
   else
-    echo_content skyBlue "---> 你已经安装了 RustDesk Server bbr"
+    echo_content skyBlue "---> 你已经安装了 RustDesk Server hbbr"
   fi
 
   if [[ -z $(docker ps -q -f "name=^${rustdesk_server_hbbr}$") ]]; then
