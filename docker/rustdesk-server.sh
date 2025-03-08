@@ -57,8 +57,8 @@ install_rustdesk_bbr() {
     docker run -d --name ${rustdesk_server_hbbr} --restart always \
       --network=host \
       -e TZ=Asia/Shanghai \
-      -v ${RUSTDESK_SERVER}data/:/root \
-      rustdesk/rustdesk-server
+      -v ${RUSTDESK_SERVER}data/:/root/ \
+      rustdesk/rustdesk-server hbbs
 
   else
     echo_content skyBlue "---> 你已经安装了 RustDesk Server hbbr"
@@ -78,8 +78,8 @@ install_rustdesk_hbbs() {
       --network=host \
       -e TZ=Asia/Shanghai \
       --depends-on hbbr \
-      -v ${RUSTDESK_SERVER}data/:/root \
-      rustdesk/rustdesk-server
+      -v ${RUSTDESK_SERVER}data/:/root/ \
+      rustdesk/rustdesk-server hbbr
 
   else
     echo_content skyBlue "---> 你已经安装了 RustDesk Server hbbs"
