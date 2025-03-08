@@ -77,7 +77,6 @@ install_rustdesk_hbbs() {
     docker run -d --name ${rustdesk_server_hbbs} --restart always \
       --network=host \
       -e TZ=Asia/Shanghai \
-      --depends-on hbbr \
       -v ${RUSTDESK_SERVER}data/:/root/ \
       rustdesk/rustdesk-server hbbs
 
