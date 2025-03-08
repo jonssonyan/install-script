@@ -9,9 +9,9 @@ init_var() {
 
   # RustDesk Server
   RUSTDESK_SERVER="/jydata/rustdesk-server/"
-  # hbbr
+  # hbbr RustDesk 中继服务器
   rustdesk_server_hbbr="jy-rustdesk-server-hbbr"
-  # hbbs
+  # hbbs RustDesk ID注册服务器
   rustdesk_server_hbbs="jy-rustdesk-server-hbbs"
 }
 
