@@ -58,7 +58,7 @@ install_rustdesk_bbr() {
       --network=host \
       -e TZ=Asia/Shanghai \
       -v ${RUSTDESK_SERVER}data/:/root/ \
-      rustdesk/rustdesk-server hbbs
+      rustdesk/rustdesk-server hbbr
 
   else
     echo_content skyBlue "---> 你已经安装了 RustDesk Server hbbr"
@@ -79,7 +79,7 @@ install_rustdesk_hbbs() {
       -e TZ=Asia/Shanghai \
       --depends-on hbbr \
       -v ${RUSTDESK_SERVER}data/:/root/ \
-      rustdesk/rustdesk-server hbbr
+      rustdesk/rustdesk-server hbbs
 
   else
     echo_content skyBlue "---> 你已经安装了 RustDesk Server hbbs"
