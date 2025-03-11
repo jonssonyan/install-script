@@ -2,7 +2,7 @@
 
 # Install Script
 
-Software quick installation script for Linux platform
+Quick installation scripts for Linux
 
 ## Recommended OS
 
