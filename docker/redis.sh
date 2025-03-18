@@ -66,6 +66,7 @@ install_redis() {
         --network=host \
         -e TZ=Asia/Shanghai \
         -v ${REDIS_DATA}data/:/data/ \
+        -v ${REDIS_DATA}etc/:/usr/local/etc/redis/ \
         redis:6.2.13 \
         redis-server --requirepass "${redis_pass}" --port "${redis_port}"
 
