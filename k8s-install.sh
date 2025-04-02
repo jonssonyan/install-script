@@ -365,11 +365,14 @@ apiVersion: v1
 metadata:
   name: kube-flannel
   labels:
+    k8s-app: flannel
     pod-security.kubernetes.io/enforce: privileged
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
+  labels:
+    k8s-app: flannel
   name: flannel
 rules:
 - apiGroups:
@@ -392,17 +395,12 @@ rules:
   - nodes/status
   verbs:
   - patch
-- apiGroups:
-  - "networking.k8s.io"
-  resources:
-  - clustercidrs
-  verbs:
-  - list
-  - watch
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
+  labels:
+    k8s-app: flannel
   name: flannel
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -416,6 +414,8 @@ subjects:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  labels:
+    k8s-app: flannel
   name: flannel
   namespace: kube-flannel
 ---
@@ -426,6 +426,7 @@ metadata:
   namespace: kube-flannel
   labels:
     tier: node
+    k8s-app: flannel
     app: flannel
 data:
   cni-conf.json: |
@@ -451,6 +452,7 @@ data:
   net-conf.json: |
     {
       "Network": "10.244.0.0/16",
+      "EnableNFTables": false,
       "Backend": {
         "Type": "vxlan"
       }
@@ -464,6 +466,7 @@ metadata:
   labels:
     tier: node
     app: flannel
+    k8s-app: flannel
 spec:
   selector:
     matchLabels:
@@ -491,8 +494,7 @@ spec:
       serviceAccountName: flannel
       initContainers:
       - name: install-cni-plugin
-        image: flannel/flannel-cni-plugin:v1.1.2
-       #image: rancher/mirrored-flannelcni-flannel-cni-plugin:v1.1.2
+        image: ghcr.io/flannel-io/flannel-cni-plugin:v1.6.2-flannel1
         command:
         - cp
         args:
@@ -503,8 +505,7 @@ spec:
         - name: cni-plugin
           mountPath: /opt/cni/bin
       - name: install-cni
-        image: flannel/flannel:v0.21.3
-       #image: rancher/mirrored-flannelcni-flannel:v0.21.3
+        image: ghcr.io/flannel-io/flannel:v0.26.4
         command:
         - cp
         args:
@@ -518,13 +519,11 @@ spec:
           mountPath: /etc/kube-flannel/
       containers:
       - name: kube-flannel
-        image: flannel/flannel:v0.21.3
-       #image: rancher/mirrored-flannelcni-flannel:v0.21.3
+        image: ghcr.io/flannel-io/flannel:v0.26.4
         command:
         - /opt/bin/flanneld
         args:
         - --ip-masq
-        - --iface=enp0s8
         - --kube-subnet-mgr
         resources:
           requests:
@@ -712,8 +711,8 @@ k8s_install() {
     [[ -z "${host_name}" ]] && host_name="k8s-master"
     set_hostname ${host_name}
 
-    while read -r -p "请输入 K8s 版本(1.23.17,1.24-1.31 默认:1.31): " k8s_version; do
-      [[ -z "${k8s_version}" ]] && k8s_version="1.31"
+    while read -r -p "请输入 K8s 版本(1.23.17,1.24-1.31 默认:1.29): " k8s_version; do
+      [[ -z "${k8s_version}" ]] && k8s_version="1.29"
       if echo "${k8s_versions}" | grep -w -q "${k8s_version}"; then
         break
       else
