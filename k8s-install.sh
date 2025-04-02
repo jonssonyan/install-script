@@ -22,14 +22,14 @@ init_var() {
   k8s_lock_file="/k8sdata/k8s.lock"
 
   k8s_version=""
-  k8s_versions="1.23.17 1.24 1.25 1.26 1.27 1.28 1.29 1.30 1.31"
+  k8s_versions="1.24 1.25 1.26 1.27 1.28 1.29 1.30 1.31"
   is_master=1
   k8s_cri_sock="unix:///var/run/containerd/containerd.sock"
   network="flannel"
   network_file="/k8sdata/network/flannelkube-flannel.yml"
-  k8s_mirror="registry.cn-hangzhou.aliyuncs.com/google_containers"
   # kube_flannel_url="https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
   # calico_url="https://docs.projectcalico.org/manifests/calico.yaml"
+  k8s_mirror="registry.cn-hangzhou.aliyuncs.com/google_containers"
 
   # Docker
   docker_mirror='"https://docker.m.daocloud.io","https://atomhub.openatom.cn"'
@@ -85,9 +85,6 @@ get_config_val() {
     fi
   done <${k8s_lock_file}
 }
-
-# 比较版本大小
-version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
 
 service_exists() {
   systemctl list-units --type=service --all | grep -Fq "$1.service"
@@ -294,28 +291,7 @@ install_containerd() {
 install_runtime() {
   echo_content green "---> 安装运行时"
 
-  while read -r -p "请选择容器运行时(1/containerd 2/dockershim 默认:1/containerd): " runtimeNum; do
-    case ${runtimeNum} in
-    "" | 1)
-      k8s_cri_sock="unix:///var/run/containerd/containerd.sock"
-      install_containerd
-      break
-      ;;
-    2)
-      # 自 1.24 版起，Dockershim 已从 Kubernetes 项目中移除
-      if version_lt "${k8s_version}" "1.24.0"; then
-        k8s_cri_sock="/var/run/dockershim.sock"
-        bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
-        break
-      else
-        echo_content red "自1.24版起，Dockershim 已从 Kubernetes 项目中移除，详情：https://kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/"
-      fi
-      ;;
-    *)
-      echo_content red "没有这个选项"
-      ;;
-    esac
-  done
+  install_containerd
 
   echo "k8s_cri_sock=${k8s_cri_sock}" >>${k8s_lock_file}
 
@@ -592,48 +568,6 @@ EOF
   k8s_bash_completion
 }
 
-# 1.24 版本以下的 K8s
-k8s_lt_1_24() {
-  # https://developer.aliyun.com/mirror/kubernetes
-  if [[ "${release}" == "centos" ]]; then
-    if [[ ${can_google} == 0 ]]; then
-      cat >/etc/yum.repos.d/kubernetes.repo <<EOF
-[kubernetes]
-name=Kubernetes
-baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-$(arch)/
-enabled=1
-gpgcheck=0
-repo_gpgcheck=0
-gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
-EOF
-    else
-      cat >/etc/yum.repos.d/kubernetes.repo <<EOF
-[kubernetes]
-name=Kubernetes
-baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$(arch)
-enabled=1
-gpgcheck=0
-repo_gpgcheck=0
-gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-EOF
-    fi
-  elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
-    ${package_manager} install -y apt-transport-https ca-certificates
-    if [[ ${can_google} == 0 ]]; then
-      curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg
-      cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
-deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
-EOF
-    else
-      curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-      cat >/etc/apt/sources.list.d/kubernetes.list <<EOF
-deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
-EOF
-    fi
-    ${package_manager} update -y
-  fi
-}
-
 # 1.24 版本及以上的 K8s
 k8s_ge_1_24() {
   if [[ "${release}" == "centos" ]]; then
@@ -711,7 +645,7 @@ k8s_install() {
     [[ -z "${host_name}" ]] && host_name="k8s-master"
     set_hostname ${host_name}
 
-    while read -r -p "请输入 K8s 版本(1.23.17,1.24-1.31 默认:1.29): " k8s_version; do
+    while read -r -p "请输入 K8s 版本(1.24-1.31 默认:1.29): " k8s_version; do
       [[ -z "${k8s_version}" ]] && k8s_version="1.29"
       if echo "${k8s_versions}" | grep -w -q "${k8s_version}"; then
         break
@@ -747,11 +681,7 @@ EOF
     # 安装运行时
     install_runtime
 
-    if version_lt "${k8s_version}" "1.24"; then
-      k8s_lt_1_24
-    else
-      k8s_ge_1_24
-    fi
+    k8s_ge_1_24
 
     if [[ -z "${k8s_version}" ]]; then
       ${package_manager} install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
