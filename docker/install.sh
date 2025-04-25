@@ -13,7 +13,7 @@ init_var() {
   can_google=0
 
   # Docker
-  docker_mirror='"https://docker.m.daocloud.io","https://atomhub.openatom.cn"'
+  docker_mirror='"https://docker.m.daocloud.io"'
 }
 
 echo_content() {
