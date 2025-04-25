@@ -41,7 +41,6 @@ echo_content() {
 }
 
 mkdir_tools() {
-  # 项目目录
   mkdir -p ${JY_DATA}
 }
 
@@ -73,10 +72,10 @@ check_sys() {
 
   if [[ -n $(find /etc -name "redhat-release") ]] || grep </proc/version -q -i "centos"; then
     release="centos"
-    if rpm -q centos-stream-release &> /dev/null; then
-        version=$(rpm -q --queryformat '%{VERSION}' centos-stream-release)
-    elif rpm -q centos-release &> /dev/null; then
-        version=$(rpm -q --queryformat '%{VERSION}' centos-release)
+    if rpm -q centos-stream-release &>/dev/null; then
+      version=$(rpm -q --queryformat '%{VERSION}' centos-stream-release)
+    elif rpm -q centos-release &>/dev/null; then
+      version=$(rpm -q --queryformat '%{VERSION}' centos-release)
     fi
   elif grep </etc/issue -q -i "debian" && [[ -f "/etc/issue" ]] || grep </etc/issue -q -i "debian" && [[ -f "/proc/version" ]]; then
     release="debian"
@@ -141,29 +140,6 @@ install_depend() {
     wget \
     systemd \
     lrzsz
-}
-
-# 环境准备
-install_prepare() {
-  # 同步时间
-  timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
-
-  if service_exists "rsyslog"; then
-    systemctl restart rsyslog
-  fi
-
-  case "${release}" in
-  centos)
-    if service_exists "crond"; then
-      systemctl restart crond
-    fi
-    ;;
-  debian | ubuntu)
-    if service_exists "cron"; then
-      systemctl restart cron
-    fi
-    ;;
-  esac
 }
 
 install_docker() {
@@ -236,7 +212,6 @@ main() {
   mkdir_tools
   check_sys
   install_depend
-  install_prepare
   clear
   echo_content red "\n=============================================================="
   echo_content skyBlue "Recommended OS: CentOS 8+/Ubuntu 20+/Debian 11+"
