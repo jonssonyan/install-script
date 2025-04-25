@@ -114,10 +114,10 @@ check_sys() {
 
   if [[ -n $(find /etc -name "redhat-release") ]] || grep </proc/version -q -i "centos"; then
     release="centos"
-    if rpm -q centos-stream-release &> /dev/null; then
-        version=$(rpm -q --queryformat '%{VERSION}' centos-stream-release)
-    elif rpm -q centos-release &> /dev/null; then
-        version=$(rpm -q --queryformat '%{VERSION}' centos-release)
+    if rpm -q centos-stream-release &>/dev/null; then
+      version=$(rpm -q --queryformat '%{VERSION}' centos-stream-release)
+    elif rpm -q centos-release &>/dev/null; then
+      version=$(rpm -q --queryformat '%{VERSION}' centos-release)
     fi
   elif grep </etc/issue -q -i "debian" && [[ -f "/etc/issue" ]] || grep </etc/issue -q -i "debian" && [[ -f "/proc/version" ]]; then
     release="debian"
@@ -290,6 +290,21 @@ install_containerd() {
 # 安装运行时
 install_runtime() {
   echo_content green "---> 安装运行时"
+
+  # 转发 IPv4 并让 iptables 看到桥接流量
+  cat >/etc/modules-load.d/k8s.conf <<EOF
+overlay
+br_netfilter
+EOF
+  modprobe overlay
+  modprobe br_netfilter
+
+  cat >/etc/sysctl.d/k8s.conf <<EOF
+net.bridge.bridge-nf-call-iptables=1
+net.bridge.bridge-nf-call-ip6tables=1
+net.ipv4.ip_forward=1
+EOF
+  sysctl --system
 
   install_containerd
 
@@ -662,21 +677,6 @@ k8s_install() {
 
     # 关闭swap分区
     swapoff -a && sed -ri 's/.*swap.*/#&/' /etc/fstab
-
-    # 转发 IPv4 并让 iptables 看到桥接流量
-    cat >/etc/modules-load.d/k8s.conf <<EOF
-overlay
-br_netfilter
-EOF
-    modprobe overlay
-    modprobe br_netfilter
-
-    cat >/etc/sysctl.d/k8s.conf <<EOF
-net.bridge.bridge-nf-call-iptables=1
-net.bridge.bridge-nf-call-ip6tables=1
-net.ipv4.ip_forward=1
-EOF
-    sysctl --system
 
     # 安装运行时
     install_runtime
