@@ -97,6 +97,8 @@ check_sys() {
     exit 1
   fi
 
+  can_connect www.google.com && can_google=1
+
   if [[ $(command -v yum) ]]; then
     package_manager='yum'
   elif [[ $(command -v dnf) ]]; then
@@ -170,8 +172,6 @@ check_sys() {
     echo_content red "Only supports x86_64/amd64 arm64/aarch64"
     exit 1
   fi
-
-  can_connect www.google.com && can_google=1
 }
 
 # 修改主机名
@@ -788,7 +788,7 @@ main() {
   install_depend
   clear
   echo_content red "\n=============================================================="
-  echo_content skyBlue "Recommended OS: CentOS 8+/Ubuntu 20+/Debian 11+"
+  echo_content skyBlue "Recommended OS: CentOS 8+/Ubuntu 22+/Debian 11+"
   echo_content skyBlue "Description: Install K8s"
   echo_content skyBlue "Author: jonssonyan <https://jonssonyan.com>"
   echo_content skyBlue "Github: https://github.com/jonssonyan/install-script"
