@@ -32,7 +32,7 @@ init_var() {
   k8s_mirror="registry.cn-hangzhou.aliyuncs.com/google_containers"
 
   # Docker
-  docker_mirror='"https://docker.m.daocloud.io","https://atomhub.openatom.cn"'
+  docker_mirror='"https://docker.m.daocloud.io"'
 }
 
 echo_content() {
