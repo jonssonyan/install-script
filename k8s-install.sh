@@ -788,7 +788,7 @@ main() {
   install_depend
   clear
   echo_content red "\n=============================================================="
-  echo_content skyBlue "Recommended OS: CentOS 8+/Ubuntu 22+/Debian 11+"
+  echo_content skyBlue "Recommended OS: CentOS 8+/Ubuntu 20+/Debian 11+"
   echo_content skyBlue "Description: Install K8s"
   echo_content skyBlue "Author: jonssonyan <https://jonssonyan.com>"
   echo_content skyBlue "Github: https://github.com/jonssonyan/install-script"
