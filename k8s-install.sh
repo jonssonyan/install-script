@@ -691,7 +691,10 @@ EOF
       if [[ ${package_manager} == "yum" || ${package_manager} == "dnf" ]]; then
         ${package_manager} install -y kubelet-"${k8s_version}" kubeadm-"${k8s_version}" kubectl-"${k8s_version}" --disableexcludes=kubernetes --nogpgcheck
       elif [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
-        ${package_manager} install -y kubelet="${k8s_version}" kubeadm="${k8s_version}" kubectl="${k8s_version}" --disableexcludes=kubernetes
+        kubelet_version=$(apt-cache madison kubelet | grep ${k8s_version} | head -n1 | awk '{print $3}')
+        kubeadm_version=$(apt-cache madison kubeadm | grep ${k8s_version} | head -n1 | awk '{print $3}')
+        kubectl_version=$(apt-cache madison kubectl | grep ${k8s_version} | head -n1 | awk '{print $3}')
+        ${package_manager} install -y kubelet="${kubelet_version}" kubeadm="${kubeadm_version}" kubectl="${kubectl_version}" --disableexcludes=kubernetes
       fi
     fi
 
