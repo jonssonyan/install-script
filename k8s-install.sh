@@ -21,7 +21,7 @@ init_var() {
   K8S_NETWORK="/k8sdata/network"
   k8s_lock_file="/k8sdata/k8s.lock"
 
-  k8s_version=""
+  k8s_version="1.29"
   k8s_versions="1.24 1.25 1.26 1.27 1.28 1.29 1.30 1.31"
   is_master=1
   k8s_cri_sock="unix:///var/run/containerd/containerd.sock"
