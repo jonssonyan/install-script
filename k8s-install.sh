@@ -727,13 +727,22 @@ k8s_run() {
       k8s_version_mini=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable-"${k8s_version}".txt)
 
       # https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
-      kubeadm init \
-        --apiserver-advertise-address="${public_ip}" \
-        --image-repository="${k8s_mirror}" \
-        --kubernetes-version="${k8s_version_mini}" \
-        --service-cidr=10.96.0.0/12 \
-        --pod-network-cidr=10.244.0.0/16 \
-        --cri-socket="${k8s_cri_sock}" | tee /k8sdata/log/kubeadm-init.log
+      if [[ ${can_google} == 0 ]]; then
+        kubeadm init \
+          --apiserver-advertise-address="${public_ip}" \
+          --image-repository="${k8s_mirror}" \
+          --kubernetes-version="${k8s_version_mini}" \
+          --service-cidr=10.96.0.0/12 \
+          --pod-network-cidr=10.244.0.0/16 \
+          --cri-socket="${k8s_cri_sock}" | tee /k8sdata/log/kubeadm-init.log
+      else
+        kubeadm init \
+          --apiserver-advertise-address="${public_ip}" \
+          --kubernetes-version="${k8s_version_mini}" \
+          --service-cidr=10.96.0.0/12 \
+          --pod-network-cidr=10.244.0.0/16 \
+          --cri-socket="${k8s_cri_sock}" | tee /k8sdata/log/kubeadm-init.log
+      fi
 
       if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
         mkdir -p "$HOME"/.kube
