@@ -27,11 +27,10 @@ init_var() {
   k8s_cri_sock="unix:///var/run/containerd/containerd.sock"
   network="flannel"
   network_file="/k8sdata/network/flannelkube-flannel.yml"
-  # kube_flannel_url="https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
-  # calico_url="https://docs.projectcalico.org/manifests/calico.yaml"
-  k8s_mirror="registry.cn-hangzhou.aliyuncs.com/google_containers"
 
-  # Docker
+  kube_flannel_url="https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
+  calico_url="https://docs.projectcalico.org/manifests/calico.yaml"
+  k8s_mirror="registry.cn-hangzhou.aliyuncs.com/google_containers"
   docker_mirror='"https://docker.m.daocloud.io"'
 }
 
