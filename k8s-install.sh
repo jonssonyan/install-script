@@ -679,7 +679,7 @@ net.ipv4.ip_forward=1
 EOF
     sysctl --system
 
-    # 安装运行时
+    # 安装运行时 https://v1-29.docs.kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/
     install_runtime
 
     k8s_ge_1_24
