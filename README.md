@@ -17,8 +17,7 @@ Quick installation scripts for Linux servers.
 
 - **Supported OS**: CentOS 7+ / Ubuntu 18+ / Debian 10+
 - **CPU Architecture**: x86_64/amd64 or arm64/aarch64
-- **Kubernetes Version**: v1.23.17 / Latest
-- **Docker Version (optional)**: v25.0.5 / Latest
+- **Kubernetes Version**: v1.29
 
 **Installation Command:**
 
@@ -32,7 +31,7 @@ bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/k8s-inst
 
 - **Supported OS**: CentOS 7+ / Ubuntu 18+ / Debian 10+
 - **CPU Architecture**: x86_64/amd64 or arm64/aarch64
-- **Docker Version**: v25.0.5 / Latest
+- **Docker Version**: Latest
 
 **Installation Command:**
 
