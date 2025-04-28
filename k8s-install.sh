@@ -365,9 +365,10 @@ k8s_network_install() {
 }
 
 setup_k8s() {
-  cat >/etc/sysconfig/kubelet <<EOF
-KUBELET_EXTRA_ARGS="--cgroup-driver=systemd"
-EOF
+  # Ubuntu / Debian: /etc/default/kubelet, CentOS / RHEL / Rocky Linux / AlmaLinux: /etc/sysconfig/kubelet
+  for file in /etc/default/kubelet /etc/sysconfig/kubelet; do
+    [ -f "$file" ] && echo 'KUBELET_EXTRA_ARGS="--cgroup-driver=systemd"' >>"$file" && break
+  done
   if [[ $(command -v crictl) ]]; then
     crictl config --set runtime-endpoint=${k8s_cri_sock}
     crictl config --set image-endpoint=${k8s_cri_sock}
