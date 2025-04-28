@@ -447,7 +447,6 @@ k8s_install() {
     done
     echo "public_ip=${public_ip}" >>${k8s_lock_file}
 
-    # 设置主机名称
     read -r -p "请输入主机名(默认:k8s-master): " host_name
     [[ -z "${host_name}" ]] && host_name="k8s-master"
     set_hostname ${host_name}
