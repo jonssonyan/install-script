@@ -290,6 +290,21 @@ install_containerd() {
 install_runtime() {
   echo_content green "---> 安装运行时"
 
+  # 转发 IPv4 并让 iptables 看到桥接流量
+  cat >/etc/modules-load.d/k8s.conf <<EOF
+overlay
+br_netfilter
+EOF
+  modprobe overlay
+  modprobe br_netfilter
+
+  cat >/etc/sysctl.d/k8s.conf <<EOF
+net.bridge.bridge-nf-call-iptables=1
+net.bridge.bridge-nf-call-ip6tables=1
+net.ipv4.ip_forward=1
+EOF
+  sysctl --system
+
   install_containerd
 
   echo "k8s_cri_sock=${k8s_cri_sock}" >>${k8s_lock_file}
@@ -663,21 +678,6 @@ k8s_install() {
 
     # 关闭swap分区
     swapoff -a && sed -ri 's/.*swap.*/#&/' /etc/fstab
-
-    # 转发 IPv4 并让 iptables 看到桥接流量
-    cat >/etc/modules-load.d/k8s.conf <<EOF
-overlay
-br_netfilter
-EOF
-    modprobe overlay
-    modprobe br_netfilter
-
-    cat >/etc/sysctl.d/k8s.conf <<EOF
-net.bridge.bridge-nf-call-iptables=1
-net.bridge.bridge-nf-call-ip6tables=1
-net.ipv4.ip_forward=1
-EOF
-    sysctl --system
 
     # 安装运行时 https://v1-29.docs.kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/
     install_runtime
