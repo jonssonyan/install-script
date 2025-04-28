@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Kubernetes Installation Script
 # Author: jonssonyan <https://jonssonyan.com>
-# Optimized version
 # Github: https://github.com/jonssonyan/install-script
 
 set -e # Exit immediately if a command exits with a non-zero status
