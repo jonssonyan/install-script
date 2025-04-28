@@ -1,81 +1,81 @@
 #!/usr/bin/env bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+# Docker Installation Script
+# Author: jonssonyan <https://jonssonyan.com>
+# Github: https://github.com/jonssonyan/install-script
 
+set -e # Exit immediately if a command exits with a non-zero status
+
+# Initialize variables
 init_var() {
   ECHO_TYPE="echo -e"
 
+  # System variables
   package_manager=""
   release=""
   version=""
-  get_arch=""
+  arch=""
+  can_access_internet=1 # Default to true, will check google.com accessibility
 
-  can_google=0
-
-  # Docker
+  # Docker configuration
   docker_mirror='"https://docker.m.daocloud.io"'
+  DOCKER_CONFIG="/etc/docker"
 }
 
+# Colorized output functions
 echo_content() {
+  local color_code
   case $1 in
-  "red")
-    ${ECHO_TYPE} "\033[31m$2\033[0m"
-    ;;
-  "green")
-    ${ECHO_TYPE} "\033[32m$2\033[0m"
-    ;;
-  "yellow")
-    ${ECHO_TYPE} "\033[33m$2\033[0m"
-    ;;
-  "blue")
-    ${ECHO_TYPE} "\033[34m$2\033[0m"
-    ;;
-  "purple")
-    ${ECHO_TYPE} "\033[35m$2\033[0m"
-    ;;
-  "skyBlue")
-    ${ECHO_TYPE} "\033[36m$2\033[0m"
-    ;;
-  "white")
-    ${ECHO_TYPE} "\033[37m$2\033[0m"
-    ;;
+  "red") color_code="\033[31m" ;;
+  "green") color_code="\033[32m" ;;
+  "yellow") color_code="\033[33m" ;;
+  "blue") color_code="\033[34m" ;;
+  "purple") color_code="\033[35m" ;;
+  "skyBlue") color_code="\033[36m" ;;
+  "white") color_code="\033[37m" ;;
+  *) color_code="\033[0m" ;;
   esac
+  ${ECHO_TYPE} "${color_code}$2\033[0m"
 }
 
+# Check if can connect to a host
 can_connect() {
-  if ping -c2 -i0.3 -W1 "$1" &>/dev/null; then
-    return 0
-  else
-    return 1
-  fi
+  ping -c2 -i0.3 -W1 "$1" &>/dev/null
+  return $?
 }
 
+# Check if service exists
 service_exists() {
   systemctl list-units --type=service --all | grep -Fq "$1.service"
 }
 
-# 检查系统
-check_sys() {
+# Check system compatibility and gather information
+check_system() {
   if [[ $(id -u) != "0" ]]; then
     echo_content red "You must be root to run this script"
     exit 1
   fi
 
-  if [[ $(command -v yum) ]]; then
-    package_manager='yum'
-  elif [[ $(command -v dnf) ]]; then
-    package_manager='dnf'
-  elif [[ $(command -v apt-get) ]]; then
-    package_manager='apt-get'
-  elif [[ $(command -v apt) ]]; then
-    package_manager='apt'
+  # Check internet connectivity
+  if ! can_connect www.google.com; then
+    can_access_internet=0
+    echo_content yellow "Limited internet connectivity detected. Using Chinese mirrors."
   fi
 
-  if [[ -z "${package_manager}" ]]; then
-    echo_content red "This system is not currently supported"
+  # Determine package manager
+  if command -v yum &>/dev/null; then
+    package_manager='yum'
+  elif command -v dnf &>/dev/null; then
+    package_manager='dnf'
+  elif command -v apt-get &>/dev/null; then
+    package_manager='apt-get'
+  elif command -v apt &>/dev/null; then
+    package_manager='apt'
+  else
+    echo_content red "Unsupported system. No compatible package manager found."
     exit 1
   fi
 
+  # Determine OS distribution and version
   if [[ -n $(find /etc -name "redhat-release") ]] || grep </proc/version -q -i "centos"; then
     release="centos"
     if rpm -q centos-stream-release &>/dev/null; then
@@ -83,37 +83,31 @@ check_sys() {
     elif rpm -q centos-release &>/dev/null; then
       version=$(rpm -q --queryformat '%{VERSION}' centos-release)
     fi
-  elif grep </etc/issue -q -i "debian" && [[ -f "/etc/issue" ]] || grep </etc/issue -q -i "debian" && [[ -f "/proc/version" ]]; then
+  elif grep </etc/issue -q -i "debian" && [[ -f "/etc/issue" ]] || grep </proc/version -q -i "debian"; then
     release="debian"
     version=$(cat /etc/debian_version)
-  elif grep </etc/issue -q -i "ubuntu" && [[ -f "/etc/issue" ]] || grep </etc/issue -q -i "ubuntu" && [[ -f "/proc/version" ]]; then
+  elif grep </etc/issue -q -i "ubuntu" && [[ -f "/etc/issue" ]] || grep </proc/version -q -i "ubuntu"; then
     release="ubuntu"
     version=$(lsb_release -sr)
   fi
 
+  # Check version compatibility
   major_version=$(echo "${version}" | cut -d. -f1)
-
   case $release in
   centos)
-    if [[ $major_version -ge 6 ]]; then
-      echo_content green "Supported CentOS version detected: $version"
-    else
+    if [[ $major_version -lt 6 ]]; then
       echo_content red "Unsupported CentOS version: $version. Only supports CentOS 6+."
       exit 1
     fi
     ;;
   ubuntu)
-    if [[ $major_version -ge 16 ]]; then
-      echo_content green "Supported Ubuntu version detected: $version"
-    else
+    if [[ $major_version -lt 16 ]]; then
       echo_content red "Unsupported Ubuntu version: $version. Only supports Ubuntu 16+."
       exit 1
     fi
     ;;
   debian)
-    if [[ $major_version -ge 8 ]]; then
-      echo_content green "Supported Debian version detected: $version"
-    else
+    if [[ $major_version -lt 8 ]]; then
       echo_content red "Unsupported Debian version: $version. Only supports Debian 8+."
       exit 1
     fi
@@ -124,37 +118,46 @@ check_sys() {
     ;;
   esac
 
+  # Check architecture
   if [[ $(arch) =~ ("x86_64"|"amd64") ]]; then
-    get_arch="amd64"
+    arch="amd64"
   elif [[ $(arch) =~ ("aarch64"|"arm64") ]]; then
-    get_arch="arm64"
-  fi
-
-  if [[ -z "${get_arch}" ]]; then
-    echo_content red "Only supports x86_64/amd64 arm64/aarch64"
+    arch="arm64"
+  else
+    echo_content red "Only supports x86_64/amd64 or arm64/aarch64 architectures"
     exit 1
   fi
 
-  can_connect www.google.com && can_google=1
+  echo_content green "System check passed: ${release} ${version} (${arch})"
 }
 
-# 安装依赖
-install_depend() {
+# Install dependencies
+install_dependencies() {
+  echo_content green "---> Installing dependencies"
+
   if [[ "${package_manager}" == 'apt-get' || "${package_manager}" == 'apt' ]]; then
     ${package_manager} update -y
   fi
+
   ${package_manager} install -y \
     curl \
     wget \
     systemd \
-    lrzsz
+    lrzsz \
+    bash-completion
+
+  echo_content skyBlue "---> Dependencies installed"
 }
 
-# 环境准备
-install_prepare() {
-  # 同步时间
-  timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
+# Prepare environment
+prepare_environment() {
+  echo_content green "---> Preparing environment"
 
+  # Sync time
+  timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
+  echo_content skyBlue "---> Timezone set to Asia/Shanghai"
+
+  # Restart required services
   if service_exists "rsyslog"; then
     systemctl restart rsyslog
   fi
@@ -171,12 +174,24 @@ install_prepare() {
     fi
     ;;
   esac
+
+  # Disable SELinux if enabled
+  if [ -s /etc/selinux/config ] && grep 'SELINUX=enforcing' /etc/selinux/config; then
+    setenforce 0 && sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+    echo_content skyBlue "---> SELinux disabled"
+  fi
+
+  echo_content skyBlue "---> Environment preparation complete"
 }
 
+# Configure Docker daemon
 setup_docker() {
-  mkdir -p /etc/docker
-  if [[ ${can_google} == 0 ]]; then
-    cat >/etc/docker/daemon.json <<EOF
+  echo_content green "---> Configuring Docker daemon"
+
+  mkdir -p ${DOCKER_CONFIG}
+
+  if [[ ${can_access_internet} == 0 ]]; then
+    cat >${DOCKER_CONFIG}/daemon.json <<EOF
 {
   "log-driver":"json-file",
   "log-opts":{
@@ -186,7 +201,7 @@ setup_docker() {
 }
 EOF
   else
-    cat >/etc/docker/daemon.json <<EOF
+    cat >${DOCKER_CONFIG}/daemon.json <<EOF
 {
   "log-driver":"json-file",
   "log-opts":{
@@ -195,68 +210,82 @@ EOF
 }
 EOF
   fi
+
   systemctl daemon-reload
+  echo_content skyBlue "---> Docker daemon configured"
 }
 
+# Install Docker
 install_docker() {
-  if [[ ! $(command -v docker) ]]; then
-    echo_content green "---> 安装 Docker"
+  if command -v docker &>/dev/null; then
+    echo_content skyBlue "---> Docker is already installed"
+    return
+  fi
 
-    if [[ "${release}" == "centos" ]]; then
-      ${package_manager} install -y yum-utils
-      if [[ ${can_google} == 0 ]]; then
-        ${package_manager} config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
-      else
-        ${package_manager} config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-      fi
-      ${package_manager} makecache || ${package_manager} makecache fast
-    elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
-      ${package_manager} update -y
-      ${package_manager} install -y \
-        ca-certificates \
-        curl \
-        gnupg \
-        lsb-release
-      sudo install -m 0755 -d /etc/apt/keyrings
-      if [[ ${can_google} == 0 ]]; then
-        sudo curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/${release}/gpg -o /etc/apt/keyrings/docker.asc
-        sudo chmod a+r /etc/apt/keyrings/docker.asc
-        echo \
-          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://mirrors.aliyun.com/docker-ce/linux/${release} \
-                        $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" |
-          sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-      else
-        sudo curl -fsSL https://download.docker.com/linux/${release}/gpg -o /etc/apt/keyrings/docker.asc
-        sudo chmod a+r /etc/apt/keyrings/docker.asc
-        echo \
-          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${release} \
-                $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" |
-          sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-      fi
-      ${package_manager} update -y
-    fi
+  echo_content green "---> Installing Docker"
 
-    ${package_manager} install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-
-    setup_docker
-
-    systemctl enable docker && systemctl restart docker
-
-    if [[ $(command -v docker) ]]; then
-      echo_content skyBlue "---> Docker 安装完成"
+  if [[ "${release}" == "centos" ]]; then
+    ${package_manager} install -y yum-utils
+    if [[ ${can_access_internet} == 0 ]]; then
+      ${package_manager}-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
     else
-      echo_content red "---> Docker 安装失败"
-      exit 1
+      ${package_manager}-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
     fi
+    ${package_manager} makecache || ${package_manager} makecache fast
+  elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
+    ${package_manager} update -y
+    ${package_manager} install -y \
+      ca-certificates \
+      curl \
+      gnupg \
+      lsb-release
+    mkdir -p /etc/apt/keyrings
+    if [[ ${can_access_internet} == 0 ]]; then
+      curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/${release}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] http://mirrors.aliyun.com/docker-ce/linux/${release} \
+            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+    else
+      curl -fsSL https://download.docker.com/linux/${release}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/${release} \
+            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+    fi
+    ${package_manager} update -y
+  fi
+
+  ${package_manager} install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+  setup_docker
+
+  systemctl enable docker && systemctl restart docker
+
+  if command -v docker &>/dev/null; then
+    echo_content skyBlue "---> Docker installation complete"
   else
-    echo_content skyBlue "---> 你已经安装了 Docker"
+    echo_content red "---> Docker installation failed"
+    exit 1
   fi
 }
 
-cd "$HOME" || exit 0
-init_var
-check_sys
-install_depend
-install_prepare
-clear
-install_docker
+# Main execution function
+main() {
+  cd "$HOME" || exit 1
+
+  # Initialize variables
+  init_var
+
+  # Check system compatibility
+  check_system
+
+  # Install basic dependencies
+  install_dependencies
+
+  # Default behavior: prepare environment and install Docker
+  prepare_environment
+
+  install_docker
+}
+
+# Execute main function with all arguments
+main "$@"
