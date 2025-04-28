@@ -30,7 +30,7 @@ init_var() {
 
   kube_flannel_url="https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
   calico_url="https://docs.projectcalico.org/manifests/calico.yaml"
-  k8s_mirror="registry.cn-hangzhou.aliyuncs.com/google_containers"
+  k8s_mirror="https://registry.cn-hangzhou.aliyuncs.com/google_containers"
   docker_mirror='"https://docker.m.daocloud.io"'
 }
 
