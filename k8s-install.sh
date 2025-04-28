@@ -406,9 +406,7 @@ EOF
     else
       mkdir -p -m 755 /etc/apt/keyrings
       curl -fsSL https://pkgs.k8s.io/core:/stable:/v"${k8s_version}"/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-      chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
       echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v${k8s_version}/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-      chmod 644 /etc/apt/sources.list.d/kubernetes.list
     fi
     ${package_manager} update -y
   fi
