@@ -242,9 +242,9 @@ install_containerd() {
     if [[ "${release}" == "centos" ]]; then
       ${package_manager} install -y yum-utils
       if [[ ${can_google} == 0 ]]; then
-        ${package_manager}-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+        ${package_manager} config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
       else
-        ${package_manager}-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+        ${package_manager} config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
       fi
       ${package_manager} makecache || ${package_manager} makecache fast
     elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
