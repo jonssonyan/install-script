@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Improved Kubernetes installation script
-# Author: Original by jonssonyan, optimized version
-# Description: One-click Kubernetes cluster installation and configuration
+# Kubernetes Installation Script
+# Author: jonssonyan <https://jonssonyan.com>
+# Optimized version
+# Github: https://github.com/jonssonyan/install-script
 
 set -e # Exit immediately if a command exits with a non-zero status
 
