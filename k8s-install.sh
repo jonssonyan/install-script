@@ -586,16 +586,17 @@ main() {
   check_sys
   install_depend
   clear
-  echo_content red "\n=============================================================="
+  echo_content red "=============================================================="
   echo_content skyBlue "Recommended OS: CentOS 8+/Ubuntu 20+/Debian 11+"
   echo_content skyBlue "Description: Install K8s"
   echo_content skyBlue "Author: jonssonyan <https://jonssonyan.com>"
   echo_content skyBlue "Github: https://github.com/jonssonyan/install-script"
-  echo_content red "\n=============================================================="
+  echo_content red "=============================================================="
   echo_content yellow "1. 安装 K8s"
   echo_content yellow "2. 运行 K8s"
-  echo_content green "=============================================================="
+  echo_content red "=============================================================="
   echo_content yellow "3. 重设 K8s"
+  echo_content red "=============================================================="
   read -r -p "Please choose:" input_option
   case ${input_option} in
   1)

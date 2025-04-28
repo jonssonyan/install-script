@@ -213,16 +213,16 @@ main() {
   check_sys
   install_depend
   clear
-  echo_content red "\n=============================================================="
+  echo_content red "=============================================================="
   echo_content skyBlue "Recommended OS: CentOS 8+/Ubuntu 20+/Debian 11+"
   echo_content skyBlue "Description: Install Docker based Services"
   echo_content skyBlue "Author: jonssonyan <https://jonssonyan.com>"
   echo_content skyBlue "Github: https://github.com/jonssonyan/install-script"
-  echo_content red "\n=============================================================="
+  echo_content red "=============================================================="
   echo_content yellow "1. Install Docker"
   echo_content yellow "2. Install Docker buildx"
   echo_content yellow "3. Uninstall Docker"
-  echo_content green "=============================================================="
+  echo_content red "=============================================================="
   echo_content yellow "4. Install MySQL 5.7.38"
   echo_content yellow "5. Install PostgreSQL 13"
   echo_content yellow "6. Install Redis 6.2.13"
@@ -235,6 +235,7 @@ main() {
   echo_content yellow "13. Install GitLab"
   echo_content yellow "14. Install SkyWalking OAP"
   echo_content yellow "15. Install SkyWalking UI"
+  echo_content red "=============================================================="
   read -r -p "Please choose:" input_option
   case ${input_option} in
   1)
