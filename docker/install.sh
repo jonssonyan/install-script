@@ -78,10 +78,10 @@ check_sys() {
 
   if [[ -n $(find /etc -name "redhat-release") ]] || grep </proc/version -q -i "centos"; then
     release="centos"
-    if rpm -q centos-stream-release &> /dev/null; then
-        version=$(rpm -q --queryformat '%{VERSION}' centos-stream-release)
-    elif rpm -q centos-release &> /dev/null; then
-        version=$(rpm -q --queryformat '%{VERSION}' centos-release)
+    if rpm -q centos-stream-release &>/dev/null; then
+      version=$(rpm -q --queryformat '%{VERSION}' centos-stream-release)
+    elif rpm -q centos-release &>/dev/null; then
+      version=$(rpm -q --queryformat '%{VERSION}' centos-release)
     fi
   elif grep </etc/issue -q -i "debian" && [[ -f "/etc/issue" ]] || grep </etc/issue -q -i "debian" && [[ -f "/proc/version" ]]; then
     release="debian"
@@ -203,40 +203,35 @@ install_docker() {
     echo_content green "---> 安装 Docker"
 
     if [[ "${release}" == "centos" ]]; then
-#      ${package_manager} remove docker \
-#        docker-client \
-#        docker-client-latest \
-#        docker-common \
-#        docker-latest \
-#        docker-latest-logrotate \
-#        docker-logrotate \
-#        docker-engine
       ${package_manager} install -y yum-utils
       if [[ ${can_google} == 0 ]]; then
-        ${package_manager}-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+        ${package_manager} config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
       else
-        ${package_manager}-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+        ${package_manager} config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
       fi
       ${package_manager} makecache || ${package_manager} makecache fast
     elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
-#      for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do ${package_manager} remove $pkg; done
       ${package_manager} update -y
       ${package_manager} install -y \
         ca-certificates \
         curl \
         gnupg \
         lsb-release
-      mkdir -p /etc/apt/keyrings
+      sudo install -m 0755 -d /etc/apt/keyrings
       if [[ ${can_google} == 0 ]]; then
-        curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/${release}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        sudo curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/${release}/gpg -o /etc/apt/keyrings/docker.asc
+        sudo chmod a+r /etc/apt/keyrings/docker.asc
         echo \
-          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] http://mirrors.aliyun.com/docker-ce/linux/${release} \
-              $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://mirrors.aliyun.com/docker-ce/linux/${release} \
+                        $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" |
+          sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
       else
-        curl -fsSL https://download.docker.com/linux/${release}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        sudo curl -fsSL https://download.docker.com/linux/${release}/gpg -o /etc/apt/keyrings/docker.asc
+        sudo chmod a+r /etc/apt/keyrings/docker.asc
         echo \
-          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/${release} \
-              $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${release} \
+                $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" |
+          sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
       fi
       ${package_manager} update -y
     fi
