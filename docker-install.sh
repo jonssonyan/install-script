@@ -349,7 +349,7 @@ main() {
     read -r -p "Please choose an option: " input_option
     case ${input_option} in
     1)
-      install_docker_service "Docker Engine" "docker.sh" "false"
+      install_docker_service "Docker Engine" "install.sh" "false"
       echo_content yellow "Press Enter to continue..."
       read -r
       ;;
