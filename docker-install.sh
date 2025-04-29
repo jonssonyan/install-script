@@ -359,7 +359,7 @@ main() {
       read -r
       ;;
     3)
-      uninstall_docker_service "Docker" "docker"
+      install_docker_service "Docker" "uninstall.sh"
       echo_content yellow "Press Enter to continue..."
       read -r
       ;;
