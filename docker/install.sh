@@ -233,7 +233,11 @@ install_docker() {
   echo_content green "---> Installing Docker"
 
   if [[ "${release}" == "centos" ]]; then
-    ${package_manager} install -y yum-utils
+    if [[ "${package_manager}" == "dnf" ]]; then
+      ${package_manager} install -y dnf-plugins-core
+    else
+      ${package_manager} install -y yum-utils
+    fi
     if [[ ${can_access_internet} == 0 ]]; then
       ${package_manager} config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
     else
