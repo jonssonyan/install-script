@@ -16,6 +16,9 @@ init_var() {
   arch=""
   can_access_internet=1 # Default to true, will check google.com accessibility
 
+  # Docker directories and files
+  DOCKER_DATA="/dockerdata"
+
   # Docker configuration
   docker_mirror='"https://docker.m.daocloud.io"'
   DOCKER_CONFIG="/etc/docker"
@@ -35,6 +38,11 @@ echo_content() {
   *) color_code="\033[0m" ;;
   esac
   ${ECHO_TYPE} "${color_code}$2\033[0m"
+}
+
+# Create necessary directories
+create_directories() {
+  mkdir -p ${DOCKER_DATA}
 }
 
 # Check if can connect to a host
@@ -227,9 +235,9 @@ install_docker() {
   if [[ "${release}" == "centos" ]]; then
     ${package_manager} install -y yum-utils
     if [[ ${can_access_internet} == 0 ]]; then
-      ${package_manager}-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+      ${package_manager} config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
     else
-      ${package_manager}-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+      ${package_manager} config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
     fi
     ${package_manager} makecache || ${package_manager} makecache fast
   elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
@@ -239,17 +247,22 @@ install_docker() {
       curl \
       gnupg \
       lsb-release
-    mkdir -p /etc/apt/keyrings
+
+    sudo install -m 0755 -d /etc/apt/keyrings
     if [[ ${can_access_internet} == 0 ]]; then
-      curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/${release}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      sudo curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/${release}/gpg -o /etc/apt/keyrings/docker.asc
+      sudo chmod a+r /etc/apt/keyrings/docker.asc
       echo \
-        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] http://mirrors.aliyun.com/docker-ce/linux/${release} \
-            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://mirrors.aliyun.com/docker-ce/linux/${release} \
+                    $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" |
+        sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
     else
-      curl -fsSL https://download.docker.com/linux/${release}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      sudo curl -fsSL https://download.docker.com/linux/${release}/gpg -o /etc/apt/keyrings/docker.asc
+      sudo chmod a+r /etc/apt/keyrings/docker.asc
       echo \
-        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/${release} \
-            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${release} \
+            $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" |
+        sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
     fi
     ${package_manager} update -y
   fi
@@ -274,6 +287,9 @@ main() {
 
   # Initialize variables
   init_var
+
+  # Create necessary directories
+  create_directories
 
   # Check system compatibility
   check_system
