@@ -3,9 +3,8 @@
 # Author: jonssonyan <https://jonssonyan.com>
 # Github: https://github.com/jonssonyan/install-script
 
-set -e # Exit immediately if a command exits with a non-zero status
+set -e
 
-# Initialize variables
 init_var() {
   ECHO_TYPE="echo -e"
 
@@ -18,7 +17,6 @@ init_var() {
   proxy_pass=""
 }
 
-# Colorized output functions
 echo_content() {
   local color_code
   case $1 in
@@ -34,7 +32,6 @@ echo_content() {
   ${ECHO_TYPE} "${color_code}$2\033[0m"
 }
 
-# Create necessary directories
 create_directories() {
   mkdir -p ${NGINX_ACME_DATA}
   mkdir -p ${NGINX_ACME_SSL}
