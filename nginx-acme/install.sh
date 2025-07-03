@@ -32,7 +32,7 @@ echo_content() {
   ${ECHO_TYPE} "${color_code}$2\033[0m"
 }
 
-create_directories() {
+create_dirs() {
   mkdir -p ${NGINX_ACME_DATA}
   mkdir -p ${NGINX_ACME_SSL}
   mkdir -p ${NGINX_ACME_CONFD}
@@ -44,7 +44,7 @@ install_docker() {
 
 install_nginx_acme() {
   if [[ -z $(docker ps -q -f "name=^${nginx_acme_ip}$") ]]; then
-    echo_content green "---> Installing Nginx ACME"
+    echo_content green "---> Install Nginx ACME"
 
     docker run -d --name ${nginx_acme_ip} --restart always \
       --network=host \
@@ -64,7 +64,7 @@ install_nginx_acme() {
 }
 
 add_domain() {
-  while read -r -p "Please input your domain(Required): " domain; do
+  while read -r -p "Please input your Domain(Required): " domain; do
     if [[ -z "${domain}" ]]; then
       echo_content red "Domain required"
     else
@@ -79,6 +79,7 @@ add_domain() {
       break
     fi
   done
+
   cat >"${NGINX_ACME_CONFD}/${domain}.conf" <<EOF
 server {
     listen 80;
@@ -112,12 +113,14 @@ server {
     }
 }
 EOF
+
   docker exec ${nginx_acme_ip} nginx -s reload
   docker exec ${nginx_acme_ip} acme.sh --issue --nginx -d ${domain}
   docker exec ${nginx_acme_ip} acme.sh --install-cert -d "${domain}" \
     --key-file /etc/nginx/ssl/${domain}.key \
     --fullchain-file /etc/nginx/ssl/${domain}.crt \
     --reloadcmd "nginx -s reload"
+  echo_content skyBlue "---> Domain ${domain} added successfully"
 }
 
 main() {
@@ -125,7 +128,7 @@ main() {
 
   init_var
 
-  create_directories
+  create_dirs
 
   install_docker
 
