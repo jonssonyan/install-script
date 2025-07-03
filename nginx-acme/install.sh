@@ -118,3 +118,23 @@ EOF
     --fullchain-file /etc/nginx/ssl/${domain}.crt \
     --reloadcmd "nginx -s reload"
 }
+
+# Main execution function
+main() {
+  cd "$HOME" || exit 1
+
+  # Initialize variables
+  init_var
+
+  # Create necessary directories
+  create_directories
+
+  install_docker
+
+  install_nginx_acme
+
+  add_domain
+}
+
+# Execute main function with all arguments
+main "$@"
