@@ -190,7 +190,7 @@ install_docker_service() {
   # Check if Docker is required and not installed
   if [[ "${require_docker}" == "true" ]] && ! command -v docker &>/dev/null; then
     echo_content yellow "---> Docker not found, installing Docker first..."
-    bash <(curl -fsSL ${REMOTE_SCRIPT_BASE}/docker.sh)
+    bash <(curl -fsSL ${REMOTE_SCRIPT_BASE}/install.sh)
   fi
 
   # Run the remote installation script
@@ -260,7 +260,7 @@ process_args() {
   case "$1" in
   docker)
     prepare_environment
-    install_docker_service "Docker Engine" "docker.sh" "false"
+    install_docker_service "Docker Engine" "install.sh" "false"
     ;;
   buildx)
     install_docker_service "Docker Buildx" "buildx.sh" "true"
