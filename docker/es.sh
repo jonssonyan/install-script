@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+# Elasticsearch Installation Script
+# Author: jonssonyan <https://jonssonyan.com>
+# Github: https://github.com/jonssonyan/install-script
+
+set -e
 
 # 官方文档：https://www.elastic.co/guide/en/elasticsearch/reference/7.17/docker.html#docker
 # 设置密码：进入容器执行 `elasticsearch-setup-passwords interactive`
