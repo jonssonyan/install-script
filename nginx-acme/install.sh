@@ -41,6 +41,10 @@ create_directories() {
   mkdir -p ${NGINX_ACME_CONFD}
 }
 
+install_docker() {
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
+}
+
 install_nginx_acme() {
   if [[ -z $(docker ps -q -f "name=^${nginx_acme_ip}$") ]]; then
     echo_content green "---> Installing Nginx ACME"
@@ -119,14 +123,11 @@ EOF
     --reloadcmd "nginx -s reload"
 }
 
-# Main execution function
 main() {
   cd "$HOME" || exit 1
 
-  # Initialize variables
   init_var
 
-  # Create necessary directories
   create_directories
 
   install_docker
@@ -136,5 +137,4 @@ main() {
   add_domain
 }
 
-# Execute main function with all arguments
 main "$@"
