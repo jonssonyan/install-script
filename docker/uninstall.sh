@@ -53,10 +53,10 @@ check_sys() {
 
   if [[ -n $(find /etc -name "redhat-release") ]] || grep </proc/version -q -i "centos"; then
     release="centos"
-    if rpm -q centos-stream-release &> /dev/null; then
-        version=$(rpm -q --queryformat '%{VERSION}' centos-stream-release)
-    elif rpm -q centos-release &> /dev/null; then
-        version=$(rpm -q --queryformat '%{VERSION}' centos-release)
+    if rpm -q centos-stream-release &>/dev/null; then
+      version=$(rpm -q --queryformat '%{VERSION}' centos-stream-release)
+    elif rpm -q centos-release &>/dev/null; then
+      version=$(rpm -q --queryformat '%{VERSION}' centos-release)
     fi
   elif grep </etc/issue -q -i "debian" && [[ -f "/etc/issue" ]] || grep </etc/issue -q -i "debian" && [[ -f "/proc/version" ]]; then
     release="debian"
@@ -126,8 +126,14 @@ uninstall_docker() {
   fi
 }
 
-cd "$HOME" || exit 0
-init_var
-check_sys
-clear
-uninstall_docker
+main() {
+  cd "$HOME" || exit 1
+
+  init_var
+
+  check_sys
+
+  uninstall_docker
+}
+
+main "$@"

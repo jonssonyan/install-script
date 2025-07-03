@@ -51,7 +51,7 @@ can_connect() {
   fi
 }
 
-mkdir_tools() {
+create_dirs() {
   mkdir -p ${SW_DATA}
   mkdir -p ${SW_DATA_OAP_LIBS}
 }
@@ -137,9 +137,16 @@ install_skywalking() {
   fi
 }
 
-cd "$HOME" || exit 0
-init_var
-mkdir_tools
-clear
-install_docker
-install_skywalking
+main() {
+  cd "$HOME" || exit 1
+
+  init_var
+
+  create_dirs
+
+  install_docker
+
+  install_skywalking
+}
+
+main "$@"

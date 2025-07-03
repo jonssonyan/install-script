@@ -37,7 +37,7 @@ echo_content() {
   ${ECHO_TYPE} "${color_code}$2\033[0m"
 }
 
-mkdir_tools() {
+create_dirs() {
   mkdir -p ${ES_DATA}
   mkdir -p ${ES_DATA_CONFIG} ${ES_DATA_LOGS} ${ES_DATA_DATA} ${ES_DATA_PLUGINS}
   chmod -R g+rwx ${ES_DATA}
@@ -94,9 +94,16 @@ EOF
   fi
 }
 
-cd "$HOME" || exit 0
-init_var
-mkdir_tools
-clear
-install_docker
-install_es
+main() {
+  cd "$HOME" || exit 1
+
+  init_var
+
+  create_dirs
+
+  install_docker
+
+  install_es
+}
+
+main "$@"

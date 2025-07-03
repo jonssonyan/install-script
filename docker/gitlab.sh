@@ -35,7 +35,7 @@ echo_content() {
   ${ECHO_TYPE} "${color_code}$2\033[0m"
 }
 
-mkdir_tools() {
+create_dirs() {
   mkdir -p ${GITLAB_DATA}
   mkdir -p ${GITLAB_CONFIG}
   mkdir -p ${GITLAB_LOG}
@@ -78,9 +78,16 @@ install_gitlab() {
   fi
 }
 
-cd "$HOME" || exit 0
-init_var
-mkdir_tools
-clear
-install_docker
-install_gitlab
+main() {
+  cd "$HOME" || exit 1
+
+  init_var
+
+  create_dirs
+
+  install_docker
+
+  install_gitlab
+}
+
+main "$@"

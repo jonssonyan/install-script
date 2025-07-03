@@ -30,7 +30,7 @@ echo_content() {
   ${ECHO_TYPE} "${color_code}$2\033[0m"
 }
 
-mkdir_tools() {
+create_dirs() {
   mkdir -p ${REDIS_DATA}
   mkdir -p ${REDIS_DATA}data/
 }
@@ -74,9 +74,16 @@ install_redis() {
   fi
 }
 
-cd "$HOME" || exit 0
-init_var
-mkdir_tools
-clear
-install_docker
-install_redis
+main() {
+  cd "$HOME" || exit 1
+
+  init_var
+
+  create_dirs
+
+  install_docker
+
+  install_redis
+}
+
+main "$@"

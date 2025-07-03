@@ -30,7 +30,7 @@ echo_content() {
   ${ECHO_TYPE} "${color_code}$2\033[0m"
 }
 
-mkdir_tools() {
+create_dirs() {
   mkdir -p ${SW_DATA}
 }
 
@@ -66,9 +66,16 @@ install_skywalking_ui() {
   fi
 }
 
-cd "$HOME" || exit 0
-init_var
-mkdir_tools
-clear
-install_docker
-install_skywalking_ui
+main() {
+  cd "$HOME" || exit 1
+
+  init_var
+
+  create_dirs
+
+  install_docker
+
+  install_skywalking_ui
+}
+
+main "$@"

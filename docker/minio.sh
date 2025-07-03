@@ -33,7 +33,7 @@ echo_content() {
   ${ECHO_TYPE} "${color_code}$2\033[0m"
 }
 
-mkdir_tools() {
+create_dirs() {
   mkdir -p ${MINIO_DATA}
   mkdir -p ${MINIO_DATA_DATA}
   mkdir -p ${MINIO_DATA_CONFIG}
@@ -87,9 +87,16 @@ install_minio() {
   fi
 }
 
-cd "$HOME" || exit 0
-init_var
-mkdir_tools
-clear
-install_docker
-install_minio
+main() {
+  cd "$HOME" || exit 1
+
+  init_var
+
+  create_dirs
+
+  install_docker
+
+  install_minio
+}
+
+main "$@"

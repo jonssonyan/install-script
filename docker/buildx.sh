@@ -66,8 +66,14 @@ EOF
   fi
 }
 
-cd "$HOME" || exit 0
-init_var
-clear
-install_docker
-install_buildx
+main() {
+  cd "$HOME" || exit 1
+
+  init_var
+
+  install_docker
+
+  install_buildx
+}
+
+main "$@"
