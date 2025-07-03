@@ -41,7 +41,7 @@ echo_content() {
 }
 
 # Create necessary directories
-create_directories() {
+create_dirs() {
   mkdir -p ${DOCKER_DATA}
 }
 
@@ -293,7 +293,7 @@ main() {
   init_var
 
   # Create necessary directories
-  create_directories
+  create_dirs
 
   # Check system compatibility
   check_system

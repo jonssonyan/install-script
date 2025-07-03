@@ -59,7 +59,7 @@ echo_content() {
 }
 
 # Create necessary directories
-create_directories() {
+create_dirs() {
   mkdir -p ${K8S_DATA} ${K8S_LOG} ${K8S_NETWORK}
 }
 
@@ -823,7 +823,7 @@ main() {
   init_var
 
   # Create necessary directories
-  create_directories
+  create_dirs
 
   # Check system compatibility
   check_system
