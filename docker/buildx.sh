@@ -11,29 +11,18 @@ init_var() {
 }
 
 echo_content() {
+  local color_code
   case $1 in
-  "red")
-    ${ECHO_TYPE} "\033[31m$2\033[0m"
-    ;;
-  "green")
-    ${ECHO_TYPE} "\033[32m$2\033[0m"
-    ;;
-  "yellow")
-    ${ECHO_TYPE} "\033[33m$2\033[0m"
-    ;;
-  "blue")
-    ${ECHO_TYPE} "\033[34m$2\033[0m"
-    ;;
-  "purple")
-    ${ECHO_TYPE} "\033[35m$2\033[0m"
-    ;;
-  "skyBlue")
-    ${ECHO_TYPE} "\033[36m$2\033[0m"
-    ;;
-  "white")
-    ${ECHO_TYPE} "\033[37m$2\033[0m"
-    ;;
+  "red") color_code="\033[31m" ;;
+  "green") color_code="\033[32m" ;;
+  "yellow") color_code="\033[33m" ;;
+  "blue") color_code="\033[34m" ;;
+  "purple") color_code="\033[35m" ;;
+  "skyBlue") color_code="\033[36m" ;;
+  "white") color_code="\033[37m" ;;
+  *) color_code="\033[0m" ;;
   esac
+  ${ECHO_TYPE} "${color_code}$2\033[0m"
 }
 
 install_docker() {
