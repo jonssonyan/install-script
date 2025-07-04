@@ -43,23 +43,24 @@ install_docker() {
 }
 
 install_nginx_acme() {
-  if [[ -z $(docker ps -q -f "name=^${nginx_acme_ip}$") ]]; then
-    echo_content green "---> Install Nginx ACME"
-
-    docker run -d --name ${nginx_acme_ip} --restart always \
-      --network=host \
-      -v ${NGINX_ACME_SSL}:/etc/nginx/ssl/ \
-      -v ${NGINX_ACME_CONFD}:/etc/nginx/conf.d/ \
-      nginx-acme:latest
-
-    if [[ -n $(docker ps -q -f "name=^${nginx_acme_ip}$") ]]; then
-      echo_content skyBlue "---> Nginx ACME installation complete"
-    else
-      echo_content red "---> Nginx ACME installation failed"
-      exit 1
-    fi
-  else
+  if docker ps -q -f "name=^${nginx_acme_ip}$" &>/dev/null; then
     echo_content skyBlue "Nginx ACME is already installed"
+    return
+  fi
+
+  echo_content green "---> Installing Nginx ACME"
+
+  docker run -d --name ${nginx_acme_ip} --restart always \
+    --network=host \
+    -v ${NGINX_ACME_SSL}:/etc/nginx/ssl/ \
+    -v ${NGINX_ACME_CONFD}:/etc/nginx/conf.d/ \
+    nginx-acme:latest
+
+  if [[ -n $(docker ps -q -f "name=^${nginx_acme_ip}$") ]]; then
+    echo_content skyBlue "---> Nginx ACME installation complete"
+  else
+    echo_content red "---> Nginx ACME installation failed"
+    exit 1
   fi
 }
 
