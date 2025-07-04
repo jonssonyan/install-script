@@ -1,5 +1,11 @@
 # Nginx with ACME.sh
 
+## Quick Start
+
+```bash
+bash <(curl -fsSL https://github.com/jonssonyan/install-script/blob/main/nginx-acme/install.sh)
+```
+
 ## File directory
 
 - Host
