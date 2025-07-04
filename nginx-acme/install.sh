@@ -62,6 +62,9 @@ install_nginx_acme() {
 
   if [[ -n $(docker ps -q -f "name=^${nginx_acme_ip}$" -f "status=running") ]]; then
     echo_content skyBlue "---> Nginx ACME installation complete"
+    echo_content yellow "---> Nginx ACME SSL directory: ${NGINX_ACME_SSL}"
+    echo_content yellow "---> Nginx ACME config directory: ${NGINX_ACME_CONFD}"
+    echo_content yellow "---> Nginx ACME log directory: ${NGINX_ACME_LOG}"
   else
     echo_content red "---> Nginx ACME installation failed"
     exit 1
@@ -107,6 +110,7 @@ EOF
     --reloadcmd "nginx -s reload"
 
   echo_content green "---> Certificate installed successfully"
+  echo_content yellow "---> Nginx ACME SSL directory: ${NGINX_ACME_SSL}"
 }
 
 proxy_pass() {
@@ -178,6 +182,7 @@ EOF
   docker exec ${nginx_acme_ip} nginx -s reload
 
   echo_content green "---> Domain: ${domain} proxy pass successfully"
+  echo_content green "---> Domain: ${domain} Nginx ACME config path: ${NGINX_ACME_CONFD}/${domain}.conf"
 }
 
 show_menu() {
