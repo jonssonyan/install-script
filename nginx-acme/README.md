@@ -1,1 +1,14 @@
 > https://github.com/acmesh-official/acme.sh
+
+File directory:
+
+- Host
+    - nginx config: /dockerdata/nginxacme/conf.d
+    - nginx ssl: /dockerdata/nginxacme/ssl
+    - nginx log: /dockerdata/nginxacme/log
+- Container
+    - acme: /root/.acme.sh
+    - webroot: /var/www/acme-challenge
+    - nginx config: /etc/nginx/conf.d
+    - nginx ssl: /etc/nginx/ssl
+    - nginx log: /var/log/nginx
