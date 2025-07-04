@@ -8,7 +8,7 @@ set -e
 init_var() {
   ECHO_TYPE="echo -e"
 
-  # buildx
+  buildx_ip="jy-buildx"
   DOCKER_CONFIG_PATH='/root/.docker/'
   docker_config='/root/.docker/config.json'
 }
@@ -32,37 +32,35 @@ install_docker() {
   bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
 }
 
-# 安装 buildx 交叉编译
 install_buildx() {
-  docker buildx inspect --bootstrap | grep -q "mybuilder"
-  if [[ "$?" != "0" ]]; then
-    echo_content green "---> 安装 buildx 交叉编译"
+  if docker buildx inspect --bootstrap | grep -q "${buildx_ip}"; then
+    echo_content skyBlue "---> buildx is already installed"
+    return
+  fi
 
-    if [[ -d "${DOCKER_CONFIG_PATH}" && -f "${docker_config}" ]]; then
-      if ! grep -q "experimental" "${docker_config}"; then
-        jq '.experimental="enabled"' "${docker_config}" >tmp.json && mv tmp.json "${docker_config}"
-      fi
-    else
-      mkdir -p "${DOCKER_CONFIG_PATH}"
-      cat >"${docker_config}" <<EOF
+  echo_content green "---> Installing buildx"
+
+  mkdir -p "${DOCKER_CONFIG_PATH}"
+  if [[ -f "${docker_config}" ]]; then
+    if ! grep -q "experimental" "${docker_config}"; then
+      jq '.experimental="enabled"' "${docker_config}" >"${docker_config}.tmp" && mv "${docker_config}.tmp" "${docker_config}"
+    fi
+  else
+    cat >"${docker_config}" <<EOF
 {
   "experimental": "enabled"
 }
 EOF
-    fi
+  fi
 
-    docker buildx create --use --name mybuilder &&
-      docker buildx use mybuilder &&
-      docker run --privileged --rm tonistiigi/binfmt --install all
+  docker buildx create --use --name ${buildx_ip} &&
+    docker run --privileged --rm tonistiigi/binfmt --install all
 
-    if docker buildx inspect --bootstrap | grep -q "mybuilder"; then
-      echo_content skyBlue "---> buildx 交叉编译安装完成"
-    else
-      echo_content red "---> buildx 交叉编译安装失败"
-      exit 1
-    fi
+  if docker buildx inspect --bootstrap | grep -q "${buildx_ip}"; then
+    echo_content skyBlue "---> buildx installation completed"
   else
-    echo_content skyBlue "---> 你已经安装了 buildx 交叉编译"
+    echo_content red "---> buildx installation failed"
+    exit 1
   fi
 }
 
