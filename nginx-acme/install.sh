@@ -54,7 +54,6 @@ install_nginx_acme() {
 
   docker run -d --name ${nginx_acme_ip} --restart always \
     --network=host \
-    -e EMAIL=my@gmail.com \
     -v ${NGINX_ACME_SSL}:/etc/nginx/ssl/ \
     -v ${NGINX_ACME_CONFD}:/etc/nginx/conf.d/ \
     nginx-acme
