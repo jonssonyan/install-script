@@ -57,7 +57,6 @@ install_nginx_acme() {
     -e EMAIL=my@gmail.com \
     -v ${NGINX_ACME_SSL}:/etc/nginx/ssl/ \
     -v ${NGINX_ACME_CONFD}:/etc/nginx/conf.d/ \
-    -v ${NGINX_ACME_LOG}:/var/log/nginx/ \
     nginx-acme
 
   if [[ -n $(docker ps -q -f "name=^${nginx_acme_ip}$" -f "status=running") ]]; then
