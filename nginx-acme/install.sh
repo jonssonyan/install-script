@@ -86,7 +86,7 @@ server {
     listen 80;
     server_name $domain;
 
-    location ^~ /.well-known/acme-challenge/ {
+    location /.well-known/acme-challenge/ {
         root /var/www/acme-challenge;
         default_type "text/plain";
         try_files \$uri =404;
@@ -94,7 +94,15 @@ server {
 
     return 301 https://\$host\$request_uri;
 }
+EOF
 
+  docker exec ${nginx_acme_ip} acme.sh --issue --nginx -d ${domain} -w /var/www/acme-challenge
+  docker exec ${nginx_acme_ip} acme.sh --install-cert -d "${domain}" \
+    --key-file /etc/nginx/ssl/${domain}.key \
+    --fullchain-file /etc/nginx/ssl/${domain}.crt \
+    --reloadcmd "nginx -s reload"
+
+  cat >>"${NGINX_ACME_CONFD}/${domain}.conf" <<EOF
 server {
     listen 443 ssl;
     server_name $domain;
@@ -114,12 +122,6 @@ server {
     }
 }
 EOF
-
-  docker exec ${nginx_acme_ip} acme.sh --issue --nginx -d ${domain}
-  docker exec ${nginx_acme_ip} acme.sh --install-cert -d "${domain}" \
-    --key-file /etc/nginx/ssl/${domain}.key \
-    --fullchain-file /etc/nginx/ssl/${domain}.crt \
-    --reloadcmd "nginx -s reload"
   echo_content skyBlue "---> Domain ${domain} added successfully"
 }
 
