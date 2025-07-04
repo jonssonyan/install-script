@@ -186,7 +186,8 @@ show_menu() {
   echo_content skyBlue "Github: https://github.com/jonssonyan/install-script"
   echo_content red "=============================================================="
   echo_content yellow "1. Install Nginx ACME"
-  echo_content yellow "2. Proxy pass with Nginx ACME"
+  echo_content yellow "2. Install SSL certificate"
+  echo_content yellow "3. Proxy pass"
   echo_content red "=============================================================="
   echo_content yellow "0. Exit"
   echo_content red "=============================================================="
@@ -206,10 +207,15 @@ main() {
     1)
       install_docker
       install_nginx_acme
-      install_cert
       read -r
       ;;
     2)
+      install_docker
+      install_nginx_acme
+      install_cert
+      read -r
+      ;;
+    3)
       install_docker
       install_nginx_acme
       proxy_pass
