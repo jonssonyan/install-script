@@ -115,7 +115,6 @@ server {
 }
 EOF
 
-  docker exec ${nginx_acme_ip} nginx -s reload
   docker exec ${nginx_acme_ip} acme.sh --issue --nginx -d ${domain}
   docker exec ${nginx_acme_ip} acme.sh --install-cert -d "${domain}" \
     --key-file /etc/nginx/ssl/${domain}.key \

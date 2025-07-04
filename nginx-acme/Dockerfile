@@ -12,7 +12,3 @@ RUN curl https://get.acme.sh | sh -s email=my@example.com \
 RUN mkdir -p /etc/nginx/ssl /var/www/acme-challenge
 
 COPY nginx.conf /etc/nginx/nginx.conf
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
