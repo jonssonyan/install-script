@@ -14,6 +14,7 @@ init_var() {
   NGINX_ACME_LOG="${NGINX_ACME_DATA}/log"
 
   nginx_acme_ip="jy-nginx-acme"
+  acme_ca="letsencrypt"
   domain=""
   proxy_pass=""
 }
@@ -104,7 +105,7 @@ EOF
 
   echo_content green "---> Requesting SSL certificate for ${domain}"
 
-  docker exec ${nginx_acme_ip} acme.sh --issue -d ${domain} -w /var/www/acme-challenge --server letsencrypt
+  docker exec ${nginx_acme_ip} acme.sh --issue -d ${domain} -w /var/www/acme-challenge --server ${acme_ca}
 
   echo_content skyBlue "---> Certificate issued successfully"
 
