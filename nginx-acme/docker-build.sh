@@ -51,7 +51,7 @@ docker_push() {
 }
 
 main() {
-  cd "$HOME" || exit 1
+  cd "$(dirname "$0")" || exit 1
 
   init_var
 
