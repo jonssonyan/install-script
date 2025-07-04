@@ -45,7 +45,7 @@ install_docker() {
 }
 
 install_nginx_acme() {
-  if docker ps -q -f "name=^${nginx_acme_ip}$" &>/dev/null; then
+  if [[ -n $(docker ps -q -f "name=^${nginx_acme_ip}$") ]]; then
     echo_content skyBlue "Nginx ACME is already installed"
     return
   fi
@@ -60,7 +60,7 @@ install_nginx_acme() {
     -v ${NGINX_ACME_LOG}:/var/log/ \
     nginx-acme
 
-  if docker ps -q -f "name=^${nginx_acme_ip}$" &>/dev/null; then
+  if [[ -n $(docker ps -q -f "name=^${nginx_acme_ip}$" -f "status=running") ]]; then
     echo_content skyBlue "---> Nginx ACME installation complete"
   else
     echo_content red "---> Nginx ACME installation failed"
