@@ -77,6 +77,9 @@ install_cert() {
     fi
   done
 
+  read -r -p "Please input CA(default:letsencrypt): " acme_ca
+  [[ -z "${acme_ca}" ]] && acme_ca="letsencrypt"
+
   cat >"${NGINX_ACME_CONFD}/${domain}.conf" <<EOF
 server {
     listen 80;
