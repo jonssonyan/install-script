@@ -95,10 +95,6 @@ server {
         default_type "text/plain";
         try_files \$uri =404;
     }
-
-    location / {
-        return 301 https://\$host\$request_uri;
-    }
 }
 EOF
 
