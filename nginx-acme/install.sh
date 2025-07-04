@@ -68,18 +68,10 @@ install_nginx_acme() {
   fi
 }
 
-add_domain() {
+install_cert() {
   while read -r -p "Please input your Domain(Required): " domain; do
     if [[ -z "${domain}" ]]; then
       echo_content red "Domain required"
-    else
-      break
-    fi
-  done
-
-  while read -r -p "Please input your Proxy pass(Required): " proxy_pass; do
-    if [[ -z "${proxy_pass}" ]]; then
-      echo_content red "Proxy pass required"
     else
       break
     fi
@@ -104,13 +96,37 @@ EOF
 
   docker exec ${nginx_acme_ip} acme.sh --issue -d ${domain} -w /var/www/acme-challenge --server ${acme_ca}
 
-  echo_content skyBlue "---> Certificate issued successfully"
+  echo_content green "---> Certificate issued successfully"
 
-  # 安装证书
   docker exec ${nginx_acme_ip} acme.sh --install-cert -d "${domain}" \
     --key-file /etc/nginx/ssl/${domain}.key \
     --fullchain-file /etc/nginx/ssl/${domain}.crt \
     --reloadcmd "nginx -s reload"
+
+  echo_content green "---> Certificate installed successfully"
+}
+
+proxy_pass() {
+  while read -r -p "Please input your Domain(Required): " domain; do
+    if [[ -z "${domain}" ]]; then
+      echo_content red "Domain required"
+    else
+      break
+    fi
+  done
+
+  while read -r -p "Please input your Proxy pass(Required): " proxy_pass; do
+    if [[ -z "${proxy_pass}" ]]; then
+      echo_content red "Proxy pass required"
+    else
+      break
+    fi
+  done
+
+  if [[ ! -f "${NGINX_ACME_SSL}/${domain}.crt" || ! -f "${NGINX_ACME_SSL}/${domain}.key" ]]; then
+    echo_content red "---> SSL certificate or key for ${domain} not found."
+    exit 1
+  fi
 
   cat >"${NGINX_ACME_CONFD}/${domain}.conf" <<EOF
 server {
@@ -158,7 +174,22 @@ EOF
 
   docker exec ${nginx_acme_ip} nginx -s reload
 
-  echo_content skyBlue "---> Domain ${domain} added successfully"
+  echo_content green "---> Domain: ${domain} proxy pass successfully"
+}
+
+show_menu() {
+  clear
+  echo_content red "=============================================================="
+  echo_content skyBlue "Nginx ACME Installation Script"
+  echo_content skyBlue "Supported OS: CentOS 8+/Ubuntu 20+/Debian 11+"
+  echo_content skyBlue "Author: jonssonyan <https://jonssonyan.com>"
+  echo_content skyBlue "Github: https://github.com/jonssonyan/install-script"
+  echo_content red "=============================================================="
+  echo_content yellow "1. Install Nginx ACME"
+  echo_content yellow "2. Proxy pass with Nginx ACME"
+  echo_content red "=============================================================="
+  echo_content yellow "0. Exit"
+  echo_content red "=============================================================="
 }
 
 main() {
@@ -168,11 +199,32 @@ main() {
 
   create_dirs
 
-  install_docker
-
-  install_nginx_acme
-
-  add_domain
+  while true; do
+    show_menu
+    read -r -p "Please choose an option: " input_option
+    case ${input_option} in
+    1)
+      install_docker
+      install_nginx_acme
+      install_cert
+      read -r
+      ;;
+    2)
+      install_docker
+      install_nginx_acme
+      proxy_pass
+      read -r
+      ;;
+    0)
+      echo_content green "Exiting..."
+      exit 0
+      ;;
+    *)
+      echo_content red "Invalid option. Please try again."
+      sleep 2
+      ;;
+    esac
+  done
 }
 
 main "$@"
