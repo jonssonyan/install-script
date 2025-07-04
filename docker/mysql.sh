@@ -80,7 +80,7 @@ install_mysql() {
           --collation-server=utf8mb4_unicode_ci
     fi
 
-    if [[ -n $(docker ps -q -f "name=^${mysql_ip}$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${mysql_ip}$" -f "status=running") ]]; then
       echo_content skyBlue "---> MySQL 安装完成"
       echo_content yellow "---> MySQL root 的数据库密码(请妥善保存): ${mysql_pas}"
       if [[ "${mysql_user}" != "root" ]]; then

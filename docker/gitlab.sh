@@ -64,7 +64,7 @@ install_gitlab() {
         -v ${GITLAB_OPT}:/var/opt/gitlab \
         gitlab/gitlab-ce:15.11.11-ce.0
 
-    if [[ -n $(docker ps -q -f "name=^${gitlab_ip}$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${gitlab_ip}$" -f "status=running") ]]; then
       gitlab_password=$(docker exec cat ${GITLAB_CONFIG}initial_root_password)
       echo_content skyBlue "---> GitLab安装完成"
       echo_content yellow "---> GitLab的用户号名(请妥善保存): root"

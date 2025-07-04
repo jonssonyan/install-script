@@ -74,7 +74,7 @@ install_minio() {
         minio/minio \
         server /data --address ":${minio_server_port}" --console-address ":${minio_console_port}"
 
-    if [[ -n $(docker ps -q -f "name=^${minio_ip}$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${minio_ip}$" -f "status=running") ]]; then
       echo_content skyBlue "---> Minio安装完成"
       echo_content yellow "---> Minio的用户号名(请妥善保存): ${minio_root_user}"
       echo_content yellow "---> Minio的密码(请妥善保存): ${minio_root_password}"

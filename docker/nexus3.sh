@@ -46,7 +46,7 @@ install_nexus3() {
         -e TZ=Asia/Shanghai \
         sonatype/nexus3:3.49.0
 
-    if [[ -n $(docker ps -q -f "name=^${nexus3_ip}$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${nexus3_ip}$" -f "status=running") ]]; then
       password=$(docker exec ${nexus3_ip} cat /nexus-data/admin.password)
       echo_content skyBlue "---> Nexus3安装完成"
       echo_content yellow "---> Nexus3 admin的密码(请妥善保存): ${password}"

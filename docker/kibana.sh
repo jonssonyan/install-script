@@ -77,7 +77,7 @@ EOF
         -v ${KIBANA_DATA_CONFIG}/kibana.yml:/usr/share/kibana/config/kibana.yml \
         kibana:7.17.10
 
-    if [[ -n $(docker ps -q -f "name=^${kibana_ip}$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${kibana_ip}$" -f "status=running") ]]; then
       echo_content skyBlue "---> Kibana安装完成"
     else
       echo_content red "---> Kibana安装失败或运行异常,请尝试修复或卸载重装"

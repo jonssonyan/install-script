@@ -50,7 +50,7 @@ install_nacos() {
         -e NACOS_SERVER_PORT=${nacos_port} \
         -e TZ=Asia/Shanghai \
         nacos/nacos-server:v2.1.2
-    if [[ -n $(docker ps -q -f "name=^${nacos_ip}$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${nacos_ip}$" -f "status=running") ]]; then
       echo_content skyBlue "---> Nacos安装完成"
       echo_content yellow "---> Nacos的登录地址: http://ip:${nacos_port}/nacos/#/login"
       echo_content yellow "---> Nacos的用户号名(请妥善保存): nacos"

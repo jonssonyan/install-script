@@ -82,7 +82,7 @@ EOF
         -v ${ES_DATA_PLUGINS}:/usr/share/elasticsearch/plugins/ \
         elasticsearch:7.17.10
 
-    if [[ -n $(docker ps -q -f "name=^${es_ip}$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${es_ip}$" -f "status=running") ]]; then
       echo_content skyBlue "---> Elasticsearch安装完成"
       echo_content yellow "---> 设置密码请进入容器执行: elasticsearch-setup-passwords interactive"
     else

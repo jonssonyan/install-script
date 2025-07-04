@@ -182,7 +182,7 @@ EOF
         -v ${SSR_DATA}config.json:/etc/shadowsocks-r/config.json \
         teddysun/shadowsocks-r
 
-    if [[ -n $(docker ps -q -f "name=^${ssr_ip}$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${ssr_ip}$" -f "status=running") ]]; then
       echo_content skyBlue "---> ShadowsocksR安装完成"
       echo_content yellow "---> 端口: ${ssr_port}"
       echo_content yellow "---> 密码(请妥善保存): ${ssr_password}"

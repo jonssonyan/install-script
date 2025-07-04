@@ -62,7 +62,7 @@ install_postgresql() {
         postgres:13 \
         -c "port=${postgresql_port}"
 
-    if [[ -n $(docker ps -q -f "name=^${postgresql_ip}$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${postgresql_ip}$" -f "status=running") ]]; then
       echo_content skyBlue "---> PostgreSQL 安装完成"
       echo_content yellow "---> PostgreSQL postgres 的数据库密码(请妥善保存): ${postgresql_pas}"
     else

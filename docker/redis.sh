@@ -62,7 +62,7 @@ install_redis() {
         redis:6.2.13 \
         redis-server --requirepass "${redis_pass}" --port "${redis_port}"
 
-    if [[ -n $(docker ps -q -f "name=^${redis_ip}$") ]]; then
+    if [[ -n $(docker ps -q -f "name=^${redis_ip}$" -f "status=running") ]]; then
       echo_content skyBlue "---> Redis 安装完成"
       echo_content yellow "---> Redis 的数据库密码(请妥善保存): ${redis_pass}"
     else
