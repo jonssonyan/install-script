@@ -51,7 +51,7 @@ install_nginx_acme() {
     return
   fi
 
-  echo_content green "---> Installing Nginx ACME"
+  echo_content skyBlue "---> Installing Nginx ACME"
 
   docker run -d --name ${nginx_acme_ip} --restart always \
     --network=host \
@@ -103,7 +103,7 @@ EOF
 
   docker exec ${nginx_acme_ip} nginx -s reload
 
-  echo_content green "---> Requesting SSL certificate for ${domain}"
+  echo_content skyBlue "---> Requesting SSL certificate for ${domain}"
 
   docker exec ${nginx_acme_ip} acme.sh --issue -d ${domain} -w /var/www/acme-challenge --server ${acme_ca}
 

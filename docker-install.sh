@@ -128,7 +128,7 @@ check_system() {
 
 # Install dependencies
 install_dependencies() {
-  echo_content green "---> Installing dependencies"
+  echo_content skyBlue "---> Installing dependencies"
 
   if [[ "${package_manager}" == 'apt-get' || "${package_manager}" == 'apt' ]]; then
     ${package_manager} update -y
@@ -146,7 +146,7 @@ install_dependencies() {
 
 # Prepare environment
 prepare_environment() {
-  echo_content green "---> Preparing environment"
+  echo_content skyBlue "---> Preparing environment"
 
   # Sync time
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
@@ -185,7 +185,7 @@ install_docker_service() {
   local script_name=$2
   local require_docker=$3
 
-  echo_content green "---> Installing ${service_name}"
+  echo_content skyBlue "---> Installing ${service_name}"
 
   # Check if Docker is required and not installed
   if [[ "${require_docker}" == "true" ]] && ! command -v docker &>/dev/null; then

@@ -38,7 +38,7 @@ install_docker() {
 
 install_nacos() {
   if [[ -z $(docker ps -q -f "name=^${nacos_ip}$") ]]; then
-    echo_content green "---> 安装Nacos"
+    echo_content skyBlue "---> 安装 Nacos"
 
     read -r -p "请输入Nacos的端口(默认:8848): " nacos_port
     [[ -z "${nacos_port}" ]] && nacos_port=8848

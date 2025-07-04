@@ -38,7 +38,7 @@ install_buildx() {
     return
   fi
 
-  echo_content green "---> Installing buildx"
+  echo_content skyBlue "---> Installing buildx"
 
   mkdir -p "${DOCKER_CONFIG_PATH}"
   if [[ -f "${docker_config}" ]]; then

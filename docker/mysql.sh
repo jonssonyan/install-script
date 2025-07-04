@@ -40,7 +40,7 @@ install_docker() {
 
 install_mysql() {
   if [[ -z $(docker ps -q -f "name=^${mysql_ip}$") ]]; then
-    echo_content green "---> 安装 MySQL"
+    echo_content skyBlue "---> 安装 MySQL"
 
     read -r -p "请输入数据库的端口(默认:9507): " mysql_port
     [[ -z "${mysql_port}" ]] && mysql_port=9507

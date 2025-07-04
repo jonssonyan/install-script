@@ -40,7 +40,7 @@ install_docker() {
 
 install_skywalking_ui() {
   if [[ -z $(docker ps -q -f "name=^${sw_ui_ip}$") ]]; then
-    echo_content green "---> 安装SkyWalking UI"
+    echo_content skyBlue "---> 安装 SkyWalking UI"
 
     read -r -p "请输入SkyWalking UI的端口(默认:8080): " sw_ui_port
     [[ -z "${sw_ui_port}" ]] && sw_ui_port=8080

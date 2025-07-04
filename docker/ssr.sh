@@ -87,7 +87,7 @@ install_docker() {
 
 install_ssr() {
   if [[ -z $(docker ps -q -f "name=^${ssr_ip}$") ]]; then
-    echo_content green "---> 安装ShadowsocksR"
+    echo_content skyBlue "---> 安装 ShadowsocksR"
 
     read -r -p "请输入ShadowsocksR的端口(默认:80): " ssr_port
     [[ -z "${ssr_port}" ]] && ssr_port=80

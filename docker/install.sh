@@ -141,7 +141,7 @@ check_system() {
 
 # Install dependencies
 install_dependencies() {
-  echo_content green "---> Installing dependencies"
+  echo_content skyBlue "---> Installing dependencies"
 
   if [[ "${package_manager}" == 'apt-get' || "${package_manager}" == 'apt' ]]; then
     ${package_manager} update -y
@@ -159,7 +159,7 @@ install_dependencies() {
 
 # Prepare environment
 prepare_environment() {
-  echo_content green "---> Preparing environment"
+  echo_content skyBlue "---> Preparing environment"
 
   # Sync time
   timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0
@@ -194,7 +194,7 @@ prepare_environment() {
 
 # Configure Docker daemon
 setup_docker() {
-  echo_content green "---> Configuring Docker daemon"
+  echo_content skyBlue "---> Configuring Docker daemon"
 
   mkdir -p ${DOCKER_CONFIG}
 
@@ -230,7 +230,7 @@ install_docker() {
     return
   fi
 
-  echo_content green "---> Installing Docker"
+  echo_content skyBlue "---> Installing Docker"
 
   if [[ "${release}" == "centos" ]]; then
     if [[ "${package_manager}" == "dnf" ]]; then

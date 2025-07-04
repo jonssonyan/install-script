@@ -62,9 +62,9 @@ install_docker() {
 
 install_skywalking() {
   if [[ -z $(docker ps -q -f "name=^${sw_oap_ip}$") ]]; then
-    echo_content green "---> 安装SkyWalking OAP"
+    echo_content skyBlue "---> 安装 SkyWalking OAP"
 
-    echo_content green "---> 设置SkyWalking OAP存储方式"
+    echo_content yellow "---> 设置 SkyWalking OAP 存储方式"
     echo_content yellow "1. Elasticsearch7"
     echo_content yellow "2. MySQL"
     read -r -p "请选择(默认:1): " sw_storage
