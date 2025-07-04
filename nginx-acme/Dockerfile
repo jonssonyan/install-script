@@ -3,7 +3,7 @@ FROM nginx:1.18-alpine
 LABEL maintainer="jonsosnyan <https://jonssonyan.com>"
 
 RUN apk update \
-    && apk add --no-cache bash curl openssl \
+    && apk add --no-cache bash curl socat openssl \
     && rm -rf /var/cache/apk/*
 
 RUN curl https://get.acme.sh | sh -s email=my@example.com \
