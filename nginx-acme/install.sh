@@ -102,14 +102,14 @@ EOF
 
   docker exec ${nginx_acme_ip} acme.sh --issue -d ${domain} -w /var/www/acme-challenge --server ${acme_ca}
 
-  echo_content green "---> Certificate issued successfully"
+  echo_content skyBlue "---> Certificate issued successfully"
 
   docker exec ${nginx_acme_ip} acme.sh --install-cert -d "${domain}" \
     --key-file /etc/nginx/ssl/${domain}.key \
     --fullchain-file /etc/nginx/ssl/${domain}.crt \
     --reloadcmd "nginx -s reload"
 
-  echo_content green "---> Certificate installed successfully"
+  echo_content skyBlue "---> Certificate installed successfully"
   echo_content yellow "---> Nginx ACME SSL directory: ${NGINX_ACME_SSL}"
 }
 
@@ -181,8 +181,8 @@ EOF
 
   docker exec ${nginx_acme_ip} nginx -s reload
 
-  echo_content green "---> Domain: ${domain} proxy pass successfully"
-  echo_content green "---> Domain: ${domain} Nginx ACME config path: ${NGINX_ACME_CONFD}/${domain}.conf"
+  echo_content skyBlue "---> Domain: ${domain} proxy pass successfully"
+  echo_content skyBlue "---> Domain: ${domain} Nginx ACME config path: ${NGINX_ACME_CONFD}/${domain}.conf"
 }
 
 show_menu() {
