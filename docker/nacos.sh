@@ -8,7 +8,7 @@ set -e
 init_var() {
   ECHO_TYPE="echo -e"
 
-  NACOS_DATA="/jydata/nacos/"
+  NACOS_DATA="/dockerdata/nacos/"
   nacos_ip="jy-nacos"
   nacos_port=8848
 }

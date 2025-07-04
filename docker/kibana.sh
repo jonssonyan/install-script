@@ -10,7 +10,7 @@ set -e
 init_var() {
   ECHO_TYPE="echo -e"
 
-  KIBANA_DATA="/jydata/kibana/"
+  KIBANA_DATA="/dockerdata/kibana/"
   KIBANA_DATA_CONFIG="${KIBANA_DATA}config/"
   kibana_ip="jy-kibana"
   kibana_server_port=5601

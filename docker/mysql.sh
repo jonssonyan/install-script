@@ -8,7 +8,7 @@ set -e
 init_var() {
   ECHO_TYPE="echo -e"
 
-  MySQL_DATA="/jydata/mysql/"
+  MySQL_DATA="/dockerdata/mysql/"
   mysql_ip="jy-mysql"
   mysql_port=9507
   mysql_user="root"

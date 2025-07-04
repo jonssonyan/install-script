@@ -8,7 +8,7 @@ set -e
 init_var() {
   ECHO_TYPE="echo -e"
 
-  MINIO_DATA="/jydata/minio/"
+  MINIO_DATA="/dockerdata/minio/"
   MINIO_DATA_DATA="${MINIO_DATA}data/"
   MINIO_DATA_CONFIG="${MINIO_DATA}config/"
   minio_ip="jy-minio"

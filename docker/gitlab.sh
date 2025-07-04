@@ -10,7 +10,7 @@ set -e
 init_var() {
   ECHO_TYPE="echo -e"
 
-  GITLAB_DATA="/jydata/gitlab/"
+  GITLAB_DATA="/dockerdata/gitlab/"
   GITLAB_CONFIG="${GITLAB_DATA}config/"
   GITLAB_LOG="${GITLAB_DATA}logs/"
   GITLAB_OPT="${GITLAB_DATA}opt/"

@@ -8,7 +8,7 @@ set -e
 init_var() {
   ECHO_TYPE="echo -e"
 
-  NEXUS3_DATA="/jydata/nexus3/"
+  NEXUS3_DATA="/dockerdata/nexus3/"
   nexus3_ip="jy-nexus3"
   nexus3_port=8081
 }

@@ -8,7 +8,7 @@ set -e
 init_var() {
   ECHO_TYPE="echo -e"
 
-  SW_DATA="/jydata/skywalking/"
+  SW_DATA="/dockerdata/skywalking/"
 
   sw_ui_ip="jy-skywalking-ui"
   sw_ui_port=8080

@@ -11,7 +11,7 @@ set -e
 init_var() {
   ECHO_TYPE="echo -e"
 
-  ES_DATA="/jydata/es/"
+  ES_DATA="/dockerdata/es/"
   ES_DATA_CONFIG="${ES_DATA}config/"
   ES_DATA_LOGS="${ES_DATA}logs/"
   ES_DATA_DATA="${ES_DATA}data/"

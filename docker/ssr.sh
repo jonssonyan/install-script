@@ -9,7 +9,7 @@ init_var() {
   ECHO_TYPE="echo -e"
 
   # ShadowsocksR
-  SSR_DATA="/jydata/ssr/"
+  SSR_DATA="/dockerdata/ssr/"
   ssr_ip="jy-ssr"
   ssr_port=80
   ssr_password="123456"

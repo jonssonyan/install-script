@@ -11,7 +11,7 @@ init_var() {
   ECHO_TYPE="echo -e"
 
   # RustDesk Server
-  RUSTDESK_SERVER="/jydata/rustdesk-server/"
+  RUSTDESK_SERVER="/dockerdata/rustdesk-server/"
   # hbbr RustDesk 中继服务器
   rustdesk_server_hbbr="jy-rustdesk-server-hbbr"
   # hbbs RustDesk ID注册服务器

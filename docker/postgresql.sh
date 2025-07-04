@@ -8,7 +8,7 @@ set -e
 init_var() {
   ECHO_TYPE="echo -e"
 
-  POSTGRESQL_DATA="/jydata/postgresql/"
+  POSTGRESQL_DATA="/dockerdata/postgresql/"
   postgresql_ip="jy-postgresql"
   postgresql_port=9876
   postgresql_user="postgres"
