@@ -1,6 +1,6 @@
-> https://github.com/acmesh-official/acme.sh
+# Nginx with ACME.sh
 
-File directory:
+## File directory
 
 - Host
     - nginx config: /dockerdata/nginxacme/conf.d
@@ -12,3 +12,7 @@ File directory:
     - nginx config: /etc/nginx/conf.d
     - nginx ssl: /etc/nginx/ssl
     - nginx log: /var/log/nginx
+
+## Reference
+
+1. https://github.com/acmesh-official/acme.sh
