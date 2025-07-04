@@ -57,7 +57,7 @@ EOF
     docker run --privileged --rm tonistiigi/binfmt --install all
 
   if docker buildx inspect --bootstrap | grep -q "${buildx_ip}"; then
-    echo_content skyBlue "---> buildx installation completed"
+    echo_content skyBlue "---> buildx installation complete"
   else
     echo_content red "---> buildx installation failed"
     exit 1

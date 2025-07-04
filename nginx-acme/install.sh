@@ -56,7 +56,7 @@ install_nginx_acme() {
     -v ${NGINX_ACME_CONFD}:/etc/nginx/conf.d/ \
     nginx-acme:latest
 
-  if [[ -n $(docker ps -q -f "name=^${nginx_acme_ip}$") ]]; then
+  if docker ps -q -f "name=^${nginx_acme_ip}$" &>/dev/null; then
     echo_content skyBlue "---> Nginx ACME installation complete"
   else
     echo_content red "---> Nginx ACME installation failed"
