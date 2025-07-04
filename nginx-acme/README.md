@@ -1,4 +1,4 @@
-# Nginx with ACME.sh
+# Nginx with acme.sh
 
 ## Quick Start
 
