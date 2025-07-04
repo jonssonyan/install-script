@@ -54,7 +54,7 @@ install_nginx_acme() {
     --network=host \
     -v ${NGINX_ACME_SSL}:/etc/nginx/ssl/ \
     -v ${NGINX_ACME_CONFD}:/etc/nginx/conf.d/ \
-    nginx-acme:latest
+    nginx-acme
 
   if docker ps -q -f "name=^${nginx_acme_ip}$" &>/dev/null; then
     echo_content skyBlue "---> Nginx ACME installation complete"
@@ -96,7 +96,7 @@ server {
 }
 EOF
 
-  docker exec ${nginx_acme_ip} acme.sh --issue --nginx -d ${domain} -w /var/www/acme-challenge
+  docker exec ${nginx_acme_ip} acme.sh --issue -d ${domain} -w /var/www/acme-challenge --server letsencrypt
   docker exec ${nginx_acme_ip} acme.sh --install-cert -d "${domain}" \
     --key-file /etc/nginx/ssl/${domain}.key \
     --fullchain-file /etc/nginx/ssl/${domain}.crt \
