@@ -9,6 +9,7 @@ init_var() {
   ECHO_TYPE="echo -e"
 
   MySQL_DATA="/dockerdata/mysql/"
+  MySQL_DATA_MYSQL="${MySQL_DATA}/mysql/"
   mysql_ip="jy-mysql"
   mysql_port=9507
   mysql_user="root"
@@ -32,6 +33,7 @@ echo_content() {
 
 create_dirs() {
   mkdir -p ${MySQL_DATA}
+  mkdir -p ${MySQL_DATA_MYSQL}
 }
 
 install_docker() {
@@ -60,7 +62,7 @@ install_mysql() {
           --network=host \
           -e MYSQL_ROOT_PASSWORD="${mysql_pas}" \
           -e TZ=Asia/Shanghai \
-          -v ${MySQL_DATA}:/var/lib/mysql \
+          -v ${MySQL_DATA_MYSQL}:/var/lib/mysql \
           mysql:5.7.42 \
           --port ${mysql_port} \
           --character-set-server=utf8mb4 \
@@ -73,7 +75,7 @@ install_mysql() {
           -e MYSQL_USER="${mysql_user}" \
           -e MYSQL_PASSWORD="${mysql_pas}" \
           -e TZ=Asia/Shanghai \
-          -v ${MySQL_DATA}:/var/lib/mysql \
+          -v ${MySQL_DATA_MYSQL}:/var/lib/mysql \
           mysql:5.7.42 \
           --port ${mysql_port} \
           --character-set-server=utf8mb4 \
