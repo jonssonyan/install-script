@@ -9,7 +9,9 @@ init_var() {
   ECHO_TYPE="echo -e"
 
   MySQL_DATA="/dockerdata/mysql/"
-  MySQL_DATA_MYSQL="${MySQL_DATA}/mysql/"
+  MySQL_DATA_MYSQL="${MySQL_DATA}data"
+  MySQL_CONF_MYSQL="${MySQL_DATA}conf"
+  MySQL_LOGS_MYSQL="${MySQL_DATA}logs"
   mysql_ip="jy-mysql"
   mysql_port=9507
   mysql_user="root"
