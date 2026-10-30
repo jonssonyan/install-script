@@ -9,9 +9,9 @@ init_var() {
   ECHO_TYPE="echo -e"
 
   MySQL_DATA="/dockerdata/mysql/"
-  MySQL_DATA_MYSQL="${MySQL_DATA}data"
-  MySQL_CONF_MYSQL="${MySQL_DATA}conf"
-  MySQL_LOGS_MYSQL="${MySQL_DATA}logs"
+  MySQL_DATA_DATA="${MySQL_DATA}data"
+  MySQL_DATA_CONF="${MySQL_DATA}conf"
+  mysql_data_conf_file="${MySQL_DATA_CONF}/custom.cnf"
   mysql_ip="jy-mysql"
   mysql_port=9507
   mysql_user="root"
@@ -34,8 +34,12 @@ echo_content() {
 }
 
 create_dirs() {
-  mkdir -p ${MySQL_DATA}
-  mkdir -p ${MySQL_DATA_MYSQL}
+  mkdir -p "${MySQL_DATA}"
+  mkdir -p "${MySQL_DATA_DATA}"
+  mkdir -p "${MySQL_DATA_CONF}"
+
+  touch "${mysql_data_conf_file}"
+  chmod 644 "${mysql_data_conf_file}"
 }
 
 install_docker() {
@@ -64,7 +68,8 @@ install_mysql() {
           --network=host \
           -e MYSQL_ROOT_PASSWORD="${mysql_pas}" \
           -e TZ=Asia/Shanghai \
-          -v ${MySQL_DATA_MYSQL}:/var/lib/mysql \
+          -v ${MySQL_DATA_DATA}:/var/lib/mysql \
+          -v ${mysql_data_conf_file}:/etc/mysql/conf.d/custom.cnf:ro \
           mysql:5.7.42 \
           --port ${mysql_port} \
           --character-set-server=utf8mb4 \
@@ -77,7 +82,8 @@ install_mysql() {
           -e MYSQL_USER="${mysql_user}" \
           -e MYSQL_PASSWORD="${mysql_pas}" \
           -e TZ=Asia/Shanghai \
-          -v ${MySQL_DATA_MYSQL}:/var/lib/mysql \
+          -v ${MySQL_DATA_DATA}:/var/lib/mysql \
+          -v ${mysql_data_conf_file}:/etc/mysql/conf.d/custom.cnf:ro \
           mysql:5.7.42 \
           --port ${mysql_port} \
           --character-set-server=utf8mb4 \
