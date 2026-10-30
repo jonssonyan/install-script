@@ -31,8 +31,8 @@ echo_content() {
 }
 
 create_dirs() {
-  mkdir -p ${REDIS_DATA}
-  mkdir -p ${REDIS_DATA}data/
+  mkdir -p "${REDIS_DATA}"
+  mkdir -p "${REDIS_DATA}data"
 }
 
 install_docker() {
@@ -57,8 +57,8 @@ install_redis() {
       docker run -d --name ${redis_ip} --restart always \
         --network=host \
         -e TZ=Asia/Shanghai \
-        -v ${REDIS_DATA}data/:/data/ \
-        -v ${REDIS_DATA}etc/:/usr/local/etc/redis/ \
+        -v "${REDIS_DATA}data:/data" \
+        -v "${REDIS_DATA}etc:/usr/local/etc/redis" \
         redis:6.2.13 \
         redis-server --requirepass "${redis_pass}" --port "${redis_port}"
 

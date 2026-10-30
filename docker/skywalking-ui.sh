@@ -31,7 +31,7 @@ echo_content() {
 }
 
 create_dirs() {
-  mkdir -p ${SW_DATA}
+  mkdir -p "${SW_DATA}"
 }
 
 install_docker() {

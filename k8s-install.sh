@@ -60,7 +60,7 @@ echo_content() {
 
 # Create necessary directories
 create_dirs() {
-  mkdir -p ${K8S_DATA} ${K8S_LOG} ${K8S_NETWORK}
+  mkdir -p "${K8S_DATA}" "${K8S_LOG}" "${K8S_NETWORK}"
 }
 
 # Check if can connect to a host
@@ -231,7 +231,7 @@ prepare_environment() {
 configure_containerd() {
   echo_content green "---> Configuring containerd"
 
-  mkdir -p /etc/containerd
+  mkdir -p "/etc/containerd"
   containerd config default >/etc/containerd/config.toml
 
   # Enable SystemdCgroup
@@ -476,7 +476,7 @@ EOF
       echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_version}/deb/ /" |
         tee /etc/apt/sources.list.d/kubernetes.list
     else
-      mkdir -p -m 755 /etc/apt/keyrings
+      mkdir -p -m 755 "/etc/apt/keyrings"
       curl -fsSL https://pkgs.k8s.io/core:/stable:/v"${k8s_version}"/deb/Release.key |
         gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
       echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v${k8s_version}/deb/ /" |
@@ -643,7 +643,7 @@ initialize_kubernetes_master() {
 
   if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
     # Set up kubeconfig
-    mkdir -p "$HOME"/.kube
+    mkdir -p "$HOME/.kube"
     cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
     chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
 

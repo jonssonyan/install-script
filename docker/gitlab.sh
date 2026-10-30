@@ -11,9 +11,9 @@ init_var() {
   ECHO_TYPE="echo -e"
 
   GITLAB_DATA="/dockerdata/gitlab/"
-  GITLAB_CONFIG="${GITLAB_DATA}config/"
-  GITLAB_LOG="${GITLAB_DATA}logs/"
-  GITLAB_OPT="${GITLAB_DATA}opt/"
+  GITLAB_CONFIG="${GITLAB_DATA}config"
+  GITLAB_LOG="${GITLAB_DATA}logs"
+  GITLAB_OPT="${GITLAB_DATA}opt"
   gitlab_ip="jy-gitlab"
   gitlab_http_port=80
   gitlab_https_port=443
@@ -36,10 +36,10 @@ echo_content() {
 }
 
 create_dirs() {
-  mkdir -p ${GITLAB_DATA}
-  mkdir -p ${GITLAB_CONFIG}
-  mkdir -p ${GITLAB_LOG}
-  mkdir -p ${GITLAB_OPT}
+  mkdir -p "${GITLAB_DATA}"
+  mkdir -p "${GITLAB_CONFIG}"
+  mkdir -p "${GITLAB_LOG}"
+  mkdir -p "${GITLAB_OPT}"
 }
 
 install_gitlab() {
@@ -59,13 +59,13 @@ install_gitlab() {
         -p ${gitlab_http_port}:80 \
         -p ${gitlab_https_port}:443 \
         -p ${gitlab_ssh_port}:22 \
-        -v ${GITLAB_CONFIG}gitlab.rb:/etc/gitlab/gitlab.rb \
-        -v ${GITLAB_LOG}:/var/log/gitlab \
-        -v ${GITLAB_OPT}:/var/opt/gitlab \
+        -v "${GITLAB_CONFIG}/gitlab.rb:/etc/gitlab/gitlab.rb" \
+        -v "${GITLAB_LOG}:/var/log/gitlab" \
+        -v "${GITLAB_OPT}:/var/opt/gitlab" \
         gitlab/gitlab-ce:15.11.11-ce.0
 
     if [[ -n $(docker ps -q -f "name=^${gitlab_ip}$" -f "status=running") ]]; then
-      gitlab_password=$(docker exec cat ${GITLAB_CONFIG}initial_root_password)
+      gitlab_password=$(docker exec cat ${GITLAB_CONFIG}/initial_root_password)
       echo_content skyBlue "---> GitLab安装完成"
       echo_content yellow "---> GitLab的用户号名(请妥善保存): root"
       echo_content yellow "---> GitLab的密码(请妥善保存): ${gitlab_password}"

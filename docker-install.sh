@@ -41,7 +41,7 @@ echo_content() {
 
 # Create necessary directories
 create_dirs() {
-  mkdir -p ${DOCKER_DATA}
+  mkdir -p "${DOCKER_DATA}"
 }
 
 # Check if service exists

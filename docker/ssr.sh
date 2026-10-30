@@ -78,7 +78,7 @@ echo_content() {
 }
 
 create_dirs() {
-  mkdir -p ${SSR_DATA}
+  mkdir -p "${SSR_DATA}"
 }
 
 install_docker() {
@@ -179,7 +179,7 @@ EOF
       docker run -d --name ${ssr_ip} --restart=always \
         --network=host \
         -e TZ=Asia/Shanghai \
-        -v ${SSR_DATA}config.json:/etc/shadowsocks-r/config.json \
+        -v "${SSR_DATA}config.json:/etc/shadowsocks-r/config.json" \
         teddysun/shadowsocks-r
 
     if [[ -n $(docker ps -q -f "name=^${ssr_ip}$" -f "status=running") ]]; then

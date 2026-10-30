@@ -68,8 +68,8 @@ install_mysql() {
           --network=host \
           -e MYSQL_ROOT_PASSWORD="${mysql_pas}" \
           -e TZ=Asia/Shanghai \
-          -v ${MySQL_DATA_DATA}:/var/lib/mysql \
-          -v ${mysql_data_conf_file}:/etc/mysql/conf.d/custom.cnf:ro \
+          -v "${MySQL_DATA_DATA}:/var/lib/mysql" \
+          -v "${mysql_data_conf_file}:/etc/mysql/conf.d/custom.cnf:ro" \
           mysql:5.7.42 \
           --port ${mysql_port} \
           --character-set-server=utf8mb4 \
@@ -82,8 +82,8 @@ install_mysql() {
           -e MYSQL_USER="${mysql_user}" \
           -e MYSQL_PASSWORD="${mysql_pas}" \
           -e TZ=Asia/Shanghai \
-          -v ${MySQL_DATA_DATA}:/var/lib/mysql \
-          -v ${mysql_data_conf_file}:/etc/mysql/conf.d/custom.cnf:ro \
+          -v "${MySQL_DATA_DATA}:/var/lib/mysql" \
+          -v "${mysql_data_conf_file}:/etc/mysql/conf.d/custom.cnf:ro" \
           mysql:5.7.42 \
           --port ${mysql_port} \
           --character-set-server=utf8mb4 \

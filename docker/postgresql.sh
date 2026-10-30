@@ -31,7 +31,7 @@ echo_content() {
 }
 
 create_dirs() {
-  mkdir -p ${POSTGRESQL_DATA}
+  mkdir -p "${POSTGRESQL_DATA}"
 }
 
 install_docker() {
@@ -58,7 +58,7 @@ install_postgresql() {
         -e POSTGRES_USER="${postgresql_user}" \
         -e POSTGRES_PASSWORD="${postgresql_pas}" \
         -e TZ="Asia/Shanghai" \
-        -v ${POSTGRESQL_DATA}data:/var/lib/postgresql/data \
+        -v "${POSTGRESQL_DATA}data:/var/lib/postgresql/data" \
         postgres:13 \
         -c "port=${postgresql_port}"
 

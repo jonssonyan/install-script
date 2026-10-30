@@ -11,7 +11,7 @@ init_var() {
   can_google=0
 
   SW_DATA="/dockerdata/skywalking/"
-  SW_DATA_OAP_LIBS="${SW_DATA}oap-libs/"
+  SW_DATA_OAP_LIBS="${SW_DATA}oap-libs"
   sw_oap_ip="jy-skywalking-oap"
   sw_oap_http=12800
   sw_oap_grpc=11800
@@ -52,8 +52,8 @@ can_connect() {
 }
 
 create_dirs() {
-  mkdir -p ${SW_DATA}
-  mkdir -p ${SW_DATA_OAP_LIBS}
+  mkdir -p "${SW_DATA}"
+  mkdir -p "${SW_DATA_OAP_LIBS}"
 }
 
 install_docker() {
@@ -106,11 +106,11 @@ install_skywalking() {
       can_connect www.google.com && can_google=1
 
       if [[ ${can_google} == 0 ]]; then
-        wget -c ${mysql_connector_java_url_aliyun} -O ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.tar.gz &&
-          tar -zxvf ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.tar.gz -C ${SW_DATA_OAP_LIBS} &&
-          cp ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28/mysql-connector-java-8.0.28.jar ${SW_DATA_OAP_LIBS}
+        wget -c ${mysql_connector_java_url_aliyun} -O ${SW_DATA_OAP_LIBS}/mysql-connector-java-8.0.28.tar.gz &&
+          tar -zxvf ${SW_DATA_OAP_LIBS}/mysql-connector-java-8.0.28.tar.gz -C ${SW_DATA_OAP_LIBS} &&
+          cp ${SW_DATA_OAP_LIBS}/mysql-connector-java-8.0.28/mysql-connector-java-8.0.28.jar ${SW_DATA_OAP_LIBS}
       else
-        wget -c ${mysql_connector_java_url} -O ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.jar
+        wget -c ${mysql_connector_java_url} -O ${SW_DATA_OAP_LIBS}/mysql-connector-java-8.0.28.jar
       fi
       docker pull apache/skywalking-oap-server:9.5.0 &&
         docker run -d --name ${sw_oap_ip} --restart always \
@@ -122,7 +122,7 @@ install_skywalking() {
           -e SW_JDBC_URL="${mysql_jdbc_url}" \
           -e SW_DATA_SOURCE_USER="${mysql_user}" \
           -e SW_DATA_SOURCE_PASSWORD="${mysql_pass}" \
-          -v ${SW_DATA_OAP_LIBS}mysql-connector-java-8.0.28.jar:/skywalking/oap-libs/mysql-connector-java-8.0.28.jar \
+          -v "${SW_DATA_OAP_LIBS}/mysql-connector-java-8.0.28.jar:/skywalking/oap-libs/mysql-connector-java-8.0.28.jar" \
           apache/skywalking-oap-server:9.5.0
     fi
 

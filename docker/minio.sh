@@ -9,8 +9,8 @@ init_var() {
   ECHO_TYPE="echo -e"
 
   MINIO_DATA="/dockerdata/minio/"
-  MINIO_DATA_DATA="${MINIO_DATA}data/"
-  MINIO_DATA_CONFIG="${MINIO_DATA}config/"
+  MINIO_DATA_DATA="${MINIO_DATA}data"
+  MINIO_DATA_CONFIG="${MINIO_DATA}config"
   minio_ip="jy-minio"
   minio_server_port=9000
   minio_console_port=9001
@@ -34,9 +34,9 @@ echo_content() {
 }
 
 create_dirs() {
-  mkdir -p ${MINIO_DATA}
-  mkdir -p ${MINIO_DATA_DATA}
-  mkdir -p ${MINIO_DATA_CONFIG}
+  mkdir -p "${MINIO_DATA}"
+  mkdir -p "${MINIO_DATA_DATA}"
+  mkdir -p "${MINIO_DATA_CONFIG}"
 }
 
 install_docker() {
@@ -69,8 +69,8 @@ install_minio() {
         -e "MINIO_ROOT_USER=${minio_root_user}" \
         -e "MINIO_ROOT_PASSWORD=${minio_root_password}" \
         -e TZ=Asia/Shanghai \
-        -v ${MINIO_DATA_DATA}:/data \
-        -v ${MINIO_DATA_CONFIG}:/root/.minio \
+        -v "${MINIO_DATA_DATA}:/data" \
+        -v "${MINIO_DATA_CONFIG}:/root/.minio" \
         minio/minio \
         server /data --address ":${minio_server_port}" --console-address ":${minio_console_port}"
 

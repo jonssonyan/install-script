@@ -42,7 +42,7 @@ echo_content() {
 
 # Create necessary directories
 create_dirs() {
-  mkdir -p ${DOCKER_DATA}
+  mkdir -p "${DOCKER_DATA}"
 }
 
 # Check if can connect to a host
@@ -196,7 +196,7 @@ prepare_environment() {
 setup_docker() {
   echo_content skyBlue "---> Configuring Docker daemon"
 
-  mkdir -p ${DOCKER_CONFIG}
+  mkdir -p "${DOCKER_CONFIG}"
 
   if [[ ${can_access_internet} == 0 ]]; then
     cat >${DOCKER_CONFIG}/daemon.json <<EOF

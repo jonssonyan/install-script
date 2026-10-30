@@ -31,8 +31,8 @@ echo_content() {
 }
 
 create_dirs() {
-  mkdir -p ${REDIS_CLUSTER_DATA}
-  mkdir -p ${REDIS_CLUSTER_DATA}data/
+  mkdir -p "${REDIS_CLUSTER_DATA}"
+  mkdir -p "${REDIS_CLUSTER_DATA}data"
 }
 
 install_docker() {

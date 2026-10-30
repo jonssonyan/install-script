@@ -29,7 +29,7 @@ echo_content() {
 }
 
 create_dirs() {
-  mkdir -p ${NACOS_DATA}
+  mkdir -p "${NACOS_DATA}"
 }
 
 install_docker() {

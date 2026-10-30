@@ -11,7 +11,7 @@ init_var() {
   ECHO_TYPE="echo -e"
 
   KIBANA_DATA="/dockerdata/kibana/"
-  KIBANA_DATA_CONFIG="${KIBANA_DATA}config/"
+  KIBANA_DATA_CONFIG="${KIBANA_DATA}config"
   kibana_ip="jy-kibana"
   kibana_server_port=5601
   kibana_server_name="jy-kibana"
@@ -36,8 +36,8 @@ echo_content() {
 }
 
 create_dirs() {
-  mkdir -p ${KIBANA_DATA}
-  mkdir -p ${KIBANA_DATA}config/
+  mkdir -p "${KIBANA_DATA}"
+  mkdir -p "${KIBANA_DATA_CONFIG}"
 }
 
 install_docker() {
@@ -74,7 +74,7 @@ EOF
       docker run -d --name ${kibana_ip} --restart always \
         --network=host \
         -e TZ=Asia/Shanghai \
-        -v ${KIBANA_DATA_CONFIG}/kibana.yml:/usr/share/kibana/config/kibana.yml \
+        -v "${KIBANA_DATA_CONFIG}/kibana.yml:/usr/share/kibana/config/kibana.yml" \
         kibana:7.17.10
 
     if [[ -n $(docker ps -q -f "name=^${kibana_ip}$" -f "status=running") ]]; then

@@ -12,10 +12,10 @@ init_var() {
   ECHO_TYPE="echo -e"
 
   ES_DATA="/dockerdata/es/"
-  ES_DATA_CONFIG="${ES_DATA}config/"
-  ES_DATA_LOGS="${ES_DATA}logs/"
-  ES_DATA_DATA="${ES_DATA}data/"
-  ES_DATA_PLUGINS="${ES_DATA}plugins/"
+  ES_DATA_CONFIG="${ES_DATA}config"
+  ES_DATA_LOGS="${ES_DATA}logs"
+  ES_DATA_DATA="${ES_DATA}data"
+  ES_DATA_PLUGINS="${ES_DATA}plugins"
   es_ip="jy-es"
   es_http_port=9200
   es_transport_port=9300
@@ -38,8 +38,8 @@ echo_content() {
 }
 
 create_dirs() {
-  mkdir -p ${ES_DATA}
-  mkdir -p ${ES_DATA_CONFIG} ${ES_DATA_LOGS} ${ES_DATA_DATA} ${ES_DATA_PLUGINS}
+  mkdir -p "${ES_DATA}"
+  mkdir -p "${ES_DATA_CONFIG}" "${ES_DATA_LOGS}" "${ES_DATA_DATA}" "${ES_DATA_PLUGINS}"
   chmod -R g+rwx ${ES_DATA}
 }
 
@@ -76,10 +76,10 @@ EOF
         -e "discovery.type=single-node" \
         -e ES_JAVA_OPTS="-Xms512m -Xmx512m" \
         -e TZ=Asia/Shanghai \
-        -v ${ES_DATA_CONFIG}elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
-        -v ${ES_DATA_LOGS}:/usr/share/elasticsearch/logs/ \
-        -v ${ES_DATA_DATA}:/usr/share/elasticsearch/data/ \
-        -v ${ES_DATA_PLUGINS}:/usr/share/elasticsearch/plugins/ \
+        -v "${ES_DATA_CONFIG}/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" \
+        -v "${ES_DATA_LOGS}:/usr/share/elasticsearch/logs" \
+        -v "${ES_DATA_DATA}:/usr/share/elasticsearch/data" \
+        -v "${ES_DATA_PLUGINS}:/usr/share/elasticsearch/plugins" \
         elasticsearch:7.17.10
 
     if [[ -n $(docker ps -q -f "name=^${es_ip}$" -f "status=running") ]]; then

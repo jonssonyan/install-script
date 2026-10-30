@@ -8,7 +8,7 @@ set -e
 init_var() {
   ECHO_TYPE="echo -e"
 
-  NEXUS3_DATA="/dockerdata/nexus3/"
+  NEXUS3_DATA="/dockerdata/nexus3"
   nexus3_ip="jy-nexus3"
   nexus3_port=8081
 }
@@ -29,7 +29,7 @@ echo_content() {
 }
 
 create_dirs() {
-  mkdir -p ${NEXUS3_DATA}
+  mkdir -p "${NEXUS3_DATA}"
 }
 
 install_nexus3() {
@@ -42,7 +42,7 @@ install_nexus3() {
     docker pull sonatype/nexus3:3.49.0 &&
       docker run -d --name ${nexus3_ip} --restart always \
         - p ${nexus3_port}:8081 \
-        -v ${NEXUS3_DATA}:/nexus-data \
+        -v "${NEXUS3_DATA}:/nexus-data" \
         -e TZ=Asia/Shanghai \
         sonatype/nexus3:3.49.0
 

@@ -34,8 +34,8 @@ echo_content() {
 }
 
 create_dirs() {
-  mkdir -p ${RUSTDESK_SERVER}
-  mkdir -p ${RUSTDESK_SERVER}data/
+  mkdir -p "${RUSTDESK_SERVER}"
+  mkdir -p "${RUSTDESK_SERVER}data"
 }
 
 install_docker() {
@@ -49,7 +49,7 @@ install_rustdesk_bbr() {
     docker run -d --name ${rustdesk_server_hbbr} --restart always \
       --network=host \
       -e TZ=Asia/Shanghai \
-      -v ${RUSTDESK_SERVER}data/:/root/ \
+      -v "${RUSTDESK_SERVER}data:/root" \
       rustdesk/rustdesk-server hbbr
 
   else
@@ -69,7 +69,7 @@ install_rustdesk_hbbs() {
     docker run -d --name ${rustdesk_server_hbbs} --restart always \
       --network=host \
       -e TZ=Asia/Shanghai \
-      -v ${RUSTDESK_SERVER}data/:/root/ \
+      -v "${RUSTDESK_SERVER}data:/root" \
       rustdesk/rustdesk-server hbbs
 
   else
