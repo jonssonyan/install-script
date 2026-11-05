@@ -589,15 +589,15 @@ install_kubernetes() {
   echo_content green "---> Installing Kubernetes components for version ${k8s_version}"
 
   if [[ -z "${k8s_version}" ]]; then
-    if [[ ${package_manager} == "yum" || ${package_manager} == "dnf" ]]; then
+    if [[ "${package_manager}" == "yum" || "${package_manager}" == "dnf" ]]; then
       ${package_manager} install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
     else
       ${package_manager} install -y kubelet kubeadm kubectl
     fi
   else
-    if [[ ${package_manager} == "yum" || ${package_manager} == "dnf" ]]; then
+    if [[ "${package_manager}" == "yum" || "${package_manager}" == "dnf" ]]; then
       ${package_manager} install -y "kubelet-${k8s_version}.*" "kubeadm-${k8s_version}.*" "kubectl-${k8s_version}.*" --disableexcludes=kubernetes
-    elif [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
+    elif [[ "${package_manager}" == "apt" || "${package_manager}" == "apt-get" ]]; then
       kubelet_version=$(apt-cache madison kubelet | grep ${k8s_version} | head -n1 | awk '{print $3}')
       kubeadm_version=$(apt-cache madison kubeadm | grep ${k8s_version} | head -n1 | awk '{print $3}')
       kubectl_version=$(apt-cache madison kubectl | grep ${k8s_version} | head -n1 | awk '{print $3}')
@@ -605,7 +605,7 @@ install_kubernetes() {
     fi
   fi
 
-  if [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
+  if [[ "${package_manager}" == "apt" || "${package_manager}" == "apt-get" ]]; then
     apt-mark hold kubelet kubeadm kubectl
   fi
 
