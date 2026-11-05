@@ -110,10 +110,16 @@ uninstall_docker() {
     if [[ "${release}" == "centos" ]]; then
       ${package_manager} remove -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
     elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
-      ${package_manager} purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
+      ${package_manager} purge -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
     fi
-    rm -rf /var/lib/docker
-    rm -rf /var/lib/containerd
+    read -r -p "是否删除 Docker 数据目录 /var/lib/docker 和 /var/lib/containerd(所有镜像、容器、数据卷将被永久删除)? (y/N): " confirm_remove_data
+    if [[ ${confirm_remove_data} =~ ^[Yy]$ ]]; then
+      rm -rf /var/lib/docker
+      rm -rf /var/lib/containerd
+      echo_content skyBlue "---> Docker 数据目录已删除"
+    else
+      echo_content skyBlue "---> 已保留 Docker 数据目录"
+    fi
   else
     echo_content skyBlue "---> 请先安装 Docker"
   fi
