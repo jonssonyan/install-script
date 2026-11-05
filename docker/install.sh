@@ -84,44 +84,42 @@ check_system() {
   fi
 
   # Determine OS distribution and version
-  if [[ -n $(find /etc -name "redhat-release") ]] || grep </proc/version -q -i "centos"; then
-    release="centos"
-    if rpm -q centos-stream-release &>/dev/null; then
-      version=$(rpm -q --queryformat '%{VERSION}' centos-stream-release)
-    elif rpm -q centos-release &>/dev/null; then
-      version=$(rpm -q --queryformat '%{VERSION}' centos-release)
-    fi
-  elif grep </etc/issue -q -i "debian" && [[ -f "/etc/issue" ]] || grep </proc/version -q -i "debian"; then
-    release="debian"
-    version=$(cat /etc/debian_version)
-  elif grep </etc/issue -q -i "ubuntu" && [[ -f "/etc/issue" ]] || grep </proc/version -q -i "ubuntu"; then
-    release="ubuntu"
-    version=$(lsb_release -sr)
+  if [[ -f /etc/os-release ]]; then
+    os_id=$(. /etc/os-release && echo "${ID}")
+    version=$(. /etc/os-release && echo "${VERSION_ID}")
   fi
+  case "${os_id}" in
+  centos | rhel | rocky | almalinux)
+    release="centos"
+    ;;
+  debian | ubuntu)
+    release="${os_id}"
+    ;;
+  esac
 
   # Check version compatibility
   major_version=$(echo "${version}" | cut -d. -f1)
   case $release in
   centos)
-    if [[ $major_version -lt 6 ]]; then
-      echo_content red "Unsupported CentOS version: $version. Only supports CentOS 6+."
+    if [[ $major_version -lt 8 ]]; then
+      echo_content red "Unsupported CentOS version: $version. Only supports CentOS/RHEL/Rocky/AlmaLinux 8+."
       exit 1
     fi
     ;;
   ubuntu)
-    if [[ $major_version -lt 16 ]]; then
-      echo_content red "Unsupported Ubuntu version: $version. Only supports Ubuntu 16+."
+    if [[ $major_version -lt 20 ]]; then
+      echo_content red "Unsupported Ubuntu version: $version. Only supports Ubuntu 20+."
       exit 1
     fi
     ;;
   debian)
-    if [[ $major_version -lt 8 ]]; then
-      echo_content red "Unsupported Debian version: $version. Only supports Debian 8+."
+    if [[ $major_version -lt 11 ]]; then
+      echo_content red "Unsupported Debian version: $version. Only supports Debian 11+."
       exit 1
     fi
     ;;
   *)
-    echo_content red "Only supports CentOS 6+/Ubuntu 16+/Debian 8+"
+    echo_content red "Only supports CentOS/RHEL/Rocky/AlmaLinux 8+/Ubuntu 20+/Debian 11+"
     exit 1
     ;;
   esac
@@ -252,21 +250,21 @@ install_docker() {
       gnupg \
       lsb-release
 
-    sudo install -m 0755 -d /etc/apt/keyrings
+    install -m 0755 -d /etc/apt/keyrings
     if [[ ${can_access_internet} == 0 ]]; then
-      sudo curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/${release}/gpg -o /etc/apt/keyrings/docker.asc
-      sudo chmod a+r /etc/apt/keyrings/docker.asc
+      curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/${release}/gpg -o /etc/apt/keyrings/docker.asc
+      chmod a+r /etc/apt/keyrings/docker.asc
       echo \
         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://mirrors.aliyun.com/docker-ce/linux/${release} \
                     $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" |
-        sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+        tee /etc/apt/sources.list.d/docker.list >/dev/null
     else
-      sudo curl -fsSL https://download.docker.com/linux/${release}/gpg -o /etc/apt/keyrings/docker.asc
-      sudo chmod a+r /etc/apt/keyrings/docker.asc
+      curl -fsSL https://download.docker.com/linux/${release}/gpg -o /etc/apt/keyrings/docker.asc
+      chmod a+r /etc/apt/keyrings/docker.asc
       echo \
         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${release} \
             $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" |
-        sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+        tee /etc/apt/sources.list.d/docker.list >/dev/null
     fi
     ${package_manager} update -y
   fi

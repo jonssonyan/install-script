@@ -11,7 +11,7 @@ init_var() {
   package_manager=""
   release=""
   version=""
-  get_arch=""
+  arch=""
 }
 
 echo_content() {
@@ -30,85 +30,78 @@ echo_content() {
 }
 
 # 检查系统
-check_sys() {
+check_system() {
   if [[ $(id -u) != "0" ]]; then
     echo_content red "You must be root to run this script"
     exit 1
   fi
 
-  if [[ $(command -v yum) ]]; then
+  # Determine package manager
+  if command -v yum &>/dev/null; then
     package_manager='yum'
-  elif [[ $(command -v dnf) ]]; then
+  elif command -v dnf &>/dev/null; then
     package_manager='dnf'
-  elif [[ $(command -v apt-get) ]]; then
+  elif command -v apt-get &>/dev/null; then
     package_manager='apt-get'
-  elif [[ $(command -v apt) ]]; then
+  elif command -v apt &>/dev/null; then
     package_manager='apt'
-  fi
-
-  if [[ -z "${package_manager}" ]]; then
-    echo_content red "This system is not currently supported"
+  else
+    echo_content red "Unsupported system. No compatible package manager found."
     exit 1
   fi
 
-  if [[ -n $(find /etc -name "redhat-release") ]] || grep </proc/version -q -i "centos"; then
-    release="centos"
-    if rpm -q centos-stream-release &>/dev/null; then
-      version=$(rpm -q --queryformat '%{VERSION}' centos-stream-release)
-    elif rpm -q centos-release &>/dev/null; then
-      version=$(rpm -q --queryformat '%{VERSION}' centos-release)
-    fi
-  elif grep </etc/issue -q -i "debian" && [[ -f "/etc/issue" ]] || grep </etc/issue -q -i "debian" && [[ -f "/proc/version" ]]; then
-    release="debian"
-    version=$(cat /etc/debian_version)
-  elif grep </etc/issue -q -i "ubuntu" && [[ -f "/etc/issue" ]] || grep </etc/issue -q -i "ubuntu" && [[ -f "/proc/version" ]]; then
-    release="ubuntu"
-    version=$(lsb_release -sr)
+  # Determine OS distribution and version
+  if [[ -f /etc/os-release ]]; then
+    os_id=$(. /etc/os-release && echo "${ID}")
+    version=$(. /etc/os-release && echo "${VERSION_ID}")
   fi
+  case "${os_id}" in
+  centos | rhel | rocky | almalinux)
+    release="centos"
+    ;;
+  debian | ubuntu)
+    release="${os_id}"
+    ;;
+  esac
 
+  # Check version compatibility
   major_version=$(echo "${version}" | cut -d. -f1)
-
   case $release in
   centos)
-    if [[ $major_version -ge 6 ]]; then
-      echo_content green "Supported CentOS version detected: $version"
-    else
-      echo_content red "Unsupported CentOS version: $version. Only supports CentOS 6+."
+    if [[ $major_version -lt 8 ]]; then
+      echo_content red "Unsupported CentOS version: $version. Only supports CentOS/RHEL/Rocky/AlmaLinux 8+."
       exit 1
     fi
     ;;
   ubuntu)
-    if [[ $major_version -ge 16 ]]; then
-      echo_content green "Supported Ubuntu version detected: $version"
-    else
-      echo_content red "Unsupported Ubuntu version: $version. Only supports Ubuntu 16+."
+    if [[ $major_version -lt 20 ]]; then
+      echo_content red "Unsupported Ubuntu version: $version. Only supports Ubuntu 20+."
       exit 1
     fi
     ;;
   debian)
-    if [[ $major_version -ge 8 ]]; then
-      echo_content green "Supported Debian version detected: $version"
-    else
-      echo_content red "Unsupported Debian version: $version. Only supports Debian 8+."
+    if [[ $major_version -lt 11 ]]; then
+      echo_content red "Unsupported Debian version: $version. Only supports Debian 11+."
       exit 1
     fi
     ;;
   *)
-    echo_content red "Only supports CentOS 6+/Ubuntu 16+/Debian 8+"
+    echo_content red "Only supports CentOS/RHEL/Rocky/AlmaLinux 8+/Ubuntu 20+/Debian 11+"
     exit 1
     ;;
   esac
 
+  # Check architecture
   if [[ $(arch) =~ ("x86_64"|"amd64") ]]; then
-    get_arch="amd64"
+    arch="amd64"
   elif [[ $(arch) =~ ("aarch64"|"arm64") ]]; then
-    get_arch="arm64"
-  fi
-
-  if [[ -z "${get_arch}" ]]; then
-    echo_content red "Only supports x86_64/amd64 arm64/aarch64"
+    arch="arm64"
+  else
+    echo_content red "Only supports x86_64/amd64 or arm64/aarch64 architectures"
     exit 1
   fi
+
+  echo_content green "System check passed: ${release} ${version} (${arch})"
 }
 
 # 卸载Docker
@@ -131,7 +124,7 @@ main() {
 
   init_var
 
-  check_sys
+  check_system
 
   uninstall_docker
 }
