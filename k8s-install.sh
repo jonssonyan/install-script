@@ -581,6 +581,10 @@ install_kubernetes() {
     fi
   fi
 
+  if [[ ${package_manager} == "apt" || ${package_manager} == "apt-get" ]]; then
+    apt-mark hold kubelet kubeadm kubectl
+  fi
+
   # Setup Kubernetes components
   setup_kubernetes
 
