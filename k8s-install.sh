@@ -425,7 +425,7 @@ install_network_plugin() {
   echo_content green "---> Installing network plugin: ${network}"
 
   if [[ ${network} == "flannel" ]]; then
-    wget --no-check-certificate -O "${network_file}" ${kube_flannel_url} || {
+    wget -O "${network_file}" ${kube_flannel_url} || {
       echo_content red "---> Failed to download flannel manifest"
       exit 1
     }
@@ -435,7 +435,7 @@ install_network_plugin() {
       exit 1
     }
   elif [[ ${network} == "calico" ]]; then
-    wget --no-check-certificate -O "${K8S_NETWORK}/calico.yaml" ${calico_url} || {
+    wget -O "${K8S_NETWORK}/calico.yaml" ${calico_url} || {
       echo_content red "---> Failed to download calico manifest"
       exit 1
     }
@@ -582,7 +582,7 @@ install_kubernetes() {
 
   [[ -z "${selected_version}" ]] && selected_version="${k8s_version}"
 
-  if ! echo "${k8s_versions}" | grep -w -q "${selected_version}"; then
+  if [[ " ${k8s_versions} " != *" ${selected_version} "* ]]; then
     echo_content red "Error: Version ${selected_version} is not supported"
     exit 1
   fi
@@ -656,11 +656,8 @@ initialize_kubernetes_master() {
 
   echo_content green "---> Initializing Kubernetes master node"
 
-  # Get exact Kubernetes version
-  k8s_version_mini=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable-"${k8s_version}".txt) || {
-    echo_content yellow "---> Could not determine exact Kubernetes version, using specified version"
-    k8s_version_mini="v${k8s_version}.0"
-  }
+  # Get exact Kubernetes version from the installed kubeadm
+  k8s_version_mini=$(kubeadm version -o short)
 
   # Initialize Kubernetes master
   local init_log="${K8S_LOG}/kubeadm-init-$(date +%Y%m%d-%H%M%S).log"
