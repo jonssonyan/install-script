@@ -78,13 +78,13 @@ get_config_val() {
   grep "^$1=" ${k8s_lock_file} | cut -d= -f2
 }
 
-# Get the newest full package version that starts with the given version, e.g. 1.29 -> 1.29.15-1.1, 1.7.27 -> 1.7.27-1
+# Get the newest full package version (with epoch if any) that starts with the given version, e.g. 1.29 -> 1.29.15-1.1, 28.0 -> 3:28.0.4-1.el9
 get_pkg_version() {
   if [[ "${package_manager}" == "yum" || "${package_manager}" == "dnf" ]]; then
-    ${package_manager} list --showduplicates "$1" 2>/dev/null | awk '{print $2}'
+    ${package_manager} repoquery --qf '%{evr}' "$1" 2>/dev/null
   else
     apt-cache madison "$1" | awk '{print $3}'
-  fi | grep "^${2//./\\.}[.-]" | sort -V | tail -n1
+  fi | grep -E "^([0-9]+:)?${2//./\\.}[.-]" | sort -V | tail -n1
 }
 
 # Check if service exists
