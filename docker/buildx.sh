@@ -9,8 +9,6 @@ init_var() {
   ECHO_TYPE="echo -e"
 
   buildx_ip="jy-buildx"
-  DOCKER_CONFIG_PATH='/root/.docker/'
-  docker_config='/root/.docker/config.json'
 }
 
 echo_content() {
@@ -39,19 +37,6 @@ install_buildx() {
   fi
 
   echo_content skyBlue "---> Installing buildx"
-
-  mkdir -p "${DOCKER_CONFIG_PATH}"
-  if [[ -f "${docker_config}" ]]; then
-    if ! grep -q "experimental" "${docker_config}"; then
-      jq '.experimental="enabled"' "${docker_config}" >"${docker_config}.tmp" && mv "${docker_config}.tmp" "${docker_config}"
-    fi
-  else
-    cat >"${docker_config}" <<EOF
-{
-  "experimental": "enabled"
-}
-EOF
-  fi
 
   docker buildx create --use --name ${buildx_ip} &&
     docker run --privileged --rm tonistiigi/binfmt --install all

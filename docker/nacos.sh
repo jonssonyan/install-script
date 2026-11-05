@@ -9,6 +9,7 @@ init_var() {
   ECHO_TYPE="echo -e"
 
   NACOS_DATA="/dockerdata/nacos/"
+  NACOS_DATA_DATA="${NACOS_DATA}data"
   nacos_ip="jy-nacos"
   nacos_port=8848
 }
@@ -30,6 +31,7 @@ echo_content() {
 
 create_dirs() {
   mkdir -p "${NACOS_DATA}"
+  mkdir -p "${NACOS_DATA_DATA}"
 }
 
 install_docker() {
@@ -49,6 +51,7 @@ install_nacos() {
         -e MODE=standalone \
         -e NACOS_SERVER_PORT=${nacos_port} \
         -e TZ=Asia/Shanghai \
+        -v "${NACOS_DATA_DATA}:/home/nacos/data" \
         nacos/nacos-server:v2.1.2
     if [[ -n $(docker ps -q -f "name=^${nacos_ip}$" -f "status=running") ]]; then
       echo_content skyBlue "---> Nacos安装完成"
