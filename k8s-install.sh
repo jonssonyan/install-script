@@ -190,7 +190,7 @@ check_system() {
 
 # Set hostname and update hosts file
 set_hostname() {
-  if ! grep -qxF "${apiserver_advertise_address} $1" /etc/hosts; then
+  if [[ -n "${apiserver_advertise_address}" ]] && ! grep -qxF "${apiserver_advertise_address} $1" /etc/hosts; then
     echo "${apiserver_advertise_address} $1" >>/etc/hosts
   fi
   hostnamectl set-hostname "$1"
@@ -253,7 +253,7 @@ prepare_environment() {
   fi
 
   # Disable swap
-  swapoff -a && sed -ri 's/.*swap.*/#&/' /etc/fstab
+  swapoff -a && sed -ri '/^[^#].*\sswap\s/s/^/#/' /etc/fstab
   echo_content skyBlue "---> Swap disabled"
 
   echo_content skyBlue "---> Environment preparation complete"
@@ -570,20 +570,22 @@ install_kubernetes() {
     exit 1
   fi
 
-  # Get API server advertise address (required) and control plane endpoint (optional, not passed to kubeadm init if skipped)
-  echo_content yellow "Please enter the API server advertise address, e.g. this node's internal IP (required):"
-  read -r -p "> " apiserver_advertise_address
+  # Get API server advertise address (required) and control plane endpoint (optional, not passed to kubeadm init if skipped), master node only
+  if [[ ${is_master} == 1 ]]; then
+    echo_content yellow "Please enter the API server advertise address, e.g. this node's internal IP (required):"
+    read -r -p "> " apiserver_advertise_address
 
-  if [[ -z "${apiserver_advertise_address}" ]]; then
-    echo_content red "Error: API server advertise address cannot be empty"
-    exit 1
+    if [[ -z "${apiserver_advertise_address}" ]]; then
+      echo_content red "Error: API server advertise address cannot be empty"
+      exit 1
+    fi
+
+    echo_content yellow "Please enter the control plane endpoint, e.g. this node's public IP (press Enter to skip):"
+    read -r -p "> " control_plane_endpoint
+
+    set_config_val apiserver_advertise_address "${apiserver_advertise_address}"
+    set_config_val control_plane_endpoint "${control_plane_endpoint}"
   fi
-
-  echo_content yellow "Please enter the control plane endpoint, e.g. this node's public IP (press Enter to skip):"
-  read -r -p "> " control_plane_endpoint
-
-  set_config_val apiserver_advertise_address "${apiserver_advertise_address}"
-  set_config_val control_plane_endpoint "${control_plane_endpoint}"
 
   # Get hostname, the default is k8s-master-<shortId> or k8s-worker-<shortId>, shortId is 7 random hex characters
   if [[ ${is_master} == 1 ]]; then
@@ -658,6 +660,11 @@ install_kubernetes() {
 initialize_kubernetes_master() {
   if ! command -v kubeadm &>/dev/null; then
     echo_content red "---> Kubernetes is not installed. Please install Kubernetes first."
+    return
+  fi
+
+  if [[ ! -f "${k8s_lock_file}" ]]; then
+    echo_content red "---> ${k8s_lock_file} not found. Please install Kubernetes with this script first."
     return
   fi
 
