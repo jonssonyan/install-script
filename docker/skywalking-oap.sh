@@ -45,11 +45,7 @@ echo_content() {
 }
 
 can_connect() {
-  if ping -c2 -i0.3 -W1 "$1" &>/dev/null; then
-    return 0
-  else
-    return 1
-  fi
+  curl -fsSI --connect-timeout 3 --max-time 5 -o /dev/null "https://$1" &>/dev/null
 }
 
 create_dirs() {
@@ -68,8 +64,13 @@ install_skywalking() {
     echo_content yellow "---> 设置 SkyWalking OAP 存储方式"
     echo_content yellow "1. Elasticsearch7"
     echo_content yellow "2. MySQL"
-    read -r -p "请选择(默认:1): " sw_storage
-    [[ -z "${sw_storage}" ]] && sw_storage=1
+    while read -r -p "请选择(默认:1): " sw_storage; do
+      [[ -z "${sw_storage}" ]] && sw_storage=1
+      if [[ "${sw_storage}" == "1" || "${sw_storage}" == "2" ]]; then
+        break
+      fi
+      echo_content red "请输入 1 或 2"
+    done
 
     if [[ "${sw_storage}" == "1" ]]; then
       read -r -p "请输入Elasticsearch的地址(默认:127.0.0.1:9200): " es_url

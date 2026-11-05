@@ -12,7 +12,7 @@ init_var() {
   SSR_DATA="/dockerdata/ssr/"
   ssr_ip="jy-ssr"
   ssr_port=80
-  ssr_password="123456"
+  ssr_password=""
   ssr_method=""
   ssr_protocols=""
   ssr_obfs=""
@@ -91,16 +91,21 @@ install_ssr() {
 
     read -r -p "请输入ShadowsocksR的端口(默认:80): " ssr_port
     [[ -z "${ssr_port}" ]] && ssr_port=80
-    read -r -p "请输入ShadowsocksR的密码(默认:123456): " ssr_password
-    [[ -z "${ssr_password}" ]] && ssr_password="123456"
+    while read -r -p "请输入ShadowsocksR的密码(必填): " ssr_password; do
+      if [[ -z "${ssr_password}" ]]; then
+        echo_content red "密码不能为空"
+      else
+        break
+      fi
+    done
 
     while true; do
       for ((i = 1; i <= ${#methods[@]}; i++)); do
         hint="${methods[$i - 1]}"
         echo "${i}) $(echo_content yellow "${hint}")"
       done
-      read -r -p "请选择ShadowsocksR的加密类型(默认:${methods[0]}): " r_methods
-      [[ -z "${r_methods}" ]] && r_methods=1
+      read -r -p "请选择ShadowsocksR的加密类型(默认:${methods[1]}): " r_methods
+      [[ -z "${r_methods}" ]] && r_methods=2
       if [[ ! "${r_methods}" =~ ^[0-9]+$ ]]; then
         echo_content red "请输入数字"
         continue

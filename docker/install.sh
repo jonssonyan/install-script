@@ -47,8 +47,7 @@ create_dirs() {
 
 # Check if can connect to a host
 can_connect() {
-  ping -c2 -i0.3 -W1 "$1" &>/dev/null
-  return $?
+  curl -fsSI --connect-timeout 3 --max-time 5 -o /dev/null "https://$1" &>/dev/null
 }
 
 # Check if service exists
