@@ -455,6 +455,7 @@ baseurl=https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_version}/rp
 enabled=1
 gpgcheck=1
 gpgkey=https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_version}/rpm/repodata/repomd.xml.key
+exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
 EOF
     else
       cat <<EOF | tee /etc/yum.repos.d/kubernetes.repo
