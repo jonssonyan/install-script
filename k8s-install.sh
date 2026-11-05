@@ -75,7 +75,22 @@ can_connect() {
 
 # Get configuration value from lock file
 get_config_val() {
-  grep "^$1=" ${k8s_lock_file} | cut -d= -f2
+  grep "^$1=" ${k8s_lock_file} | tail -n1 | cut -d= -f2
+}
+
+set_config_val() {
+  if [[ -f "${k8s_lock_file}" ]]; then
+    sed -i "/^$1=/d" "${k8s_lock_file}"
+  fi
+  echo "$1=$2" >>"${k8s_lock_file}"
+}
+
+load_config_val() {
+  local val
+  val=$(get_config_val "$1")
+  if [[ -n "${val}" ]]; then
+    printf -v "$1" '%s' "${val}"
+  fi
 }
 
 # Get the newest full package version (with epoch if any) that starts with the given version, e.g. 1.29 -> 1.29.15-1.1, 28.0 -> 3:28.0.4-1.el9
@@ -175,7 +190,9 @@ check_system() {
 
 # Set hostname and update hosts file
 set_hostname() {
-  echo "${apiserver_advertise_address} $1" >>/etc/hosts
+  if ! grep -qxF "${apiserver_advertise_address} $1" /etc/hosts; then
+    echo "${apiserver_advertise_address} $1" >>/etc/hosts
+  fi
   hostnamectl set-hostname "$1"
   echo_content green "Hostname set to: $1"
 }
@@ -381,7 +398,7 @@ EOF
   install_containerd
 
   # Save CRI socket to lock file
-  echo "k8s_cri_sock=${k8s_cri_sock}" >>${k8s_lock_file}
+  set_config_val k8s_cri_sock "${k8s_cri_sock}"
 
   echo_content skyBlue "---> Container runtime installation complete"
 }
@@ -417,7 +434,7 @@ install_network_plugin() {
     return
   fi
 
-  if kubectl get pods -n kube-system 2>/dev/null | grep -E 'calico|flannel' >/dev/null; then
+  if kubectl get pods -A 2>/dev/null | grep -E 'calico|flannel' >/dev/null; then
     echo_content skyBlue "---> Network plugin already installed"
     return
   fi
@@ -430,7 +447,7 @@ install_network_plugin() {
       exit 1
     }
 
-    kubectl create -f "${network_file}" || {
+    kubectl apply -f "${network_file}" || {
       echo_content red "---> Failed to apply flannel manifest"
       exit 1
     }
@@ -440,7 +457,7 @@ install_network_plugin() {
       exit 1
     }
 
-    kubectl create -f "${K8S_NETWORK}/calico.yaml" || {
+    kubectl apply -f "${K8S_NETWORK}/calico.yaml" || {
       echo_content red "---> Failed to apply calico manifest"
       exit 1
     }
@@ -504,13 +521,13 @@ EOF
 
     if [[ ${can_access_internet} == 0 ]]; then
       curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v"${k8s_version}"/deb/Release.key |
-        gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+        gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
       echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_version}/deb/ /" |
         tee /etc/apt/sources.list.d/kubernetes.list
     else
       mkdir -p -m 755 "/etc/apt/keyrings"
       curl -fsSL https://pkgs.k8s.io/core:/stable:/v"${k8s_version}"/deb/Release.key |
-        gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+        gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
       echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v${k8s_version}/deb/ /" |
         tee /etc/apt/sources.list.d/kubernetes.list
     fi
@@ -545,7 +562,7 @@ install_kubernetes() {
     ;;
   esac
 
-  echo "is_master=${is_master}" >>${k8s_lock_file}
+  set_config_val is_master "${is_master}"
 
   # Check CPU cores for master node
   if [[ ${is_master} == 1 && $(grep -c "processor" /proc/cpuinfo) -lt 2 ]]; then
@@ -565,15 +582,20 @@ install_kubernetes() {
   echo_content yellow "Please enter the control plane endpoint, e.g. this node's public IP (press Enter to skip):"
   read -r -p "> " control_plane_endpoint
 
-  echo "apiserver_advertise_address=${apiserver_advertise_address}" >>${k8s_lock_file}
-  echo "control_plane_endpoint=${control_plane_endpoint}" >>${k8s_lock_file}
+  set_config_val apiserver_advertise_address "${apiserver_advertise_address}"
+  set_config_val control_plane_endpoint "${control_plane_endpoint}"
 
-  # Get hostname
-  echo_content yellow "Please enter hostname for this node (default: k8s-master):"
+  # Get hostname, the default is k8s-master-<shortId> or k8s-worker-<shortId>, shortId is 7 random hex characters
+  if [[ ${is_master} == 1 ]]; then
+    default_host_name="k8s-master-$(LC_ALL=C tr -dc 'a-f0-9' </dev/urandom | head -c 7)"
+  else
+    default_host_name="k8s-worker-$(LC_ALL=C tr -dc 'a-f0-9' </dev/urandom | head -c 7)"
+  fi
+  echo_content yellow "Please enter hostname for this node (default: ${default_host_name}):"
   read -r -p "> " host_name
 
-  [[ -z "${host_name}" ]] && host_name="k8s-master"
-  set_hostname ${host_name}
+  [[ -z "${host_name}" ]] && host_name="${default_host_name}"
+  set_hostname "${host_name}"
 
   # Get Kubernetes version
   echo_content yellow "Please select Kubernetes version:"
@@ -588,7 +610,7 @@ install_kubernetes() {
   fi
 
   k8s_version="${selected_version}"
-  echo "k8s_version=${k8s_version}" >>${k8s_lock_file}
+  set_config_val k8s_version "${k8s_version}"
 
   # Install container runtime
   install_runtime
@@ -640,11 +662,11 @@ initialize_kubernetes_master() {
   fi
 
   # Load configuration from lock file
-  is_master=$(get_config_val is_master)
-  apiserver_advertise_address=$(get_config_val apiserver_advertise_address)
-  control_plane_endpoint=$(get_config_val control_plane_endpoint)
-  k8s_version=$(get_config_val k8s_version)
-  k8s_cri_sock=$(get_config_val k8s_cri_sock)
+  load_config_val is_master
+  load_config_val apiserver_advertise_address
+  load_config_val control_plane_endpoint
+  load_config_val k8s_version
+  load_config_val k8s_cri_sock
 
   if [[ "${is_master}" != "1" ]]; then
     echo_content yellow "---> This is configured as a worker node."
@@ -820,11 +842,11 @@ check_lock_file() {
   if [[ -f "${k8s_lock_file}" ]]; then
     echo_content skyBlue "---> Loading configuration from ${k8s_lock_file}"
 
-    is_master=$(get_config_val is_master)
-    apiserver_advertise_address=$(get_config_val apiserver_advertise_address)
-    control_plane_endpoint=$(get_config_val control_plane_endpoint)
-    k8s_version=$(get_config_val k8s_version)
-    k8s_cri_sock=$(get_config_val k8s_cri_sock)
+    load_config_val is_master
+    load_config_val apiserver_advertise_address
+    load_config_val control_plane_endpoint
+    load_config_val k8s_version
+    load_config_val k8s_cri_sock
 
     echo_content skyBlue "---> Configuration loaded"
   else
