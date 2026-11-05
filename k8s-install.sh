@@ -19,7 +19,8 @@ init_var() {
 
   # Host settings
   host_name="k8s-master"
-  public_ip=""
+  apiserver_advertise_address=""
+  control_plane_endpoint=""
 
   # K8s directories and files
   K8S_DATA="/k8sdata"
@@ -31,15 +32,18 @@ init_var() {
   k8s_version="1.29"
   k8s_versions="1.24 1.25 1.26 1.27 1.28 1.29 1.30 1.31"
   is_master=1
+  containerd_version="1.7.27"
   k8s_cri_sock="unix:///var/run/containerd/containerd.sock"
   network="flannel"
   network_file="${K8S_NETWORK}/kube-flannel.yml"
 
   # URLs and mirrors
-  kube_flannel_url="https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
+  flannel_version="v0.28.9"
+  kube_flannel_url="https://github.com/flannel-io/flannel/releases/download/${flannel_version}/kube-flannel.yml"
   calico_url="https://docs.projectcalico.org/manifests/calico.yaml"
   k8s_mirror="https://registry.cn-hangzhou.aliyuncs.com/google_containers"
   docker_mirror='"https://docker.m.daocloud.io"'
+  ghcr_mirror='"https://ghcr.m.daocloud.io"'
 }
 
 # Colorized output functions
@@ -162,7 +166,7 @@ check_system() {
 
 # Set hostname and update hosts file
 set_hostname() {
-  echo "${public_ip} $1" >>/etc/hosts
+  echo "${apiserver_advertise_address} $1" >>/etc/hosts
   hostnamectl set-hostname "$1"
   echo_content green "Hostname set to: $1"
 }
@@ -239,6 +243,7 @@ configure_containerd() {
   if [[ ${can_access_internet} == 0 ]]; then
     k8s_mirror_escape=${k8s_mirror//\//\\\/}
     docker_mirror_escape=${docker_mirror//\//\\\/}
+    ghcr_mirror_escape=${ghcr_mirror//\//\\\/}
 
     # Replace registry.k8s.io with mirror
     sed -i "s#registry.k8s.io#${k8s_mirror_escape}#g" /etc/containerd/config.toml
@@ -246,6 +251,10 @@ configure_containerd() {
     # Add Docker.io mirror
     sed -i "/\[plugins.\"io.containerd.grpc.v1.cri\".registry.mirrors\]/a\        [plugins.\"io.containerd.grpc.v1.cri\".registry.mirrors.\"docker.io\"]" /etc/containerd/config.toml
     sed -i "/\[plugins.\"io.containerd.grpc.v1.cri\".registry.mirrors.\"docker.io\"\]/a\          endpoint = [${docker_mirror_escape}]" /etc/containerd/config.toml
+
+    # Add ghcr.io mirror
+    sed -i "/\[plugins.\"io.containerd.grpc.v1.cri\".registry.mirrors\]/a\        [plugins.\"io.containerd.grpc.v1.cri\".registry.mirrors.\"ghcr.io\"]" /etc/containerd/config.toml
+    sed -i "/\[plugins.\"io.containerd.grpc.v1.cri\".registry.mirrors.\"ghcr.io\"\]/a\          endpoint = [${ghcr_mirror_escape}]" /etc/containerd/config.toml
 
     # Add registry.k8s.io mirror
     sed -i "/endpoint = \[${docker_mirror_escape}]/a\        [plugins.\"io.containerd.grpc.v1.cri\".registry.mirrors.\"registry.k8s.io\"]" /etc/containerd/config.toml
@@ -308,7 +317,20 @@ install_containerd() {
     ${package_manager} update -y
   fi
 
-  ${package_manager} install -y containerd.io
+  # EL8 repository only provides containerd 1.6.x
+  if [[ "${release}" == "centos" && ${major_version} == 8 ]]; then
+    containerd_version="1.6.32"
+  fi
+
+  # Pin containerd version and prevent upgrades
+  if [[ "${package_manager}" == "yum" || "${package_manager}" == "dnf" ]]; then
+    ${package_manager} install -y "containerd.io-${containerd_version}" python3-dnf-plugin-versionlock
+    ${package_manager} versionlock add containerd.io
+  else
+    containerd_pkg_version=$(apt-cache madison containerd.io | awk '{print $3}' | grep "^${containerd_version}-" | head -n1)
+    ${package_manager} install -y containerd.io="${containerd_pkg_version}"
+    apt-mark hold containerd.io
+  fi
 
   configure_containerd
 
@@ -520,16 +542,20 @@ install_kubernetes() {
     exit 1
   fi
 
-  # Get public IP
-  echo_content yellow "Please enter this node's public IP address (required):"
-  read -r -p "> " public_ip
+  # Get API server advertise address (required) and control plane endpoint (optional, not passed to kubeadm init if skipped)
+  echo_content yellow "Please enter the API server advertise address, e.g. this node's internal IP (required):"
+  read -r -p "> " apiserver_advertise_address
 
-  if [[ -z "${public_ip}" ]]; then
-    echo_content red "Error: Public IP cannot be empty"
+  if [[ -z "${apiserver_advertise_address}" ]]; then
+    echo_content red "Error: API server advertise address cannot be empty"
     exit 1
   fi
 
-  echo "public_ip=${public_ip}" >>${k8s_lock_file}
+  echo_content yellow "Please enter the control plane endpoint, e.g. this node's public IP (press Enter to skip):"
+  read -r -p "> " control_plane_endpoint
+
+  echo "apiserver_advertise_address=${apiserver_advertise_address}" >>${k8s_lock_file}
+  echo "control_plane_endpoint=${control_plane_endpoint}" >>${k8s_lock_file}
 
   # Get hostname
   echo_content yellow "Please enter hostname for this node (default: k8s-master):"
@@ -606,7 +632,8 @@ initialize_kubernetes_master() {
 
   # Load configuration from lock file
   is_master=$(get_config_val is_master)
-  public_ip=$(get_config_val public_ip)
+  apiserver_advertise_address=$(get_config_val apiserver_advertise_address)
+  control_plane_endpoint=$(get_config_val control_plane_endpoint)
   k8s_version=$(get_config_val k8s_version)
   k8s_cri_sock=$(get_config_val k8s_cri_sock)
 
@@ -633,7 +660,8 @@ initialize_kubernetes_master() {
 
   if [[ ${can_access_internet} == 0 ]]; then
     kubeadm init \
-      --apiserver-advertise-address="${public_ip}" \
+      ${apiserver_advertise_address:+--apiserver-advertise-address="${apiserver_advertise_address}"} \
+      ${control_plane_endpoint:+--control-plane-endpoint="${control_plane_endpoint}"} \
       --image-repository="${k8s_mirror}" \
       --kubernetes-version="${k8s_version_mini}" \
       --service-cidr=10.96.0.0/12 \
@@ -641,7 +669,8 @@ initialize_kubernetes_master() {
       --cri-socket="${k8s_cri_sock}" | tee "${init_log}"
   else
     kubeadm init \
-      --apiserver-advertise-address="${public_ip}" \
+      ${apiserver_advertise_address:+--apiserver-advertise-address="${apiserver_advertise_address}"} \
+      ${control_plane_endpoint:+--control-plane-endpoint="${control_plane_endpoint}"} \
       --kubernetes-version="${k8s_version_mini}" \
       --service-cidr=10.96.0.0/12 \
       --pod-network-cidr=10.244.0.0/16 \
@@ -786,7 +815,8 @@ check_lock_file() {
     echo_content skyBlue "---> Loading configuration from ${k8s_lock_file}"
 
     is_master=$(get_config_val is_master)
-    public_ip=$(get_config_val public_ip)
+    apiserver_advertise_address=$(get_config_val apiserver_advertise_address)
+    control_plane_endpoint=$(get_config_val control_plane_endpoint)
     k8s_version=$(get_config_val k8s_version)
     k8s_cri_sock=$(get_config_val k8s_cri_sock)
 
