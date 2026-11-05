@@ -16,7 +16,8 @@ init_var() {
   sw_oap_http=12800
   sw_oap_grpc=11800
 
-  es_url="http://127.0.0.1:9200"
+  es_protocol="http"
+  es_url="127.0.0.1:9200"
   es_username="elastic"
   es_password="elastic"
 
@@ -71,8 +72,12 @@ install_skywalking() {
     [[ -z "${sw_storage}" ]] && sw_storage=1
 
     if [[ "${sw_storage}" == "1" ]]; then
-      read -r -p "请输入Elasticsearch的URL(默认:http://127.0.0.1:9200): " es_url
-      [[ -z "${es_url}" ]] && es_url="http://127.0.0.1:9200"
+      read -r -p "请输入Elasticsearch的地址(默认:127.0.0.1:9200): " es_url
+      [[ -z "${es_url}" ]] && es_url="127.0.0.1:9200"
+      if [[ "${es_url}" =~ ^(https?)://(.+)$ ]]; then
+        es_protocol="${BASH_REMATCH[1]}"
+        es_url="${BASH_REMATCH[2]%/}"
+      fi
       read -r -p "请输入Elasticsearch的用户名(默认:elastic): " es_username
       [[ -z "${es_username}" ]] && es_username="elastic"
       read -r -p "请输入Elasticsearch的密码(默认:elastic): " es_password
@@ -86,6 +91,7 @@ install_skywalking() {
           -e SW_CORE_GRPC_PORT=${sw_oap_grpc} \
           -e SW_STORAGE=elasticsearch \
           -e SW_STORAGE_ES_CLUSTER_NODES="${es_url}" \
+          -e SW_STORAGE_ES_HTTP_PROTOCOL="${es_protocol}" \
           -e SW_ES_USER="${es_username}" \
           -e SW_ES_PASSWORD="${es_password}" \
           apache/skywalking-oap-server:9.5.0

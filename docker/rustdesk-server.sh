@@ -56,10 +56,7 @@ install_rustdesk_bbr() {
     echo_content skyBlue "---> 你已经安装了 RustDesk Server hbbr"
   fi
 
-  if [[ -z $(docker ps -q -f "name=^${rustdesk_server_hbbr}$") ]]; then
-    install_rustdesk_hbbs
-  fi
-
+  install_rustdesk_hbbs
 }
 
 install_rustdesk_hbbs() {

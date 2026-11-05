@@ -101,8 +101,7 @@ install_ssr() {
       done
       read -r -p "请选择ShadowsocksR的加密类型(默认:${methods[0]}): " r_methods
       [[ -z "${r_methods}" ]] && r_methods=1
-      expr ${r_methods} + 1 &>/dev/null
-      if [[ "$?" != "0" ]]; then
+      if [[ ! "${r_methods}" =~ ^[0-9]+$ ]]; then
         echo_content red "请输入数字"
         continue
       fi
@@ -121,8 +120,7 @@ install_ssr() {
       done
       read -r -p "请选择ShadowsocksR的协议(默认:${protocols[0]}): " r_protocols
       [[ -z "${r_protocols}" ]] && r_protocols=1
-      expr ${r_protocols} + 1 &>/dev/null
-      if [[ "$?" != "0" ]]; then
+      if [[ ! "${r_protocols}" =~ ^[0-9]+$ ]]; then
         echo_content red "请输入数字"
         continue
       fi
@@ -141,8 +139,7 @@ install_ssr() {
       done
       read -r -p "请选择ShadowsocksR的混淆方式(默认:${obfs[0]}): " r_obfs
       [[ -z "${r_obfs}" ]] && r_obfs=1
-      expr ${r_obfs} + 1 &>/dev/null
-      if [[ "$?" != "0" ]]; then
+      if [[ ! "${r_obfs}" =~ ^[0-9]+$ ]]; then
         echo_content red "请输入数字"
         continue
       fi
