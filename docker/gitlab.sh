@@ -47,7 +47,7 @@ install_docker() {
 }
 
 install_gitlab() {
-  if [[ -z $(docker ps -q -f "name=^${gitlab_ip}$") ]]; then
+  if [[ -z $(docker ps -aq -f "name=^${gitlab_ip}$") ]]; then
     echo_content skyBlue "---> 安装 GitLab"
 
     read -r -p "请输入GitLab的HTTP端口(默认:80): " gitlab_http_port

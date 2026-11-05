@@ -44,7 +44,7 @@ install_docker() {
 }
 
 install_minio() {
-  if [[ -z $(docker ps -q -f "name=^${minio_ip}$") ]]; then
+  if [[ -z $(docker ps -aq -f "name=^${minio_ip}$") ]]; then
     echo_content skyBlue "---> 安装 Minio"
 
     read -r -p "请输入Minio的服务端口(默认:9000): " minio_server_port

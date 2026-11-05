@@ -45,7 +45,7 @@ install_docker() {
 }
 
 install_kibana() {
-  if [[ -z $(docker ps -q -f "name=^${kibana_ip}$") ]]; then
+  if [[ -z $(docker ps -aq -f "name=^${kibana_ip}$") ]]; then
     echo_content skyBlue "---> 安装 Kibana"
 
     read -r -p "请输入Kibana的端口(默认:5601): " kibana_server_port

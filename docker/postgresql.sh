@@ -39,7 +39,7 @@ install_docker() {
 }
 
 install_postgresql() {
-  if [[ -z $(docker ps -q -f "name=^${postgresql_ip}$") ]]; then
+  if [[ -z $(docker ps -aq -f "name=^${postgresql_ip}$") ]]; then
     read -r -p "请输入数据库的端口(默认:9876): " postgresql_port
     [[ -z "${postgresql_port}" ]] && postgresql_port=9876
     read -r -p "请输入数据库的用户名(默认:postgres): " postgresql_user

@@ -38,7 +38,7 @@ install_docker() {
 }
 
 install_nexus3() {
-  if [[ -z $(docker ps -q -f "name=^${nexus3_ip}$") ]]; then
+  if [[ -z $(docker ps -aq -f "name=^${nexus3_ip}$") ]]; then
     echo_content skyBlue "---> 安装 Nexus3"
 
     read -r -p "请输入Nexus3的端口(默认:8081): " nexus3_port

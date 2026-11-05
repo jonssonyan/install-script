@@ -40,7 +40,7 @@ install_docker() {
 }
 
 install_redis() {
-  if [[ -z $(docker ps -q -f "name=^${redis_ip}$") ]]; then
+  if [[ -z $(docker ps -aq -f "name=^${redis_ip}$") ]]; then
     echo_content skyBlue "---> 安装 Redis"
 
     read -r -p "请输入 Redis 的端口(默认:6378): " redis_port

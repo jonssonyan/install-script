@@ -40,7 +40,7 @@ install_docker() {
 }
 
 install_redis_cluster() {
-  if [[ -z $(docker ps -q -f "name=^${redis_cluster_ip}$") ]]; then
+  if [[ -z $(docker ps -aq -f "name=^${redis_cluster_ip}$") ]]; then
     echo_content skyBlue "---> 安装 Redis 集群"
   else
     echo_content skyBlue "---> 你已经安装了 Redis 集群"

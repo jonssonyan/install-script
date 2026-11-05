@@ -62,7 +62,7 @@ install_docker() {
 }
 
 install_skywalking() {
-  if [[ -z $(docker ps -q -f "name=^${sw_oap_ip}$") ]]; then
+  if [[ -z $(docker ps -aq -f "name=^${sw_oap_ip}$") ]]; then
     echo_content skyBlue "---> 安装 SkyWalking OAP"
 
     echo_content yellow "---> 设置 SkyWalking OAP 存储方式"

@@ -48,7 +48,7 @@ install_docker() {
 }
 
 install_es() {
-  if [[ -z $(docker ps -q -f "name=^${es_ip}$") ]]; then
+  if [[ -z $(docker ps -aq -f "name=^${es_ip}$") ]]; then
     echo_content skyBlue "---> 安装 Elasticsearch"
 
     read -r -p "请输入ES的HTTP端口(默认:9200): " es_http_port
