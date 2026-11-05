@@ -42,6 +42,10 @@ create_dirs() {
   mkdir -p "${GITLAB_OPT}"
 }
 
+install_docker() {
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
+}
+
 install_gitlab() {
   if [[ -z $(docker ps -q -f "name=^${gitlab_ip}$") ]]; then
     echo_content skyBlue "---> 安装 GitLab"
