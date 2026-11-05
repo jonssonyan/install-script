@@ -30,6 +30,11 @@ echo_content() {
 
 create_dirs() {
   mkdir -p "${NEXUS3_DATA}"
+  chown -R 200 "${NEXUS3_DATA}"
+}
+
+install_docker() {
+  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
 }
 
 install_nexus3() {
@@ -41,15 +46,14 @@ install_nexus3() {
 
     docker pull sonatype/nexus3:3.49.0 &&
       docker run -d --name ${nexus3_ip} --restart always \
-        - p ${nexus3_port}:8081 \
+        -p ${nexus3_port}:8081 \
         -v "${NEXUS3_DATA}:/nexus-data" \
         -e TZ=Asia/Shanghai \
         sonatype/nexus3:3.49.0
 
     if [[ -n $(docker ps -q -f "name=^${nexus3_ip}$" -f "status=running") ]]; then
-      password=$(docker exec ${nexus3_ip} cat /nexus-data/admin.password)
       echo_content skyBlue "---> Nexus3安装完成"
-      echo_content yellow "---> Nexus3 admin的密码(请妥善保存): ${password}"
+      echo_content yellow "---> Nexus3初始化需要几分钟，完成后执行以下命令查看admin的密码: cat ${NEXUS3_DATA}/admin.password"
     else
       echo_content red "---> Nexus3安装失败或运行异常,请尝试修复或卸载重装"
       exit 1
