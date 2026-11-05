@@ -187,6 +187,10 @@ install_dependencies() {
     bash-completion \
     gpg
 
+  if [[ "${package_manager}" == "yum" || "${package_manager}" == "dnf" ]]; then
+    ${package_manager} install -y python3-dnf-plugin-versionlock
+  fi
+
   echo_content skyBlue "---> Dependencies installed"
 }
 
@@ -324,7 +328,7 @@ install_containerd() {
 
   # Pin containerd version and prevent upgrades
   if [[ "${package_manager}" == "yum" || "${package_manager}" == "dnf" ]]; then
-    ${package_manager} install -y "containerd.io-${containerd_version}" python3-dnf-plugin-versionlock
+    ${package_manager} install -y "containerd.io-${containerd_version}"
     ${package_manager} versionlock add containerd.io
   else
     containerd_pkg_version=$(apt-cache madison containerd.io | awk '{print $3}' | grep "^${containerd_version}-" | head -n1)
@@ -475,7 +479,6 @@ baseurl=https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_version}/rp
 enabled=1
 gpgcheck=1
 gpgkey=https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_version}/rpm/repodata/repomd.xml.key
-exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
 EOF
     else
       cat <<EOF | tee /etc/yum.repos.d/kubernetes.repo
@@ -485,7 +488,6 @@ baseurl=https://pkgs.k8s.io/core:/stable:/v${k8s_version}/rpm/
 enabled=1
 gpgcheck=1
 gpgkey=https://pkgs.k8s.io/core:/stable:/v${k8s_version}/rpm/repodata/repomd.xml.key
-exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
 EOF
     fi
   elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
@@ -589,14 +591,10 @@ install_kubernetes() {
   echo_content green "---> Installing Kubernetes components for version ${k8s_version}"
 
   if [[ -z "${k8s_version}" ]]; then
-    if [[ "${package_manager}" == "yum" || "${package_manager}" == "dnf" ]]; then
-      ${package_manager} install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
-    else
-      ${package_manager} install -y kubelet kubeadm kubectl
-    fi
+    ${package_manager} install -y kubelet kubeadm kubectl
   else
     if [[ "${package_manager}" == "yum" || "${package_manager}" == "dnf" ]]; then
-      ${package_manager} install -y "kubelet-${k8s_version}.*" "kubeadm-${k8s_version}.*" "kubectl-${k8s_version}.*" --disableexcludes=kubernetes
+      ${package_manager} install -y "kubelet-${k8s_version}.*" "kubeadm-${k8s_version}.*" "kubectl-${k8s_version}.*"
     elif [[ "${package_manager}" == "apt" || "${package_manager}" == "apt-get" ]]; then
       kubelet_version=$(apt-cache madison kubelet | grep ${k8s_version} | head -n1 | awk '{print $3}')
       kubeadm_version=$(apt-cache madison kubeadm | grep ${k8s_version} | head -n1 | awk '{print $3}')
@@ -605,7 +603,9 @@ install_kubernetes() {
     fi
   fi
 
-  if [[ "${package_manager}" == "apt" || "${package_manager}" == "apt-get" ]]; then
+  if [[ "${package_manager}" == "yum" || "${package_manager}" == "dnf" ]]; then
+    ${package_manager} versionlock add kubelet kubeadm kubectl
+  else
     apt-mark hold kubelet kubeadm kubectl
   fi
 
