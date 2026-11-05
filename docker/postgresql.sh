@@ -35,7 +35,7 @@ create_dirs() {
 }
 
 install_docker() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
+  command -v docker &>/dev/null || bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
 }
 
 install_postgresql() {
@@ -64,7 +64,7 @@ install_postgresql() {
 
     if [[ -n $(docker ps -q -f "name=^${postgresql_ip}$" -f "status=running") ]]; then
       echo_content skyBlue "---> PostgreSQL 安装完成"
-      echo_content yellow "---> PostgreSQL postgres 的数据库密码(请妥善保存): ${postgresql_pas}"
+      echo_content yellow "---> PostgreSQL ${postgresql_user} 的数据库密码(请妥善保存): ${postgresql_pas}"
     else
       echo_content red "---> PostgreSQL 安装失败或运行异常,请尝试修复或卸载重装"
       exit 1

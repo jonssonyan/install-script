@@ -27,11 +27,12 @@ echo_content() {
 }
 
 install_docker() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
+  command -v docker &>/dev/null || bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
 }
 
 install_buildx() {
-  if docker buildx inspect --bootstrap | grep -q "${buildx_ip}"; then
+  if docker buildx inspect "${buildx_ip}" &>/dev/null; then
+    docker buildx use "${buildx_ip}"
     echo_content skyBlue "---> buildx is already installed"
     return
   fi

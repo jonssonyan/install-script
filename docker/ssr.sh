@@ -82,7 +82,7 @@ create_dirs() {
 }
 
 install_docker() {
-  bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
+  command -v docker &>/dev/null || bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
 }
 
 install_ssr() {
