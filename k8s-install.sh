@@ -78,6 +78,15 @@ get_config_val() {
   grep "^$1=" ${k8s_lock_file} | cut -d= -f2
 }
 
+# Get the newest full package version that starts with the given version, e.g. 1.29 -> 1.29.15-1.1, 1.7.27 -> 1.7.27-1
+get_pkg_version() {
+  if [[ "${package_manager}" == "yum" || "${package_manager}" == "dnf" ]]; then
+    ${package_manager} list --showduplicates "$1" 2>/dev/null | awk '{print $2}'
+  else
+    apt-cache madison "$1" | awk '{print $3}'
+  fi | grep "^${2//./\\.}[.-]" | sort -V | tail -n1
+}
+
 # Check if service exists
 service_exists() {
   systemctl list-units --type=service --all | grep -Fq "$1.service"
@@ -327,11 +336,11 @@ install_containerd() {
   fi
 
   # Pin containerd version and prevent upgrades
+  containerd_pkg_version=$(get_pkg_version containerd.io "${containerd_version}")
   if [[ "${package_manager}" == "yum" || "${package_manager}" == "dnf" ]]; then
-    ${package_manager} install -y "containerd.io-${containerd_version}"
+    ${package_manager} install -y "containerd.io-${containerd_pkg_version}"
     ${package_manager} versionlock add containerd.io
   else
-    containerd_pkg_version=$(apt-cache madison containerd.io | awk '{print $3}' | grep "^${containerd_version}-" | head -n1)
     ${package_manager} install -y containerd.io="${containerd_pkg_version}"
     apt-mark hold containerd.io
   fi
@@ -593,12 +602,12 @@ install_kubernetes() {
   if [[ -z "${k8s_version}" ]]; then
     ${package_manager} install -y kubelet kubeadm kubectl
   else
+    kubelet_version=$(get_pkg_version kubelet "${k8s_version}")
+    kubeadm_version=$(get_pkg_version kubeadm "${k8s_version}")
+    kubectl_version=$(get_pkg_version kubectl "${k8s_version}")
     if [[ "${package_manager}" == "yum" || "${package_manager}" == "dnf" ]]; then
-      ${package_manager} install -y "kubelet-${k8s_version}.*" "kubeadm-${k8s_version}.*" "kubectl-${k8s_version}.*"
-    elif [[ "${package_manager}" == "apt" || "${package_manager}" == "apt-get" ]]; then
-      kubelet_version=$(apt-cache madison kubelet | grep ${k8s_version} | head -n1 | awk '{print $3}')
-      kubeadm_version=$(apt-cache madison kubeadm | grep ${k8s_version} | head -n1 | awk '{print $3}')
-      kubectl_version=$(apt-cache madison kubectl | grep ${k8s_version} | head -n1 | awk '{print $3}')
+      ${package_manager} install -y "kubelet-${kubelet_version}" "kubeadm-${kubeadm_version}" "kubectl-${kubectl_version}"
+    else
       ${package_manager} install -y kubelet="${kubelet_version}" kubeadm="${kubeadm_version}" kubectl="${kubectl_version}"
     fi
   fi
