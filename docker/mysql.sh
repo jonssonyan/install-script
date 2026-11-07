@@ -64,19 +64,19 @@ install_mysql() {
 
     if [[ "${mysql_user}" == "root" ]]; then
       docker pull mysql:5.7.42 &&
-        docker run -d --name ${mysql_ip} --restart always \
+        docker run -d --name "${mysql_ip}" --restart always \
           --network=host \
           -e MYSQL_ROOT_PASSWORD="${mysql_pas}" \
           -e TZ=Asia/Shanghai \
           -v "${MySQL_DATA_DATA}:/var/lib/mysql" \
           -v "${mysql_data_conf_file}:/etc/mysql/conf.d/custom.cnf:ro" \
           mysql:5.7.42 \
-          --port ${mysql_port} \
+          --port "${mysql_port}" \
           --character-set-server=utf8mb4 \
           --collation-server=utf8mb4_unicode_ci
     else
       docker pull mysql:5.7.42 &&
-        docker run -d --name ${mysql_ip} --restart always \
+        docker run -d --name "${mysql_ip}" --restart always \
           --network=host \
           -e MYSQL_ROOT_PASSWORD="${mysql_pas}" \
           -e MYSQL_USER="${mysql_user}" \
@@ -85,7 +85,7 @@ install_mysql() {
           -v "${MySQL_DATA_DATA}:/var/lib/mysql" \
           -v "${mysql_data_conf_file}:/etc/mysql/conf.d/custom.cnf:ro" \
           mysql:5.7.42 \
-          --port ${mysql_port} \
+          --port "${mysql_port}" \
           --character-set-server=utf8mb4 \
           --collation-server=utf8mb4_unicode_ci
     fi

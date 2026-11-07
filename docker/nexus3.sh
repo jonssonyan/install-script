@@ -45,8 +45,8 @@ install_nexus3() {
     [[ -z "${nexus3_port}" ]] && nexus3_port=8081
 
     docker pull sonatype/nexus3:3.49.0 &&
-      docker run -d --name ${nexus3_ip} --restart always \
-        -p ${nexus3_port}:8081 \
+      docker run -d --name "${nexus3_ip}" --restart always \
+        -p "${nexus3_port}:8081" \
         -v "${NEXUS3_DATA}:/nexus-data" \
         -e TZ=Asia/Shanghai \
         sonatype/nexus3:3.49.0

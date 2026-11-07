@@ -156,7 +156,7 @@ install_ssr() {
       break
     done
 
-    cat >${SSR_DATA}config.json <<EOF
+    cat >"${SSR_DATA}config.json" <<EOF
 {
     "server":"0.0.0.0",
     "server_ipv6":"::",
@@ -178,7 +178,7 @@ install_ssr() {
 EOF
 
     docker pull teddysun/shadowsocks-r &&
-      docker run -d --name ${ssr_ip} --restart=always \
+      docker run -d --name "${ssr_ip}" --restart=always \
         --network=host \
         -e TZ=Asia/Shanghai \
         -v "${SSR_DATA}config.json:/etc/shadowsocks-r/config.json" \

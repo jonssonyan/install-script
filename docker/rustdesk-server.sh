@@ -46,7 +46,7 @@ install_rustdesk_bbr() {
   if [[ -z $(docker ps -aq -f "name=^${rustdesk_server_hbbr}$") ]]; then
     echo_content skyBlue "---> 安装 RustDesk Server hbbr"
 
-    docker run -d --name ${rustdesk_server_hbbr} --restart always \
+    docker run -d --name "${rustdesk_server_hbbr}" --restart always \
       --network=host \
       -e TZ=Asia/Shanghai \
       -v "${RUSTDESK_SERVER}data:/root" \
@@ -63,7 +63,7 @@ install_rustdesk_hbbs() {
   if [[ -z $(docker ps -aq -f "name=^${rustdesk_server_hbbs}$") ]]; then
     echo_content skyBlue "---> 安装 RustDesk Server hbbs"
 
-    docker run -d --name ${rustdesk_server_hbbs} --restart always \
+    docker run -d --name "${rustdesk_server_hbbs}" --restart always \
       --network=host \
       -e TZ=Asia/Shanghai \
       -v "${RUSTDESK_SERVER}data:/root" \

@@ -60,7 +60,7 @@ install_kibana() {
     read -r -p "请输入Elasticsearch的密码(默认:elastic): " es_password
     [[ -z "${es_password}" ]] && es_password="elastic"
 
-    cat >${KIBANA_DATA}config/kibana.yml <<EOF
+    cat >"${KIBANA_DATA}config/kibana.yml" <<EOF
 server.name: "${kibana_server_name}"
 server.host: "0.0.0.0"
 server.port: ${kibana_server_port}
@@ -71,7 +71,7 @@ i18n.locale: "zh-CN"
 EOF
 
     docker pull kibana:7.17.10 &&
-      docker run -d --name ${kibana_ip} --restart always \
+      docker run -d --name "${kibana_ip}" --restart always \
         --network=host \
         -e TZ=Asia/Shanghai \
         -v "${KIBANA_DATA_CONFIG}/kibana.yml:/usr/share/kibana/config/kibana.yml" \

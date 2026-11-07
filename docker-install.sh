@@ -188,11 +188,11 @@ install_docker_service() {
   # Check if Docker is required and not installed
   if [[ "${require_docker}" == "true" ]] && ! command -v docker &>/dev/null; then
     echo_content yellow "---> Docker not found, installing Docker first..."
-    bash <(curl -fsSL ${REMOTE_SCRIPT_BASE}/install.sh)
+    bash <(curl -fsSL "${REMOTE_SCRIPT_BASE}/install.sh")
   fi
 
   # Run the remote installation script
-  bash <(curl -fsSL ${REMOTE_SCRIPT_BASE}/${script_name})
+  bash <(curl -fsSL "${REMOTE_SCRIPT_BASE}/${script_name}")
 
   echo_content skyBlue "---> ${service_name} installation complete"
 }

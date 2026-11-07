@@ -53,7 +53,7 @@ install_postgresql() {
     done
 
     docker pull postgres:13 &&
-      docker run -d --name ${postgresql_ip} --restart always \
+      docker run -d --name "${postgresql_ip}" --restart always \
         --network=host \
         -e POSTGRES_USER="${postgresql_user}" \
         -e POSTGRES_PASSWORD="${postgresql_pas}" \

@@ -8,8 +8,6 @@ set -e
 init_var() {
   ECHO_TYPE="echo -e"
 
-  SW_DATA="/dockerdata/skywalking/"
-
   sw_ui_ip="jy-skywalking-ui"
   sw_ui_port=8080
   sw_oap_url="http://127.0.0.1:12800"
@@ -30,10 +28,6 @@ echo_content() {
   ${ECHO_TYPE} "${color_code}$2\033[0m"
 }
 
-create_dirs() {
-  mkdir -p "${SW_DATA}"
-}
-
 install_docker() {
   command -v docker &>/dev/null || bash <(curl -fsSL https://github.com/jonssonyan/install-script/raw/main/docker/install.sh)
 }
@@ -48,10 +42,10 @@ install_skywalking_ui() {
     [[ -z "${sw_oap_url}" ]] && sw_oap_url="http://127.0.0.1:12800"
 
     docker pull apache/skywalking-ui:9.5.0 &&
-      docker run -d --name ${sw_ui_ip} --restart always \
+      docker run -d --name "${sw_ui_ip}" --restart always \
         --network=host \
         -e TZ=Asia/Shanghai \
-        -e SW_SERVER_PORT=${sw_ui_port} \
+        -e SW_SERVER_PORT="${sw_ui_port}" \
         -e SW_OAP_ADDRESS="${sw_oap_url}" \
         apache/skywalking-ui:9.5.0
 
@@ -70,8 +64,6 @@ main() {
   cd "$HOME" || exit 1
 
   init_var
-
-  create_dirs
 
   install_docker
 

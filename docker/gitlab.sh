@@ -58,11 +58,11 @@ install_gitlab() {
     [[ -z "${gitlab_ssh_port}" ]] && gitlab_ssh_port=22
 
     docker pull gitlab/gitlab-ce:15.11.11-ce.0 &&
-      docker run -d --name ${gitlab_ip} --restart always \
+      docker run -d --name "${gitlab_ip}" --restart always \
         -e TZ=Asia/Shanghai \
-        -p ${gitlab_http_port}:80 \
-        -p ${gitlab_https_port}:443 \
-        -p ${gitlab_ssh_port}:22 \
+        -p "${gitlab_http_port}:80" \
+        -p "${gitlab_https_port}:443" \
+        -p "${gitlab_ssh_port}:22" \
         -v "${GITLAB_CONFIG}:/etc/gitlab" \
         -v "${GITLAB_LOG}:/var/log/gitlab" \
         -v "${GITLAB_OPT}:/var/opt/gitlab" \

@@ -46,10 +46,10 @@ install_nacos() {
     [[ -z "${nacos_port}" ]] && nacos_port=8848
 
     docker pull nacos/nacos-server:v2.1.2 &&
-      docker run -d --name ${nacos_ip} --restart=always \
+      docker run -d --name "${nacos_ip}" --restart=always \
         --network=host \
         -e MODE=standalone \
-        -e NACOS_SERVER_PORT=${nacos_port} \
+        -e NACOS_SERVER_PORT="${nacos_port}" \
         -e TZ=Asia/Shanghai \
         -v "${NACOS_DATA_DATA}:/home/nacos/data" \
         nacos/nacos-server:v2.1.2

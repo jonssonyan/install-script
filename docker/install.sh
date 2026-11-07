@@ -196,7 +196,7 @@ setup_docker() {
   mkdir -p "${DOCKER_CONFIG}"
 
   if [[ ${can_access_internet} == 0 ]]; then
-    cat >${DOCKER_CONFIG}/daemon.json <<EOF
+    cat >"${DOCKER_CONFIG}/daemon.json" <<EOF
 {
   "log-driver":"json-file",
   "log-opts":{
@@ -206,7 +206,7 @@ setup_docker() {
 }
 EOF
   else
-    cat >${DOCKER_CONFIG}/daemon.json <<EOF
+    cat >"${DOCKER_CONFIG}/daemon.json" <<EOF
 {
   "log-driver":"json-file",
   "log-opts":{
@@ -251,14 +251,14 @@ install_docker() {
 
     install -m 0755 -d /etc/apt/keyrings
     if [[ ${can_access_internet} == 0 ]]; then
-      curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/${release}/gpg -o /etc/apt/keyrings/docker.asc
+      curl -fsSL "https://mirrors.aliyun.com/docker-ce/linux/${release}/gpg" -o /etc/apt/keyrings/docker.asc
       chmod a+r /etc/apt/keyrings/docker.asc
       echo \
         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://mirrors.aliyun.com/docker-ce/linux/${release} \
                     $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" |
         tee /etc/apt/sources.list.d/docker.list >/dev/null
     else
-      curl -fsSL https://download.docker.com/linux/${release}/gpg -o /etc/apt/keyrings/docker.asc
+      curl -fsSL "https://download.docker.com/linux/${release}/gpg" -o /etc/apt/keyrings/docker.asc
       chmod a+r /etc/apt/keyrings/docker.asc
       echo \
         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${release} \

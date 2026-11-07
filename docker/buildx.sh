@@ -39,7 +39,7 @@ install_buildx() {
 
   echo_content skyBlue "---> Installing buildx"
 
-  docker buildx create --use --name ${buildx_ip} &&
+  docker buildx create --use --name "${buildx_ip}" &&
     docker run --privileged --rm tonistiigi/binfmt --install all
 
   if docker buildx inspect --bootstrap | grep -q "${buildx_ip}"; then

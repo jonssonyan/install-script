@@ -85,11 +85,11 @@ install_skywalking() {
       [[ -z "${es_password}" ]] && es_password="elastic"
 
       docker pull apache/skywalking-oap-server:9.5.0 &&
-        docker run -d --name ${sw_oap_ip} --restart always \
+        docker run -d --name "${sw_oap_ip}" --restart always \
           --network=host \
           -e TZ=Asia/Shanghai \
-          -e SW_CORE_REST_PORT=${sw_oap_http} \
-          -e SW_CORE_GRPC_PORT=${sw_oap_grpc} \
+          -e SW_CORE_REST_PORT="${sw_oap_http}" \
+          -e SW_CORE_GRPC_PORT="${sw_oap_grpc}" \
           -e SW_STORAGE=elasticsearch \
           -e SW_STORAGE_ES_CLUSTER_NODES="${es_url}" \
           -e SW_STORAGE_ES_HTTP_PROTOCOL="${es_protocol}" \
@@ -113,18 +113,18 @@ install_skywalking() {
       can_connect www.google.com && can_google=1
 
       if [[ ${can_google} == 0 ]]; then
-        wget -c ${mysql_connector_java_url_aliyun} -O ${SW_DATA_OAP_LIBS}/mysql-connector-java-8.0.28.tar.gz &&
-          tar -zxvf ${SW_DATA_OAP_LIBS}/mysql-connector-java-8.0.28.tar.gz -C ${SW_DATA_OAP_LIBS} &&
-          cp ${SW_DATA_OAP_LIBS}/mysql-connector-java-8.0.28/mysql-connector-java-8.0.28.jar ${SW_DATA_OAP_LIBS}
+        curl -fsSL -o "${SW_DATA_OAP_LIBS}/mysql-connector-java-8.0.28.tar.gz" "${mysql_connector_java_url_aliyun}" &&
+          tar -zxvf "${SW_DATA_OAP_LIBS}/mysql-connector-java-8.0.28.tar.gz" -C "${SW_DATA_OAP_LIBS}" &&
+          cp "${SW_DATA_OAP_LIBS}/mysql-connector-java-8.0.28/mysql-connector-java-8.0.28.jar" "${SW_DATA_OAP_LIBS}"
       else
-        wget -c ${mysql_connector_java_url} -O ${SW_DATA_OAP_LIBS}/mysql-connector-java-8.0.28.jar
+        curl -fsSL -o "${SW_DATA_OAP_LIBS}/mysql-connector-java-8.0.28.jar" "${mysql_connector_java_url}"
       fi
       docker pull apache/skywalking-oap-server:9.5.0 &&
-        docker run -d --name ${sw_oap_ip} --restart always \
+        docker run -d --name "${sw_oap_ip}" --restart always \
           --network=host \
           -e TZ=Asia/Shanghai \
-          -e SW_CORE_REST_PORT=${sw_oap_http} \
-          -e SW_CORE_GRPC_PORT=${sw_oap_grpc} \
+          -e SW_CORE_REST_PORT="${sw_oap_http}" \
+          -e SW_CORE_GRPC_PORT="${sw_oap_grpc}" \
           -e SW_STORAGE=mysql \
           -e SW_JDBC_URL="${mysql_jdbc_url}" \
           -e SW_DATA_SOURCE_USER="${mysql_user}" \

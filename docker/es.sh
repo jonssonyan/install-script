@@ -40,7 +40,7 @@ echo_content() {
 create_dirs() {
   mkdir -p "${ES_DATA}"
   mkdir -p "${ES_DATA_CONFIG}" "${ES_DATA_LOGS}" "${ES_DATA_DATA}" "${ES_DATA_PLUGINS}"
-  chmod -R g+rwx ${ES_DATA}
+  chmod -R g+rwx "${ES_DATA}"
 }
 
 install_docker() {
@@ -58,7 +58,7 @@ install_es() {
     read -r -p "请输入ES的节点名称(默认:node-1): " es_node_name
     [[ -z "${es_node_name}" ]] && es_node_name='node-1'
 
-    cat >${ES_DATA}config/elasticsearch.yml <<EOF
+    cat >"${ES_DATA}config/elasticsearch.yml" <<EOF
 node.name: ${es_node_name}
 http.host: 0.0.0.0
 http.port: ${es_http_port}
@@ -70,7 +70,7 @@ xpack.security.enabled: true
 EOF
 
     docker pull elasticsearch:7.17.10 &&
-      docker run -d --name ${es_ip} --restart always \
+      docker run -d --name "${es_ip}" --restart always \
         --network=host \
         -e "discovery.type=single-node" \
         -e ES_JAVA_OPTS="-Xms512m -Xmx512m" \

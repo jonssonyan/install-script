@@ -64,7 +64,7 @@ install_minio() {
     done
 
     docker pull minio/minio &&
-      docker run -d --name ${minio_ip} --restart=always \
+      docker run -d --name "${minio_ip}" --restart=always \
         --network=host \
         -e "MINIO_ROOT_USER=${minio_root_user}" \
         -e "MINIO_ROOT_PASSWORD=${minio_root_password}" \
