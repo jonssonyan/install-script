@@ -74,7 +74,7 @@ can_connect() {
 
 # Get configuration value from lock file
 get_config_val() {
-  grep "^$1=" ${k8s_lock_file} | tail -n1 | cut -d= -f2
+  grep "^$1=" "${k8s_lock_file}" | tail -n1 | cut -d= -f2
 }
 
 set_config_val() {
@@ -329,14 +329,14 @@ install_containerd() {
 
     install -m 0755 -d /etc/apt/keyrings
     if [[ ${can_access_internet} == 0 ]]; then
-      curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/${release}/gpg -o /etc/apt/keyrings/docker.asc
+      curl -fsSL "https://mirrors.aliyun.com/docker-ce/linux/${release}/gpg" -o /etc/apt/keyrings/docker.asc
       chmod a+r /etc/apt/keyrings/docker.asc
       echo \
         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://mirrors.aliyun.com/docker-ce/linux/${release} \
                 $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" |
         tee /etc/apt/sources.list.d/docker.list >/dev/null
     else
-      curl -fsSL https://download.docker.com/linux/${release}/gpg -o /etc/apt/keyrings/docker.asc
+      curl -fsSL "https://download.docker.com/linux/${release}/gpg" -o /etc/apt/keyrings/docker.asc
       chmod a+r /etc/apt/keyrings/docker.asc
       echo \
         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${release} \
@@ -441,7 +441,7 @@ install_network_plugin() {
   echo_content green "---> Installing network plugin: ${network}"
 
   if [[ ${network} == "flannel" ]]; then
-    wget -O "${network_file}" ${kube_flannel_url} || {
+    wget -O "${network_file}" "${kube_flannel_url}" || {
       echo_content red "---> Failed to download flannel manifest"
       exit 1
     }
@@ -451,7 +451,7 @@ install_network_plugin() {
       exit 1
     }
   elif [[ ${network} == "calico" ]]; then
-    wget -O "${K8S_NETWORK}/calico.yaml" ${calico_url} || {
+    wget -O "${K8S_NETWORK}/calico.yaml" "${calico_url}" || {
       echo_content red "---> Failed to download calico manifest"
       exit 1
     }
@@ -481,8 +481,8 @@ setup_kubernetes() {
 
   # Configure crictl
   if command -v crictl &>/dev/null; then
-    crictl config --set runtime-endpoint=${k8s_cri_sock}
-    crictl config --set image-endpoint=${k8s_cri_sock}
+    crictl config --set runtime-endpoint="${k8s_cri_sock}"
+    crictl config --set image-endpoint="${k8s_cri_sock}"
   fi
 
   # Setup bash completion
@@ -780,7 +780,7 @@ reset_kubernetes() {
   sysctl --system
 
   # Remove lock file
-  rm -f ${k8s_lock_file}
+  rm -f "${k8s_lock_file}"
 
   echo_content skyBlue "---> Kubernetes reset complete"
 }
