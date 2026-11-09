@@ -719,9 +719,8 @@ initialize_kubernetes_master() {
 
     echo_content skyBlue "---> Kubernetes master node initialization complete"
 
-    # Extract join command for future use
-    local join_command=$(grep -A 1 "kubeadm join" "${init_log}" | tr -d '\\\n' | sed 's/^[ \t]*//')
-    echo "${join_command}" >"${K8S_DATA}/join-command.txt"
+    # Save worker join command for future use
+    kubeadm token create --print-join-command >"${K8S_DATA}/join-command.txt"
     echo_content green "---> Worker join command saved to ${K8S_DATA}/join-command.txt"
 
     # Install network plugin
