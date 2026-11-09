@@ -33,6 +33,7 @@ echo_content() {
 create_dirs() {
   mkdir -p "${REDIS_DATA}"
   mkdir -p "${REDIS_DATA}data"
+  mkdir -p "${REDIS_DATA}etc"
 }
 
 install_docker() {
@@ -53,14 +54,21 @@ install_redis() {
       fi
     done
 
+    cat >"${REDIS_DATA}etc/redis.conf" <<EOF
+port ${redis_port}
+requirepass "${redis_pass}"
+EOF
+    chown 999:999 "${REDIS_DATA}etc/redis.conf"
+    chmod 600 "${REDIS_DATA}etc/redis.conf"
+
     docker pull redis:6.2.13 &&
-      docker run -d --name ${redis_ip} --restart always \
+      docker run -d --name "${redis_ip}" --restart always \
         --network=host \
         -e TZ=Asia/Shanghai \
         -v "${REDIS_DATA}data:/data" \
         -v "${REDIS_DATA}etc:/usr/local/etc/redis" \
         redis:6.2.13 \
-        redis-server --requirepass "${redis_pass}" --port "${redis_port}"
+        redis-server /usr/local/etc/redis/redis.conf
 
     if [[ -n $(docker ps -q -f "name=^${redis_ip}$" -f "status=running") ]]; then
       echo_content skyBlue "---> Redis 安装完成"
