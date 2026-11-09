@@ -11,7 +11,7 @@ init_var() {
   # ShadowsocksR
   SSR_DATA="/dockerdata/ssr/"
   ssr_ip="jy-ssr"
-  ssr_port=80
+  ssr_port=8080
   ssr_password=""
   ssr_method=""
   ssr_protocols=""
@@ -89,8 +89,8 @@ install_ssr() {
   if [[ -z $(docker ps -aq -f "name=^${ssr_ip}$") ]]; then
     echo_content skyBlue "---> 安装 ShadowsocksR"
 
-    read -r -p "请输入ShadowsocksR的端口(默认:80): " ssr_port
-    [[ -z "${ssr_port}" ]] && ssr_port=80
+    read -r -p "请输入ShadowsocksR的端口(默认:8080): " ssr_port
+    [[ -z "${ssr_port}" ]] && ssr_port=8080
     while read -r -p "请输入ShadowsocksR的密码(必填): " ssr_password; do
       if [[ -z "${ssr_password}" ]]; then
         echo_content red "密码不能为空"
