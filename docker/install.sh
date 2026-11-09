@@ -268,7 +268,7 @@ install_docker() {
     ${package_manager} update -y
   fi
 
-  ${package_manager} install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+  ${package_manager} install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
   setup_docker
 

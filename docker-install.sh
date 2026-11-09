@@ -308,7 +308,9 @@ process_args() {
     show_help
     ;;
   *)
-    return 1
+    echo_content red "Unknown option: $1"
+    show_help
+    exit 1
     ;;
   esac
   return 0
