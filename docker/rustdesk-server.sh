@@ -52,6 +52,12 @@ install_rustdesk_bbr() {
       -v "${RUSTDESK_SERVER}data:/root" \
       rustdesk/rustdesk-server hbbr
 
+    if [[ -n $(docker ps -q -f "name=^${rustdesk_server_hbbr}$" -f "status=running") ]]; then
+      echo_content skyBlue "---> RustDesk Server hbbr 安装完成"
+    else
+      echo_content red "---> RustDesk Server hbbr 安装失败或运行异常,请尝试修复或卸载重装"
+      exit 1
+    fi
   else
     echo_content skyBlue "---> 你已经安装了 RustDesk Server hbbr"
   fi
@@ -69,6 +75,12 @@ install_rustdesk_hbbs() {
       -v "${RUSTDESK_SERVER}data:/root" \
       rustdesk/rustdesk-server hbbs
 
+    if [[ -n $(docker ps -q -f "name=^${rustdesk_server_hbbs}$" -f "status=running") ]]; then
+      echo_content skyBlue "---> RustDesk Server hbbs 安装完成"
+    else
+      echo_content red "---> RustDesk Server hbbs 安装失败或运行异常,请尝试修复或卸载重装"
+      exit 1
+    fi
   else
     echo_content skyBlue "---> 你已经安装了 RustDesk Server hbbs"
   fi
