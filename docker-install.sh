@@ -257,7 +257,6 @@ show_menu() {
 process_args() {
   case "$1" in
   docker)
-    prepare_environment
     install_docker_service "Docker Engine" "install.sh" "false"
     ;;
   buildx)
